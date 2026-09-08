@@ -23,9 +23,11 @@ A first-time user sets up prescribed tray count, current tray, interval and dail
 
 Onboarding/setup, current-state timer, persisted events, configurable prescribed goal, partial-day totals, correction timestamps, current tray/projection/manual change, completion, break/tray reminders with permission status, history/date browsing, basic statistics, dark/system theme, accessible touch targets and text scaling, local JSON backup/validated restore, CSV report, delete data, automated test/build/lint and emulator smoke. One plan and fixed per-tray interval; treatment-zone daily accounting. No predefined medical target presented as advice: input is labeled prescribed target, default merely editable example.
 
-## Later releases
+## Expanded v1.0 scope
 
-Beta: variable per-tray schedules, refinement/retainer phases, historical targets, notes/appointments, home widget + notification controls, encrypted portable backup, full calendar and charts, locale/RTL audit, physical/OEM reminder tests, usability sessions and battery profiling. v1: optional local photos/comparison/time-lapse, polished report/share, Wear OS companion prototype then production gate, translations, signed distribution/F-Droid feasibility. Optional user-controlled sync only after conflict/encryption design proves value; no mandatory backend. Do not promise all later candidates for v1.
+The requested v1.0 includes every MVP feature plus variable per-tray schedules, explicit adjustments, refinements and retention, preserved actual tray changes and historical targets, missing-interval corrections, widget and notification actions, snooze and appointment reminders, calendar/list history, notes/appointments, daily/weekly/monthly/per-tray reports and optional supportive streaks, encrypted complete portable backups, private progress photos/comparison/time-lapse, and a working Wear OS companion with Tile/complication and deterministic offline reconciliation. All are free. This supersedes the initial later-candidate/prototype scope.
+
+[Finite completion checklist](v1-checklist.md) distinguishes implementation, automated/emulator evidence and external acceptance. Existing schema1 backups and installed MVP databases must upgrade without destructive fallback. Phone records remain authoritative; uncertain/stale remote actions must be explicit and never silently rewrite history. Optional cloud sync is outside this release; no backend is added for watch communication. No diagnostic photo analysis or automatic treatment advancement.
 
 ## Differentiation
 

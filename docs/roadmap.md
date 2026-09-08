@@ -10,8 +10,12 @@ Highest risks/prototype early: time/DST/clock rollback and import invariants (#3
 
 MVP test entry requires a debug APK plus setup, tracking, corrections, explicit tray progression/completion, covered-time summaries, opted-in reminders and local backup/restore; build/lint/JVM checks and emulator smoke recorded. Real-user pilot remains gated by explicit physical-device checks and user consent. A compiled APK alone does not close device acceptance issues.
 
-New material audit findings get independent bounded issues with reproducer, impact, acceptance and dependencies. No endless speculative audit loops. Finish the requested MVP and retain clear open Beta/v1 work.
+New material audit findings get independent bounded issues with reproducer, impact, acceptance and dependencies. No endless speculative audit loops. Finish the expanded v1.0 checklist and retain evidence-based external acceptance gates.
 
 ## Audit additions
 
 #23 tracks hosted CI execution while the existing shared runner is offline. #24 records the discovered320dp/200% font navigation defect and its accepted adaptive-layout fix. See validation.md for exact local acceptance and remaining Beta gates.
+
+## Expanded v1.0 execution
+
+The 2026-09-08 continuation expands all remaining feature issues into production implementation scope, including #16 encrypted backup and #20 working watch companion rather than prototypes. [v1-checklist.md](v1-checklist.md) is the finite completion contract. Preserve closed Foundation/MVP work. Shared schema/migrations and action revision/ownership lead the critical path, followed by complete phone/watch journeys, portable data/media lifecycle and integrated validation. Device/pilot/signing/publication gates remain distinct and open without evidence. #23 currently has waiting run API576; runner repair ownership must be checked before any shared infrastructure mutation.
