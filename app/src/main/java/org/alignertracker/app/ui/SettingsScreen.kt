@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
@@ -17,8 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import org.alignertracker.app.R
 import org.alignertracker.app.domain.TreatmentPlan
@@ -41,6 +42,8 @@ fun SettingsScreen(
     onExport: (Boolean) -> Unit,
     onImport: () -> Unit,
     onDelete: () -> Unit,
+    onEncryptedExport: () -> Unit = {},
+    onEncryptedImport: () -> Unit = {},
 ) {
     var goal by
         rememberSaveable(plan?.dailyGoalMinutes) {
@@ -69,21 +72,22 @@ fun SettingsScreen(
                     R.string.goal_minutes,
                     numeric = true,
                     error = goalError,
+                    errorMessage = if (goalError) R.string.goal_invalid else null,
                     enabled = !busy && !plan.completed,
                 )
                 Text(stringResource(R.string.target_help))
-                if (goalError) ErrorText(R.string.goal_invalid)
                 Button(
                     onClick = {
-                        val value = goal.toIntOrNull()
+                        val value = parseUserInteger(goal)
                         goalError = value == null || value !in 1..1440
                         if (!goalError) onGoal(value!!)
                     },
                     enabled = !busy && !plan.completed,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                 ) {
                     Text(stringResource(R.string.save_target))
                 }
-                Text(stringResource(R.string.zone_value, plan.zoneId))
+                Text(stringResource(R.string.zone_value, readableZone(plan.zoneId)))
             }
         if (plan != null && !plan.completed)
             Section(R.string.reminder_heading) {
@@ -101,6 +105,8 @@ fun SettingsScreen(
                     R.string.break_delay,
                     numeric = true,
                     error = delayError,
+                    errorMessage =
+                        if (delayError) R.string.reminder_delay_invalid else null,
                     enabled = !busy,
                 )
                 ToggleRow(stringResource(R.string.tray_reminder), trayEnabled, !busy) {
@@ -113,10 +119,9 @@ fun SettingsScreen(
                     if (value && !exactAllowed) onRequestExact()
                 }
                 Text(stringResource(R.string.precise_help))
-                if (delayError) ErrorText(R.string.reminder_delay_invalid)
                 Button(
                     onClick = {
-                        val minutes = delay.toIntOrNull()
+                        val minutes = parseUserInteger(delay)
                         delayError = minutes == null || minutes !in 1..240
                         if (!delayError)
                             onReminders(
@@ -129,6 +134,7 @@ fun SettingsScreen(
                             )
                     },
                     enabled = !busy,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                 ) {
                     Text(stringResource(R.string.reminder_save))
                 }
@@ -180,6 +186,13 @@ fun SettingsScreen(
                     Text(stringResource(R.string.export_backup))
                 }
                 OutlinedButton(
+                    onClick = onEncryptedExport,
+                    enabled = !busy,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                ) {
+                    Text(stringResource(R.string.export_encrypted_backup))
+                }
+                OutlinedButton(
                     onClick = { onExport(true) },
                     enabled = !busy,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
@@ -193,6 +206,13 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
             ) {
                 Text(stringResource(R.string.import_backup))
+            }
+            OutlinedButton(
+                onClick = onEncryptedImport,
+                enabled = !busy,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+            ) {
+                Text(stringResource(R.string.import_encrypted_backup))
             }
             if (plan != null)
                 TextButton(
@@ -215,16 +235,23 @@ private fun ToggleRow(
     onChecked: (Boolean) -> Unit,
 ) {
     Row(
-        Modifier.fillMaxWidth().heightIn(min = 56.dp),
+        Modifier.fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .toggleable(
+                value = checked,
+                enabled = enabled,
+                role = Role.Switch,
+                onValueChange = onChecked,
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(label, Modifier.weight(1f))
         Switch(
             checked = checked,
-            onCheckedChange = onChecked,
+            onCheckedChange = null,
             enabled = enabled,
-            modifier = Modifier.semantics { contentDescription = label },
+            modifier = Modifier.clearAndSetSemantics {},
         )
     }
 }

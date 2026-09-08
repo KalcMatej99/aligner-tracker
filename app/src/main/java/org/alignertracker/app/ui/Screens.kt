@@ -29,11 +29,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.os.ConfigurationCompat
+import androidx.core.text.BidiFormatter
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -42,6 +48,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.Locale
 import kotlin.math.max
 import org.alignertracker.app.R
 import org.alignertracker.app.domain.DaySummary
@@ -96,13 +103,18 @@ internal fun Entry(
     @StringRes label: Int,
     numeric: Boolean = false,
     error: Boolean = false,
+    @StringRes errorMessage: Int? = null,
     enabled: Boolean = true,
 ) {
+    val message = errorMessage?.let { stringResource(it) }
     OutlinedTextField(
         value,
         onChange,
-        Modifier.fillMaxWidth(),
+        Modifier.fillMaxWidth().semantics {
+            if (error && message != null) this.error(message)
+        },
         label = { Text(stringResource(label)) },
+        supportingText = message?.let { { Text(it) } },
         singleLine = true,
         isError = error,
         enabled = enabled,
@@ -117,22 +129,106 @@ internal fun ErrorText(@StringRes error: Int) {
         stringResource(error),
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
     )
 }
 
 @Composable
 internal fun durationLabel(millis: Long): String {
     val minutes = max(0L, millis) / 60_000
-    return stringResource(R.string.duration_value, minutes / 60, minutes % 60)
+    val hours = minutes / 60
+    val remainingMinutes = minutes % 60
+    return if (hours == 0L) {
+        androidx.compose.ui.res.pluralStringResource(
+            R.plurals.duration_minutes,
+            remainingMinutes.toInt(),
+            remainingMinutes,
+        )
+    } else {
+        stringResource(
+            R.string.duration_hours_minutes,
+            androidx.compose.ui.res.pluralStringResource(
+                R.plurals.duration_hours,
+                hours.toInt(),
+                hours,
+            ),
+            androidx.compose.ui.res.pluralStringResource(
+                R.plurals.duration_minutes,
+                remainingMinutes.toInt(),
+                remainingMinutes,
+            ),
+        )
+    }
 }
 
-internal fun readableDate(date: LocalDate): String =
-    date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+internal fun formatDateForLocale(date: LocalDate, locale: Locale): String =
+    date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale))
 
-internal fun readableTime(at: Long, zone: ZoneId): String =
-    Instant.ofEpochMilli(at)
-        .atZone(zone)
-        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss XXX"))
+@Composable
+private fun currentLocale(): Locale =
+    ConfigurationCompat.getLocales(LocalConfiguration.current)[0] ?: Locale.getDefault()
+
+@Composable
+internal fun readableDate(date: LocalDate): String {
+    val locale = currentLocale()
+    return BidiFormatter.getInstance(locale).unicodeWrap(formatDateForLocale(date, locale))
+}
+
+@Composable
+internal fun readableTime(at: Long, zone: ZoneId): String {
+    val locale = currentLocale()
+    val zoned = Instant.ofEpochMilli(at).atZone(zone)
+    val dateTime =
+        zoned.format(
+            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale)
+        )
+    val offset =
+        if (zoned.offset == ZoneOffset.UTC) stringResource(R.string.utc_abbreviation)
+        else stringResource(R.string.utc_offset, zoned.offset.id)
+    val bidi = BidiFormatter.getInstance(locale)
+    return stringResource(
+        R.string.date_time_with_offset,
+        bidi.unicodeWrap(dateTime),
+        bidi.unicodeWrap(offset),
+    )
+}
+
+@Composable
+internal fun readableZone(zoneId: String): String =
+    BidiFormatter.getInstance(currentLocale()).unicodeWrap(zoneId)
+
+internal fun parseUserInteger(value: String): Int? {
+    val input = value.trim()
+    if (input.isEmpty()) return null
+    var result = 0
+    input.forEach { character ->
+        val digit = Character.digit(character, 10)
+        if (digit < 0 || result > (Int.MAX_VALUE - digit) / 10) return null
+        result = result * 10 + digit
+    }
+    return result
+}
+
+internal fun parseUserHours(value: String): Int? {
+    val normalized = StringBuilder()
+    var separatorSeen = false
+    value.trim().forEach { character ->
+        val digit = Character.digit(character, 10)
+        when {
+            digit >= 0 -> normalized.append(digit)
+            (character == '.' || character == ',' || character == '\u066B') && !separatorSeen -> {
+                normalized.append('.')
+                separatorSeen = true
+            }
+            else -> return null
+        }
+    }
+    if (normalized.isEmpty() || normalized.length > 8) return null
+    return runCatching {
+            (normalized.toString().toBigDecimal() * 60.toBigDecimal()).intValueExact()
+        }
+        .getOrNull()
+}
 
 @Composable
 fun OnboardingScreen(
@@ -155,11 +251,10 @@ fun OnboardingScreen(
                 val today = LocalDate.now(zoneId)
                 val first = LocalDate.parse(start.trim())
                 val trayDate = LocalDate.parse(currentStart.trim())
-                val trays = total.toInt()
-                val tray = current.toInt()
-                val days = interval.toInt()
-                val minutes =
-                    (goal.replace(',', '.').toBigDecimal() * 60.toBigDecimal()).intValueExact()
+                val trays = requireNotNull(parseUserInteger(total))
+                val tray = requireNotNull(parseUserInteger(current))
+                val days = requireNotNull(parseUserInteger(interval))
+                val minutes = requireNotNull(parseUserHours(goal))
                 require(
                     trays in 1..1000 && tray in 1..trays && days in 1..365 && minutes in 1..1440
                 )
@@ -211,7 +306,7 @@ fun OnboardingScreen(
             if (attempted && candidate == null) ErrorText(R.string.setup_invalid)
         }
         Section(R.string.setup_state) {
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
                     selected = wearing,
                     onClick = { wearing = true },
@@ -272,7 +367,7 @@ internal fun Totals(
 
 @Composable
 internal fun Metric(@StringRes title: Int, value: String) {
-    Column {
+    Column(Modifier.semantics(mergeDescendants = true) {}) {
         Text(
             stringResource(title),
             style = MaterialTheme.typography.labelLarge,
@@ -341,7 +436,7 @@ fun TodayScreen(
         }
         Text(stringResource(R.string.edit_hint))
         Text(
-            stringResource(R.string.zone_value, plan.zoneId),
+            stringResource(R.string.zone_value, readableZone(plan.zoneId)),
             style = MaterialTheme.typography.bodySmall,
         )
     }
@@ -414,7 +509,7 @@ fun ScheduleScreen(
                     Text(stringResource(R.string.future_more))
             }
         Text(
-            stringResource(R.string.zone_value, plan.zoneId),
+            stringResource(R.string.zone_value, readableZone(plan.zoneId)),
             style = MaterialTheme.typography.bodySmall,
         )
     }
@@ -466,6 +561,7 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                 },
                 R.string.history_date,
                 error = dateError,
+                errorMessage = if (dateError) R.string.date_invalid else null,
             )
             OutlinedButton(
                 onClick = {
@@ -477,7 +573,6 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
             ) {
                 Text(stringResource(R.string.go_to_date))
             }
-            if (dateError) ErrorText(R.string.date_invalid)
             if (summary.trackedMillis == 0L) Text(stringResource(R.string.no_tracking))
             Totals(summary, now, zone, date == today && !plan.completed)
         }
@@ -510,7 +605,7 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
             }
         }
         Text(
-            stringResource(R.string.zone_value, plan.zoneId),
+            stringResource(R.string.zone_value, readableZone(plan.zoneId)),
             style = MaterialTheme.typography.bodySmall,
         )
     }
@@ -577,7 +672,7 @@ fun ProgressScreen(snapshot: TrackerSnapshot, now: Instant) {
         }
         Text(stringResource(R.string.progress_goal_policy))
         Text(
-            stringResource(R.string.zone_value, plan.zoneId),
+            stringResource(R.string.zone_value, readableZone(plan.zoneId)),
             style = MaterialTheme.typography.bodySmall,
         )
     }
@@ -610,7 +705,7 @@ internal fun EditEventDialog(
                 Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text(stringResource(R.string.edit_event_body, zone.id))
+                Text(stringResource(R.string.edit_event_body, readableZone(zone.id)))
                 previous?.let {
                     Text(stringResource(R.string.previous_event, readableTime(it.at, zone)))
                 }
@@ -626,6 +721,7 @@ internal fun EditEventDialog(
                     },
                     R.string.event_timestamp,
                     error = invalid,
+                    errorMessage = if (invalid) R.string.timestamp_invalid else null,
                     enabled = !busy,
                 )
                 Entry(
@@ -638,7 +734,6 @@ internal fun EditEventDialog(
                     error = invalid,
                     enabled = !busy,
                 )
-                if (invalid) ErrorText(R.string.timestamp_invalid)
             }
         },
         confirmButton = {

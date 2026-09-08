@@ -52,7 +52,18 @@
     <string name="removed">Recorded out</string>
     <string name="covered">Tracked time</string>
     <string name="untracked">Untracked elapsed time</string>
-    <string name="duration_value">%1$d h %2$02d min</string>
+    <plurals name="duration_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <plurals name="duration_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <string name="duration_hours_minutes">%1$s, %2$s</string>
+    <string name="date_time_with_offset">%1$s (%2$s)</string>
+    <string name="utc_abbreviation" translatable="false">UTC</string>
+    <string name="utc_offset" translatable="false">UTC%1$s</string>
     <string name="goal_value">Current target: %1$s each day</string>
     <string name="coverage_note">Untracked hours are unknown, not missed wear. Today is still in progress.</string>
     <string name="zone_value">Daily accounting: %1$s</string>
@@ -124,10 +135,12 @@
     <string name="precise_settings">Allow precise alarms</string>
     <string name="reminder_limits">Android may delay reminders. Force-stopping the app prevents delivery until you reopen it. Reminders never change your tray or IN / OUT state.</string>
     <string name="data_heading">Your data, your copy</string>
-    <string name="data_help">Everything is saved locally. Exports are unencrypted and contain treatment history. Save them somewhere you trust; a document provider may upload them if you choose cloud storage.</string>
+    <string name="data_help">Everything is saved locally. JSON and CSV exports are unencrypted and contain treatment history; an encrypted backup is protected by the password you choose. Save exports somewhere you trust. A document provider may upload them if you choose cloud storage.</string>
     <string name="export_backup">Export JSON backup</string>
+    <string name="export_encrypted_backup">Export encrypted backup</string>
     <string name="export_csv">Export daily CSV report</string>
     <string name="import_backup">Restore JSON backup</string>
+    <string name="import_encrypted_backup">Restore encrypted backup</string>
     <string name="restore_heading">Review this backup</string>
     <string name="restore_summary">%1$d state changes · %2$s</string>
     <string name="restore_plan">Tray %1$d of %2$d · %3$s</string>

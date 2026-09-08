@@ -69,7 +69,7 @@ class TrackerScreensTest {
         compose.onNodeWithText("Put aligners in").performScrollTo().performClick()
         compose.runOnIdle { assertEquals(true, nextState) }
         compose.onNodeWithText("Untracked elapsed time").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithText("9 h 00 min").assertIsDisplayed()
+        compose.onNodeWithText("9 hours, 0 minutes").assertIsDisplayed()
     }
 
     @Test
