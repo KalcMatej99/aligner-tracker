@@ -1,0 +1,4 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="12dp" android:background="#E0F2F1">
+    <TextView android:id="@+id/widget_state" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:gravity="center" android:textColor="#003734" android:textSize="20sp" android:text="@string/widget_setup" />
+    <Button android:id="@+id/widget_action" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/widget_open" />
+</LinearLayout>

@@ -1,0 +1,7 @@
+# Encrypted portable envelope
+
+Envelope version 1 is binary: ASCII `ATBK`, version byte 1, big-endian 32-bit iteration count 600000, random 16-byte salt, random 12-byte nonce, AES-256-GCM ciphertext with 128-bit authentication tag. Entire header is authenticated additional data. PBKDF2-HMAC-SHA256 derives a 256-bit key from the password; JCA supplies both primitives. Fixed version/work factor and bounded input reject hostile parameter amplification before derivation. Every export generates fresh salt and nonce. Encryption runs away from the UI thread.
+
+The payload is the versioned logical portable archive, not a live database file. Complete payload validation precedes replacement. Password minimum is 12 characters for new exports; Unicode is supported. There is no server, password recovery, password storage or silent key generation. Losing the password makes that backup unrecoverable; the original installed data remains usable. Wrong passwords and authenticated-content corruption are intentionally one error because they cannot be distinguished reliably. A cancelled picker/import never replaces data. External exported copies remain user-owned after deletion.
+
+Primitive choice follows [Android cryptography guidance](https://developer.android.com/privacy-and-security/cryptography). Work factor follows [OWASP PBKDF2 guidance](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html). These references support the construction choices; automated tamper/round-trip tests do not constitute an independent cryptographic audit.

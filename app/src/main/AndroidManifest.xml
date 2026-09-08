@@ -14,5 +14,20 @@
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".controls.TrackerControlReceiver" android:exported="false" />
+        <receiver android:name=".controls.TrackerWidget" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/tracker_widget" />
+        </receiver>
+        <service android:name=".wear.WearListenerService" android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.REQUEST_RECEIVED" />
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/aligner/v1" />
+            </intent-filter>
+        </service>
+        <provider android:name="androidx.core.content.FileProvider" android:authorities="org.alignertracker.app.photos" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/photo_paths" />
+        </provider>
     </application>
 </manifest>

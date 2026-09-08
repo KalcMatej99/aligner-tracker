@@ -115,7 +115,7 @@ class TrackerScreensTest {
             .assertIsDisplayed()
         compose
             .onAllNodesWithText(
-                "0 complete days meet the current target, from 0 fully tracked days"
+                "0 complete days meet their recorded target, from 0 fully tracked days"
             )[0]
             .assertExists()
     }

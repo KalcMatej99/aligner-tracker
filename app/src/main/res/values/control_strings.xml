@@ -1,0 +1,14 @@
+<resources>
+<string name="widget_setup">Set up Aligner Tracker</string>
+<string name="widget_completed">Treatment completed</string>
+<string name="widget_in">Aligners IN</string>
+<string name="widget_out">Aligners OUT</string>
+<string name="widget_open">Open tracker</string>
+<string name="widget_take_out">Take out</string>
+<string name="widget_put_in">Put in</string>
+<string name="widget_description">Current recorded aligner state and a quick IN or OUT action.</string>
+<string name="reminder_snooze">Snooze 10 minutes</string>
+<string name="channel_appointments">Appointment reminders</string>
+<string name="reminder_appointment_title">Upcoming appointment</string>
+<string name="reminder_appointment_body">Open Aligner Tracker to review your appointment.</string>
+</resources>

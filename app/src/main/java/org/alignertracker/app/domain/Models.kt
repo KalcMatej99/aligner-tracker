@@ -36,7 +36,11 @@ data class TrackerSnapshot(
 )
 
 @Serializable
-enum class TrackingGapReason { CLOCK_DISCONTINUITY, MANUAL_CORRECTION, COMPLETED_PHASE_PAUSE }
+enum class TrackingGapReason {
+    CLOCK_DISCONTINUITY,
+    MANUAL_CORRECTION,
+    COMPLETED_PHASE_PAUSE,
+}
 
 @Serializable
 data class TrackingGap(
@@ -46,7 +50,12 @@ data class TrackingGap(
     val reason: TrackingGapReason = TrackingGapReason.CLOCK_DISCONTINUITY,
 )
 
-@Serializable enum class TreatmentPhaseKind { ALIGNER, REFINEMENT, RETENTION }
+@Serializable
+enum class TreatmentPhaseKind {
+    ALIGNER,
+    REFINEMENT,
+    RETENTION,
+}
 
 @Serializable
 data class TreatmentPhase(
@@ -95,11 +104,7 @@ data class TrayHistoryEntry(
 )
 
 @Serializable
-data class TargetHistoryEntry(
-    val id: Long = 0,
-    val effectiveFrom: String,
-    val goalMinutes: Int,
-)
+data class TargetHistoryEntry(val id: Long = 0, val effectiveFrom: String, val goalMinutes: Int)
 
 @Serializable
 data class TreatmentNote(
@@ -140,11 +145,25 @@ data class PhotoMetadata(
 
 @Serializable data class StateVersion(val generation: String = "", val revision: Long = 0)
 
-@Serializable enum class CommandSource { PHONE, WATCH }
+@Serializable
+enum class CommandSource {
+    PHONE,
+    WATCH,
+}
 
-@Serializable enum class CommandStatus { ACCEPTED, REJECTED }
+@Serializable
+enum class CommandStatus {
+    ACCEPTED,
+    REJECTED,
+}
 
-@Serializable enum class CommandRejection { STALE_GENERATION, STALE_REVISION, INVALID, COMPLETED }
+@Serializable
+enum class CommandRejection {
+    STALE_GENERATION,
+    STALE_REVISION,
+    INVALID,
+    COMPLETED,
+}
 
 @Serializable
 data class WearCommand(

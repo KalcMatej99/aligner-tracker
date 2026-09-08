@@ -2,6 +2,7 @@ package org.alignertracker.app.integration
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -44,6 +45,9 @@ class TrackerJourneyTest {
             .performTextReplacement("21.5")
         compose.onNodeWithText("Start tracking").performScrollTo().performClick()
         compose.waitUntil(10_000) { runBlocking { container.repository.snapshot().plan != null } }
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText("Take aligners out").fetchSemanticsNodes().isNotEmpty()
+        }
         compose.onNodeWithText("Take aligners out").performScrollTo().performClick()
         compose.waitUntil(10_000) {
             runBlocking { container.repository.snapshot().events.size == 2 }

@@ -31,6 +31,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -69,6 +70,9 @@ internal enum class Destination(val title: Int, val glyph: String) {
     HISTORY(R.string.history, "≡"),
     PROGRESS(R.string.progress, "↗"),
     SETTINGS(R.string.settings, ""),
+    PHOTOS(R.string.photos_title, ""),
+    DETAILS(R.string.treatment_details, ""),
+    JOURNAL(R.string.journal_title, ""),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,8 +90,13 @@ fun TrackerApp(model: TrackerViewModel) {
     var permissionEpoch by androidx.compose.runtime.remember { mutableIntStateOf(0) }
     var destinationName by rememberSaveable { mutableStateOf(Destination.TODAY.name) }
     val destination = Destination.valueOf(destinationName)
+    var moreExpanded by androidx.compose.runtime.remember { mutableStateOf(false) }
     var confirmation by rememberSaveable { mutableStateOf<String?>(null) }
     var editId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var passwordAction by rememberSaveable { mutableStateOf<String?>(null) }
+    var backupPassword by androidx.compose.runtime.remember { mutableStateOf("") }
+    var repeatPassword by androidx.compose.runtime.remember { mutableStateOf("") }
+    var passwordDocument by rememberSaveable { mutableStateOf<String?>(null) }
     val resolver = context.contentResolver
     val pickerFailure = stringResource(R.string.open_settings_failed)
     fun launchIntent(intent: Intent) {
@@ -100,7 +109,7 @@ fun TrackerApp(model: TrackerViewModel) {
         }
     val backupExport =
         rememberLauncherForActivityResult(
-            ActivityResultContracts.CreateDocument("application/json")
+            ActivityResultContracts.CreateDocument("application/zip")
         ) { uri ->
             uri?.let { model.export(resolver, it, false) }
         }
@@ -109,6 +118,22 @@ fun TrackerApp(model: TrackerViewModel) {
             ->
             uri?.let { model.export(resolver, it, true) }
         }
+    val encryptedExporter =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.CreateDocument("application/octet-stream")
+        ) { uri ->
+            if (uri != null) {
+                passwordDocument = uri.toString()
+                passwordAction = "export"
+            }
+        }
+    val encryptedImporter =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) {
+                passwordDocument = uri.toString()
+                passwordAction = "import"
+            }
+        }
     val importer =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             uri?.let { model.inspectImport(resolver, it) }
@@ -116,7 +141,12 @@ fun TrackerApp(model: TrackerViewModel) {
     fun openImport() {
         runCatching {
                 importer.launch(
-                    arrayOf("application/json", "text/plain", "application/octet-stream")
+                    arrayOf(
+                        "application/json",
+                        "application/zip",
+                        "text/plain",
+                        "application/octet-stream",
+                    )
                 )
             }
             .onFailure { model.reportError(pickerFailure) }
@@ -174,6 +204,29 @@ fun TrackerApp(model: TrackerViewModel) {
                         }
                 },
                 actions = {
+                    if (snapshot?.plan != null)
+                        Box {
+                            TextButton(onClick = { moreExpanded = true }) {
+                                Text(stringResource(R.string.more_features))
+                            }
+                            androidx.compose.material3.DropdownMenu(
+                                expanded = moreExpanded,
+                                onDismissRequest = { moreExpanded = false },
+                            ) {
+                                for (target in
+                                    listOf(
+                                        Destination.DETAILS,
+                                        Destination.JOURNAL,
+                                        Destination.PHOTOS,
+                                    )) androidx.compose.material3.DropdownMenuItem(
+                                    text = { Text(stringResource(target.title)) },
+                                    onClick = {
+                                        moreExpanded = false
+                                        destinationName = target.name
+                                    },
+                                )
+                            }
+                        }
                     if (snapshot != null && destination != Destination.SETTINGS)
                         TextButton(onClick = { destinationName = Destination.SETTINGS.name }) {
                             Text(stringResource(R.string.settings))
@@ -199,6 +252,7 @@ fun TrackerApp(model: TrackerViewModel) {
                         TrackerViewModel.Notice.RESTORED -> R.string.notice_restored
                         TrackerViewModel.Notice.DELETED -> R.string.notice_deleted
                         TrackerViewModel.Notice.REMINDER_RETRY -> R.string.notice_reminder_retry
+                        TrackerViewModel.Notice.CLEANUP_RETRY -> R.string.notice_cleanup_retry
                     }
                 TextButton(onClick = model::dismissMessage) { Text(stringResource(text)) }
             }
@@ -248,11 +302,35 @@ fun TrackerApp(model: TrackerViewModel) {
                                     )
                                 )
                         },
+                        appointmentChannelAllowed =
+                            context
+                                .getSystemService(android.app.NotificationManager::class.java)
+                                .getNotificationChannel(
+                                    org.alignertracker.app.reminders.ReminderScheduler
+                                        .APPOINTMENT_CHANNEL
+                                )
+                                ?.importance != android.app.NotificationManager.IMPORTANCE_NONE,
                         onGoal = model::updateGoal,
                         onReminders = model::updateReminders,
                         onExport = { confirmation = if (it) "exportCsv" else "exportBackup" },
                         onImport = ::openImport,
                         onDelete = { confirmation = "delete" },
+                        onEncryptedExport = {
+                            runCatching { encryptedExporter.launch("aligner-backup.atbk") }
+                                .onFailure { model.reportError(pickerFailure) }
+                        },
+                        onEncryptedImport = {
+                            runCatching {
+                                    encryptedImporter.launch(
+                                        arrayOf(
+                                            "application/octet-stream",
+                                            "application/zip",
+                                            "*/*",
+                                        )
+                                    )
+                                }
+                                .onFailure { model.reportError(pickerFailure) }
+                        },
                     )
                 } else if (state.plan == null) {
                     OnboardingScreen(busy, model::start, ::openImport)
@@ -271,11 +349,98 @@ fun TrackerApp(model: TrackerViewModel) {
                                 editId = it
                             }
                         Destination.PROGRESS ->
-                            ProgressScreen(state, now.truncatedTo(ChronoUnit.MINUTES))
+                            ReportsScreen(
+                                state,
+                                model,
+                                now.truncatedTo(ChronoUnit.MINUTES),
+                                preferences,
+                            )
+                        Destination.PHOTOS -> PhotosScreen(state, model, busy)
+                        Destination.DETAILS -> TreatmentDetailsScreen(state, model, busy)
+                        Destination.JOURNAL -> JournalScreen(state, model, busy)
                         Destination.SETTINGS -> Unit
                     }
             }
         }
+    }
+    passwordAction?.let { action ->
+        val exporting = action == "export"
+        AlertDialog(
+            onDismissRequest = {
+                passwordAction = null
+                backupPassword = ""
+                repeatPassword = ""
+            },
+            title = {
+                Text(
+                    stringResource(
+                        if (exporting) R.string.secure_export_title
+                        else R.string.secure_import_title
+                    )
+                )
+            },
+            text = {
+                Column(
+                    Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(stringResource(R.string.password_recovery_notice))
+                    OutlinedTextField(
+                        value = backupPassword,
+                        onValueChange = { backupPassword = it.take(1024) },
+                        label = { Text(stringResource(R.string.backup_password)) },
+                        visualTransformation =
+                            androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                        singleLine = true,
+                    )
+                    if (exporting)
+                        OutlinedTextField(
+                            value = repeatPassword,
+                            onValueChange = { repeatPassword = it.take(1024) },
+                            label = { Text(stringResource(R.string.repeat_password)) },
+                            visualTransformation =
+                                androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                            singleLine = true,
+                        )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled =
+                        if (exporting)
+                            backupPassword.length >= 12 && backupPassword == repeatPassword
+                        else backupPassword.isNotEmpty(),
+                    onClick = {
+                        val document = passwordDocument?.let(Uri::parse)
+                        val password = backupPassword.toCharArray()
+                        passwordAction = null
+                        passwordDocument = null
+                        backupPassword = ""
+                        repeatPassword = ""
+                        if (document != null) {
+                            if (exporting) model.export(resolver, document, false, password)
+                            else model.inspectImport(resolver, document, password)
+                        } else {
+                            password.fill('\u0000')
+                            model.reportError(pickerFailure)
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.continue_backup))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        passwordAction = null
+                        backupPassword = ""
+                        repeatPassword = ""
+                    }
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
     }
     val activeSnapshot = snapshot
     activeSnapshot
@@ -307,6 +472,15 @@ fun TrackerApp(model: TrackerViewModel) {
                             )
                     Text(
                         stringResource(R.string.restore_summary, restored.events.size, description)
+                    )
+                    Text(
+                        stringResource(
+                            R.string.restore_expanded_counts,
+                            restored.phases.size,
+                            restored.notes.size,
+                            restored.appointments.size,
+                            restored.photos.size,
+                        )
                     )
                     Text(stringResource(R.string.restore_warning))
                 }
@@ -372,7 +546,7 @@ fun TrackerApp(model: TrackerViewModel) {
                                 runCatching {
                                         if (action == "exportCsv")
                                             csvExport.launch("aligner-report.csv")
-                                        else backupExport.launch("aligner-backup.json")
+                                        else backupExport.launch("aligner-backup.zip")
                                     }
                                     .onFailure { model.reportError(pickerFailure) }
                         }
@@ -407,7 +581,8 @@ fun TrackerApp(model: TrackerViewModel) {
 /** Gives enlarged labels room without reducing the user's font scale or hiding destinations. */
 @Composable
 internal fun TrackerNavigation(destination: Destination, onNavigate: (Destination) -> Unit) {
-    val tabs = Destination.entries.filter { it != Destination.SETTINGS }
+    val tabs =
+        listOf(Destination.TODAY, Destination.SCHEDULE, Destination.HISTORY, Destination.PROGRESS)
     val fontScale = LocalDensity.current.fontScale
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         if (maxWidth / fontScale < 300.dp) {

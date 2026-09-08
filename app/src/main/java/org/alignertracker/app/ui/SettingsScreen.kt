@@ -44,6 +44,7 @@ fun SettingsScreen(
     onDelete: () -> Unit,
     onEncryptedExport: () -> Unit = {},
     onEncryptedImport: () -> Unit = {},
+    appointmentChannelAllowed: Boolean = true,
 ) {
     var goal by
         rememberSaveable(plan?.dailyGoalMinutes) {
@@ -76,6 +77,7 @@ fun SettingsScreen(
                     enabled = !busy && !plan.completed,
                 )
                 Text(stringResource(R.string.target_help))
+                Text(stringResource(R.string.watch_privacy))
                 Button(
                     onClick = {
                         val value = parseUserInteger(goal)
@@ -105,8 +107,7 @@ fun SettingsScreen(
                     R.string.break_delay,
                     numeric = true,
                     error = delayError,
-                    errorMessage =
-                        if (delayError) R.string.reminder_delay_invalid else null,
+                    errorMessage = if (delayError) R.string.reminder_delay_invalid else null,
                     enabled = !busy,
                 )
                 ToggleRow(stringResource(R.string.tray_reminder), trayEnabled, !busy) {
@@ -130,6 +131,7 @@ fun SettingsScreen(
                                     breakMinutes = minutes!!,
                                     trayEnabled = trayEnabled,
                                     precise = precise,
+                                    streaksEnabled = preferences.streaksEnabled,
                                 )
                             )
                     },
@@ -158,6 +160,16 @@ fun SettingsScreen(
                             else R.string.tray_channel_blocked
                         )
                     )
+                Text(
+                    stringResource(
+                        if (appointmentChannelAllowed) R.string.appointment_channel_allowed
+                        else R.string.appointment_channel_blocked
+                    )
+                )
+                if (!notificationsAllowed)
+                    TextButton(onClick = onRequestNotifications) {
+                        Text(stringResource(R.string.enable_notifications))
+                    }
                 TextButton(onClick = onOpenNotificationSettings) {
                     Text(stringResource(R.string.notifications_settings))
                 }

@@ -233,6 +233,44 @@ class ReminderSchedulerTest {
         assertTrue(scheduled().single().isAllowWhileIdle)
     }
 
+    @Test
+    fun `appointments retain independent notifications and snoozes in due order`() = runBlocking {
+        startBreak(ReminderPreferences())
+        val now = System.currentTimeMillis()
+        repository.addAppointment(
+            org.alignertracker.app.domain.Appointment(
+                startsAt = now + 60_000,
+                durationMinutes = 30,
+                title = "First",
+                reminderMinutesBefore = 5,
+            )
+        )
+        repository.addAppointment(
+            org.alignertracker.app.domain.Appointment(
+                startsAt = now + 120_000,
+                durationMinutes = 30,
+                title = "Second",
+                reminderMinutesBefore = 5,
+            )
+        )
+        scheduler.reconcile()
+        val first = payload("appointment")
+        deliver(first)
+        assertEquals(1, shadowOf(notifications).size())
+        val second = payload("appointment")
+        assertNotEquals(first.getStringExtra("key"), second.getStringExtra("key"))
+        scheduler.snooze("appointment", requireNotNull(first.getStringExtra("key")))
+        assertEquals(second.getStringExtra("key"), payload("appointment").getStringExtra("key"))
+        deliver(second)
+        assertEquals(1, shadowOf(notifications).size())
+        scheduler.snooze("appointment", requireNotNull(second.getStringExtra("key")))
+        val snoozedFirst = payload("appointment").getStringExtra("key")!!
+        assertTrue(snoozedFirst.startsWith(first.getStringExtra("key")!! + ":snooze:"))
+        assertTrue(shadowOf(notifications).allNotifications.isEmpty())
+        scheduler.cancelAll()
+        assertTrue(scheduled().isEmpty())
+    }
+
     private suspend fun startBreak(
         preferences: ReminderPreferences = ReminderPreferences(enabled = true, breakMinutes = 1)
     ) {

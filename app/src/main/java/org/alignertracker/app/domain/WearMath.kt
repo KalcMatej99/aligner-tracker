@@ -11,6 +11,29 @@ object WearMath {
     fun nextChangeDate(plan: TreatmentPlan): LocalDate =
         LocalDate.parse(plan.currentTrayStartedOn).plusDays(plan.daysPerTray.toLong())
 
+    fun futureTrayStarts(snapshot: TrackerSnapshot, limit: Int = 12): List<Pair<Int, LocalDate>> {
+        val plan = snapshot.plan ?: return emptyList()
+        if (plan.completed) return emptyList()
+        val phase = snapshot.phases.singleOrNull { it.active }
+        val revision =
+            snapshot.scheduleRevisions
+                .filter { it.phaseId == phase?.id }
+                .maxWithOrNull(compareBy<ScheduleRevision> { it.createdAt }.thenBy { it.id })
+        var start = nextChangeDate(snapshot)
+        return (plan.currentTray + 1..minOf(plan.totalTrays, plan.currentTray + limit)).map { tray
+            ->
+            val row = tray to start
+            val days =
+                snapshot.trayIntervals
+                    .singleOrNull {
+                        it.scheduleRevisionId == revision?.id && tray in it.firstTray..it.lastTray
+                    }
+                    ?.daysPerTray ?: plan.daysPerTray
+            start = start.plusDays(days.toLong())
+            row
+        }
+    }
+
     fun nextChangeDate(snapshot: TrackerSnapshot): LocalDate {
         val plan = checkNotNull(snapshot.plan) { "Set up a treatment first." }
         val openTray = snapshot.trayHistory.singleOrNull { it.endedOn == null }
@@ -22,11 +45,14 @@ object WearMath {
                     .maxWithOrNull(compareBy<ScheduleRevision> { it.createdAt }.thenBy { it.id })
             }
         val currentDays =
-            revision?.let { current ->
-                snapshot.trayIntervals.singleOrNull {
-                    it.scheduleRevisionId == current.id && plan.currentTray in it.firstTray..it.lastTray
+            revision
+                ?.let { current ->
+                    snapshot.trayIntervals.singleOrNull {
+                        it.scheduleRevisionId == current.id &&
+                            plan.currentTray in it.firstTray..it.lastTray
+                    }
                 }
-            }?.daysPerTray ?: plan.daysPerTray
+                ?.daysPerTray ?: plan.daysPerTray
         return LocalDate.parse(openTray?.startedOn ?: plan.currentTrayStartedOn)
             .plusDays(currentDays.toLong())
     }
@@ -70,10 +96,17 @@ object WearMath {
                     (minOf(intervalEnd, gap.endAt) - maxOf(intervalStart, gap.startAt))
                         .coerceAtLeast(0)
                 }
-            val duration = ((intervalEnd - intervalStart).coerceAtLeast(0) - obscured).coerceAtLeast(0)
+            val duration =
+                ((intervalEnd - intervalStart).coerceAtLeast(0) - obscured).coerceAtLeast(0)
             if (event.wearing) worn += duration else removed += duration
             index++
         }
-        return DaySummary(date.toString(), worn, removed, worn + removed, targetForDate(snapshot, date))
+        return DaySummary(
+            date.toString(),
+            worn,
+            removed,
+            worn + removed,
+            targetForDate(snapshot, date),
+        )
     }
 }

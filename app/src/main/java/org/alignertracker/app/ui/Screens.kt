@@ -110,9 +110,7 @@ internal fun Entry(
     OutlinedTextField(
         value,
         onChange,
-        Modifier.fillMaxWidth().semantics {
-            if (error && message != null) this.error(message)
-        },
+        Modifier.fillMaxWidth().semantics { if (error && message != null) this.error(message) },
         label = { Text(stringResource(label)) },
         supportingText = message?.let { { Text(it) } },
         singleLine = true,
@@ -179,9 +177,7 @@ internal fun readableTime(at: Long, zone: ZoneId): String {
     val locale = currentLocale()
     val zoned = Instant.ofEpochMilli(at).atZone(zone)
     val dateTime =
-        zoned.format(
-            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale)
-        )
+        zoned.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale))
     val offset =
         if (zoned.offset == ZoneOffset.UTC) stringResource(R.string.utc_abbreviation)
         else stringResource(R.string.utc_offset, zoned.offset.id)
@@ -402,10 +398,13 @@ fun TodayScreen(
             else {
                 snapshot.events.lastOrNull()?.let { event ->
                     Text(
-                        stringResource(
-                            R.string.current_duration,
-                            durationLabel(now.toEpochMilli() - event.at),
-                        ),
+                        if (snapshot.trackingGaps.any { it.endAt > event.at })
+                            stringResource(R.string.clock_duration_uncertain)
+                        else
+                            stringResource(
+                                R.string.current_duration,
+                                durationLabel(now.toEpochMilli() - event.at),
+                            ),
                         style = MaterialTheme.typography.headlineSmall,
                     )
                     Text(
@@ -430,9 +429,7 @@ fun TodayScreen(
         Section(R.string.today_summary) {
             Totals(summary, now, zone, !plan.completed)
             HorizontalDivider()
-            Text(
-                stringResource(R.string.goal_value, durationLabel(plan.dailyGoalMinutes * 60_000L))
-            )
+            Text(stringResource(R.string.goal_value, durationLabel(summary.goalMinutes * 60_000L)))
         }
         Text(stringResource(R.string.edit_hint))
         Text(
@@ -450,7 +447,7 @@ fun ScheduleScreen(
     onComplete: () -> Unit,
 ) {
     val plan = snapshot.plan ?: return
-    val due = WearMath.nextChangeDate(plan)
+    val due = WearMath.nextChangeDate(snapshot)
     ScreenColumn {
         Heading(R.string.plan_heading)
         Section(R.string.schedule) {
@@ -491,19 +488,8 @@ fun ScheduleScreen(
         }
         if (!plan.completed && plan.currentTray < plan.totalTrays)
             Section(R.string.future_schedule) {
-                (plan.currentTray + 1..minOf(plan.totalTrays, plan.currentTray + 12)).forEach { tray
-                    ->
-                    Text(
-                        stringResource(
-                            R.string.future_tray,
-                            tray,
-                            readableDate(
-                                due.plusDays(
-                                    (tray - plan.currentTray - 1).toLong() * plan.daysPerTray
-                                )
-                            ),
-                        )
-                    )
+                WearMath.futureTrayStarts(snapshot).forEach { (tray, startDate) ->
+                    Text(stringResource(R.string.future_tray, tray, readableDate(startDate)))
                 }
                 if (plan.totalTrays > plan.currentTray + 12)
                     Text(stringResource(R.string.future_more))
@@ -656,9 +642,7 @@ fun ProgressScreen(snapshot: TrackerSnapshot, now: Instant) {
                         Text(
                             stringResource(
                                 R.string.full_days,
-                                fullyTracked.count {
-                                    it.wornMillis >= plan.dailyGoalMinutes * 60_000L
-                                },
+                                fullyTracked.count { it.wornMillis >= it.goalMinutes * 60_000L },
                                 fullyTracked.size,
                             )
                         )

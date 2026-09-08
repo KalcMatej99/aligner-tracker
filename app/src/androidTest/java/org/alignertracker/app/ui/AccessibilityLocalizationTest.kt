@@ -133,12 +133,7 @@ class AccessibilityLocalizationTest {
             CompositionLocalProvider(LocalDensity provides Density(density, fontScale = 2f)) {
                 AlignerTheme {
                     Box(Modifier.width(640.dp).height(320.dp)) {
-                        TodayScreen(
-                            example(),
-                            Instant.parse("2026-09-08T12:00:00Z"),
-                            false,
-                            {},
-                        )
+                        TodayScreen(example(), Instant.parse("2026-09-08T12:00:00Z"), false, {})
                     }
                 }
             }
@@ -176,16 +171,12 @@ class AccessibilityLocalizationTest {
             }
         }
 
-        compose
-            .onNodeWithText("Prescribed daily target in minutes")
-            .performTextReplacement("0")
+        compose.onNodeWithText("Prescribed daily target in minutes").performTextReplacement("0")
         compose.onNodeWithText("Update target").performScrollTo().performClick()
         compose
             .onNodeWithText("Prescribed daily target in minutes")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
-        compose
-            .onNodeWithText("Enter a whole number from 1 to 1440 minutes.")
-            .assertIsDisplayed()
+        compose.onNodeWithText("Enter a whole number from 1 to 1440 minutes.").assertIsDisplayed()
     }
 
     @Test
@@ -194,12 +185,7 @@ class AccessibilityLocalizationTest {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 AlignerTheme {
                     Box(Modifier.width(320.dp).height(480.dp)) {
-                        HistoryScreen(
-                            example(),
-                            Instant.parse("2026-09-08T12:00:00Z"),
-                            false,
-                            {},
-                        )
+                        HistoryScreen(example(), Instant.parse("2026-09-08T12:00:00Z"), false, {})
                     }
                 }
             }

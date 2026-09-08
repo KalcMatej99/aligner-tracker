@@ -17,13 +17,15 @@ class ReminderReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 withTimeout(8000) {
-                    (context.applicationContext as TrackerApplication)
-                        .container
-                        .reminderScheduler
-                        .handleAlarm(
-                            intent.getStringExtra("kind") ?: "",
-                            intent.getStringExtra("key") ?: "",
-                        )
+                    val scheduler =
+                        (context.applicationContext as TrackerApplication)
+                            .container
+                            .reminderScheduler
+                    val kind = intent.getStringExtra("kind") ?: ""
+                    val key = intent.getStringExtra("key") ?: ""
+                    if (intent.action == "org.alignertracker.app.SNOOZE")
+                        scheduler.snooze(kind, key)
+                    else scheduler.handleAlarm(kind, key)
                 }
             } catch (_: Exception) {
                 ReminderScheduler.enqueueRecovery(context)

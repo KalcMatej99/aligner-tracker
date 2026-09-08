@@ -25,6 +25,8 @@ class MainActivity : ComponentActivity() {
                             container.repository,
                             container.reminderSettings,
                             container.reminderScheduler,
+                            container.photoStore,
+                            container.clockGuard,
                         )
                             as T
                 },
