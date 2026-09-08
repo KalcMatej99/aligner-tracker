@@ -22,17 +22,13 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -359,7 +355,7 @@ fun TrackerApp(model: TrackerViewModel) {
     }
     passwordAction?.let { action ->
         val exporting = action == "export"
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = {
                 passwordAction = null
                 backupPassword = ""
@@ -374,12 +370,9 @@ fun TrackerApp(model: TrackerViewModel) {
                 )
             },
             text = {
-                Column(
-                    Modifier.verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(stringResource(R.string.password_recovery_notice))
-                    OutlinedTextField(
+                    TrackerTextField(
                         value = backupPassword,
                         onValueChange = { backupPassword = it.take(1024) },
                         label = { Text(stringResource(R.string.backup_password)) },
@@ -388,7 +381,7 @@ fun TrackerApp(model: TrackerViewModel) {
                         singleLine = true,
                     )
                     if (exporting)
-                        OutlinedTextField(
+                        TrackerTextField(
                             value = repeatPassword,
                             onValueChange = { repeatPassword = it.take(1024) },
                             label = { Text(stringResource(R.string.repeat_password)) },
@@ -446,14 +439,11 @@ fun TrackerApp(model: TrackerViewModel) {
             }
         }
     pendingRestore?.let { restored ->
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = { if (!busy) model.cancelImport() },
             title = { Text(stringResource(R.string.restore_heading)) },
             text = {
-                Column(
-                    Modifier.verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     val plan = restored.plan
                     val description =
                         if (plan == null) stringResource(R.string.restore_empty)
@@ -520,10 +510,10 @@ fun TrackerApp(model: TrackerViewModel) {
                 "delete" -> R.string.confirm_delete
                 else -> R.string.choose_location
             }
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = { if (!busy) confirmation = null },
             title = { Text(title) },
-            text = { Text(stringResource(body), Modifier.verticalScroll(rememberScrollState())) },
+            text = { Text(stringResource(body)) },
             confirmButton = {
                 TextButton(
                     enabled = !busy,
@@ -557,15 +547,10 @@ fun TrackerApp(model: TrackerViewModel) {
         )
     }
     if (error != null)
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = model::dismissMessage,
             title = { Text(stringResource(R.string.error_title)) },
-            text = {
-                Text(
-                    stringResource(R.string.error_detail, error!!),
-                    Modifier.verticalScroll(rememberScrollState()),
-                )
-            },
+            text = { Text(stringResource(R.string.error_detail, error!!)) },
             confirmButton = {
                 TextButton(onClick = model::dismissMessage) { Text(stringResource(R.string.close)) }
             },

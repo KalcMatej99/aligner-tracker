@@ -83,7 +83,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         }
         item { Text(stringResource(R.string.photos_private)) }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 date,
                 { date = it },
                 label = { Text(stringResource(R.string.photo_date)) },
@@ -93,7 +93,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         }
         if (!validDate) item { FormFeedback(R.string.photo_date_invalid) }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 caption,
                 { caption = it.take(1000) },
                 label = { Text(stringResource(R.string.photo_caption)) },
@@ -199,7 +199,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         }
     }
     if (exportPreview)
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = { exportPreview = false },
             title = { Text(stringResource(R.string.photo_timelapse)) },
             text = { Text(stringResource(R.string.photo_export_notice, selected.size)) },
@@ -220,7 +220,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
             },
         )
     deleteId?.let { id ->
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = { deleteId = null },
             title = { Text(stringResource(R.string.photo_delete)) },
             text = { Text(stringResource(R.string.photo_delete_notice)) },

@@ -57,7 +57,7 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
         )
         Text(stringResource(R.string.schedule_instructions))
         if (active != null && snapshot.plan?.completed == false) {
-            OutlinedTextField(
+            TrackerTextField(
                 intervals,
                 { intervals = it },
                 modifier = Modifier.fillMaxWidth(),
@@ -66,7 +66,7 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
                 isError = parsed == null,
             )
             if (parsed == null) FormFeedback(R.string.schedule_format_invalid)
-            OutlinedTextField(
+            TrackerTextField(
                 reason,
                 { reason = it.take(1000) },
                 modifier = Modifier.fillMaxWidth(),
@@ -86,7 +86,7 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
             modifier = Modifier.semantics { heading() },
         )
         Text(stringResource(R.string.phase_instructions))
-        OutlinedTextField(
+        TrackerTextField(
             phaseName,
             { phaseName = it.take(100) },
             modifier = Modifier.fillMaxWidth(),
@@ -105,13 +105,13 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
                 )
             },
         )
-        OutlinedTextField(
+        TrackerTextField(
             count,
             { count = it },
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.phase_count)) },
         )
-        OutlinedTextField(
+        TrackerTextField(
             days,
             { days = it },
             modifier = Modifier.fillMaxWidth(),
@@ -158,7 +158,7 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
         }
     }
     confirm?.let { action ->
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = { confirm = null },
             title = {
                 Text(

@@ -5,8 +5,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -57,7 +55,7 @@ fun ReportsScreen(
         item { Text(stringResource(R.string.reports_rules)) }
         item {
             Column {
-                for (row in listOf(1, 7, 30, 0).chunked(2)) Row(
+                for (row in listOf(1, 7, 30, 0).chunked(2)) FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     for (period in row) FilterChip(
@@ -169,11 +167,11 @@ fun ReportsScreen(
         }
     }
     if (preview)
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = { preview = false },
             title = { Text(stringResource(R.string.preview_report)) },
             text = {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
+                Column {
                     Text(stringResource(R.string.report_export_notice))
                     Text(
                         stringResource(

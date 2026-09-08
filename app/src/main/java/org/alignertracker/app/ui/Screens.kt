@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -20,7 +19,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -107,7 +105,7 @@ internal fun Entry(
     enabled: Boolean = true,
 ) {
     val message = errorMessage?.let { stringResource(it) }
-    OutlinedTextField(
+    TrackerTextField(
         value,
         onChange,
         Modifier.fillMaxWidth().semantics { if (error && message != null) this.error(message) },
@@ -681,14 +679,11 @@ internal fun EditEventDialog(
     val index = snapshot.events.indexOfFirst { it.id == event.id }
     val previous = snapshot.events.getOrNull(index - 1)
     val following = snapshot.events.getOrNull(index + 1)
-    AlertDialog(
+    TrackerDialog(
         onDismissRequest = { if (!busy) onDismiss() },
         title = { Text(stringResource(R.string.edit_event_title)) },
         text = {
-            Column(
-                Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(stringResource(R.string.edit_event_body, readableZone(zone.id)))
                 previous?.let {
                     Text(stringResource(R.string.previous_event, readableTime(it.at, zone)))
