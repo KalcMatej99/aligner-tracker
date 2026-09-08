@@ -6,7 +6,19 @@
 
 The coordinator prepares the installable **phone** APK, an immutable copy and source/hash/signer manifest, a validated synthetic history fixture and expected totals, and non-personal sample images. Use the verified artifact, not an arbitrary later CI build. Record exact app version, source commit, APK SHA-256 and signing-certificate SHA-256. A debug build is an internal test build, not a release.
 
-The accepted hosted build in [#23](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/23#issuecomment-5242) used certificate SHA-256 `41977c26cc7d423a2b7120fcb857ec9a08cf90306aaf86981a09c8cb072a2518`; the local debug signer differs. A filename/version match does not establish update compatibility. The coordinator must settle a stable internal-test signing/delivery path before tomorrow's install. No release key or publication is authorized by this checklist.
+Use the persistent local Android **debug test key** for the owner's test series: certificate SHA-256
+`f6d5455d1cf388c655c3bd3fbc66982ba8d31977ecdc639b899052c928c1f455`.
+The coordinator preserves the exact tested APK and manifest outside expiring CI artifacts. Hosted
+jobs generate their own temporary debug keys, so their APKs are CI evidence and cannot be assumed
+compatible updates for this test series. Both come from the same final source. No key file is
+included in the test bundle, and no release key or publication is authorized by this checklist.
+A filename/version match does not establish update compatibility.
+
+The prepared [synthetic fixture and expected results](../app/src/test/resources/pixel/README.md)
+include schema-2 and legacy JSON, a deliberately invalid backup, two non-personal image samples,
+exact historical totals, and concrete midnight/missing-interval correction values. These files are
+validated by the application importer in `PixelAcceptanceFixtureTest`. The final test-bundle path,
+APK hash and successful hosted workflow are recorded in #23 when integration completes.
 
 At the session, identify the intended Pixel and current Android/GrapheneOS build, patch level, locale, time zone and app installation state. Inspect an existing app's signer before `adb install -r`. If it differs, **stop the update and resolve artifact/signing compatibility; do not uninstall the owner's app or clear its data to fix the mismatch**. Preserve the working install. Never install an instrumentation/test APK as the phone app.
 

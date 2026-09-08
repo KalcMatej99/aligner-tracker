@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "plan": {
+    "id": 1,
+    "startDate": "2026-09-01",
+    "totalTrays": 4,
+    "currentTray": 1,
+    "daysPerTray": 7,
+    "currentTrayStartedOn": "2026-09-01",
+    "dailyGoalMinutes": 1320,
+    "zoneId": "Europe/Rome",
+    "trackingStartedAt": 1788256800000,
+    "completed": false,
+    "completedAt": null
+  },
+  "events": [
+    {
+      "id": 1,
+      "at": 1788256800000,
+      "wearing": true
+    },
+    {
+      "id": 2,
+      "at": 1788260400000,
+      "wearing": false
+    },
+    {
+      "id": 3,
+      "at": 1788262200000,
+      "wearing": true
+    }
+  ]
+}

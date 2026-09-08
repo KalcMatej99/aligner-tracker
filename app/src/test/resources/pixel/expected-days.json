@@ -1,0 +1,58 @@
+[
+  {
+    "date": "2026-09-01",
+    "wornMillis": 41400000,
+    "removedMillis": 1800000,
+    "trackedMillis": 43200000,
+    "goalMinutes": 1320
+  },
+  {
+    "date": "2026-09-02",
+    "wornMillis": 82800000,
+    "removedMillis": 3600000,
+    "trackedMillis": 86400000,
+    "goalMinutes": 1320
+  },
+  {
+    "date": "2026-09-03",
+    "wornMillis": 85800000,
+    "removedMillis": 600000,
+    "trackedMillis": 86400000,
+    "goalMinutes": 1320
+  },
+  {
+    "date": "2026-09-04",
+    "wornMillis": 85800000,
+    "removedMillis": 600000,
+    "trackedMillis": 86400000,
+    "goalMinutes": 1320
+  },
+  {
+    "date": "2026-09-05",
+    "wornMillis": 84600000,
+    "removedMillis": 1800000,
+    "trackedMillis": 86400000,
+    "goalMinutes": 1200
+  },
+  {
+    "date": "2026-09-06",
+    "wornMillis": 79200000,
+    "removedMillis": 0,
+    "trackedMillis": 79200000,
+    "goalMinutes": 1200
+  },
+  {
+    "date": "2026-09-07",
+    "wornMillis": 81000000,
+    "removedMillis": 5400000,
+    "trackedMillis": 86400000,
+    "goalMinutes": 1200
+  },
+  {
+    "date": "2026-09-08",
+    "wornMillis": 84600000,
+    "removedMillis": 1800000,
+    "trackedMillis": 86400000,
+    "goalMinutes": 1200
+  }
+]

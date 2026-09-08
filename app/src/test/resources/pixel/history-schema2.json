@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 2,
+  "plan": {
+    "id": 1,
+    "startDate": "2026-09-01",
+    "totalTrays": 4,
+    "currentTray": 2,
+    "daysPerTray": 10,
+    "currentTrayStartedOn": "2026-09-04",
+    "dailyGoalMinutes": 1200,
+    "zoneId": "Europe/Rome",
+    "trackingStartedAt": 1788256800000,
+    "completed": false,
+    "completedAt": null
+  },
+  "events": [
+    {
+      "id": 1,
+      "at": 1788256800000,
+      "wearing": true
+    },
+    {
+      "id": 2,
+      "at": 1788260400000,
+      "wearing": false
+    },
+    {
+      "id": 3,
+      "at": 1788262200000,
+      "wearing": true
+    },
+    {
+      "id": 4,
+      "at": 1788343200000,
+      "wearing": false
+    },
+    {
+      "id": 5,
+      "at": 1788346800000,
+      "wearing": true
+    },
+    {
+      "id": 6,
+      "at": 1788472200000,
+      "wearing": false
+    },
+    {
+      "id": 7,
+      "at": 1788473400000,
+      "wearing": true
+    },
+    {
+      "id": 8,
+      "at": 1788602400000,
+      "wearing": false
+    },
+    {
+      "id": 9,
+      "at": 1788604200000,
+      "wearing": true
+    },
+    {
+      "id": 10,
+      "at": 1788775200000,
+      "wearing": false
+    },
+    {
+      "id": 11,
+      "at": 1788780600000,
+      "wearing": true
+    },
+    {
+      "id": 12,
+      "at": 1788861600000,
+      "wearing": false
+    },
+    {
+      "id": 13,
+      "at": 1788863400000,
+      "wearing": true
+    }
+  ],
+  "phases": [
+    {
+      "id": 1,
+      "kind": "ALIGNER",
+      "ordinal": 1,
+      "name": "SYNTHETIC Pixel acceptance",
+      "totalTrays": 4,
+      "startedOn": "2026-09-01",
+      "completedOn": null,
+      "active": true
+    }
+  ],
+  "scheduleRevisions": [
+    {
+      "id": 1,
+      "phaseId": 1,
+      "createdAt": 1788256800000,
+      "reason": "Synthetic original schedule"
+    },
+    {
+      "id": 2,
+      "phaseId": 1,
+      "createdAt": 1788516000000,
+      "reason": "Synthetic explicit schedule adjustment"
+    }
+  ],
+  "trayIntervals": [
+    {
+      "id": 1,
+      "scheduleRevisionId": 1,
+      "firstTray": 1,
+      "lastTray": 4,
+      "daysPerTray": 7
+    },
+    {
+      "id": 2,
+      "scheduleRevisionId": 2,
+      "firstTray": 1,
+      "lastTray": 1,
+      "daysPerTray": 7
+    },
+    {
+      "id": 3,
+      "scheduleRevisionId": 2,
+      "firstTray": 2,
+      "lastTray": 4,
+      "daysPerTray": 10
+    }
+  ],
+  "trayHistory": [
+    {
+      "id": 1,
+      "phaseId": 1,
+      "trayNumber": 1,
+      "startedOn": "2026-09-01",
+      "endedOn": "2026-09-04",
+      "scheduleRevisionId": 1,
+      "prescribedDays": 7,
+      "startedAt": 1788256800000,
+      "endedAt": 1788516000000
+    },
+    {
+      "id": 2,
+      "phaseId": 1,
+      "trayNumber": 2,
+      "startedOn": "2026-09-04",
+      "endedOn": null,
+      "scheduleRevisionId": 2,
+      "prescribedDays": 10,
+      "startedAt": 1788516000000,
+      "endedAt": null
+    }
+  ],
+  "targetHistory": [
+    {
+      "id": 1,
+      "effectiveFrom": "2026-09-01",
+      "goalMinutes": 1320
+    },
+    {
+      "id": 2,
+      "effectiveFrom": "2026-09-05",
+      "goalMinutes": 1200
+    }
+  ],
+  "notes": [
+    {
+      "id": 1,
+      "occurredAt": 1788451200000,
+      "text": "SYNTHETIC note: use disposable records only.",
+      "phaseId": 1,
+      "trayHistoryId": 1,
+      "createdAt": 1788451200000,
+      "updatedAt": 1788451200000
+    }
+  ],
+  "appointments": [
+    {
+      "id": 1,
+      "startsAt": 1788958800000,
+      "durationMinutes": 30,
+      "title": "SYNTHETIC appointment",
+      "note": "Example only. Change to a short future reminder during testing.",
+      "reminderMinutesBefore": null,
+      "completed": false
+    }
+  ],
+  "photos": [],
+  "trackingGaps": [
+    {
+      "id": 1,
+      "startAt": 1788688800000,
+      "endAt": 1788696000000,
+      "reason": "MANUAL_CORRECTION"
+    }
+  ]
+}
