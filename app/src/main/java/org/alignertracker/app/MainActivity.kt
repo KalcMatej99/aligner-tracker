@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
                             container.reminderScheduler,
                             container.photoStore,
                             container.clockGuard,
+                            org.alignertracker.app.ui.ResourceUserErrorText(applicationContext),
                         )
                             as T
                 },

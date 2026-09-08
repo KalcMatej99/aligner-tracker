@@ -30,6 +30,7 @@ class TrackerViewModel(
     private val scheduler: ReminderScheduler,
     private val photoStore: PhotoStore? = null,
     private val clockGuard: org.alignertracker.app.data.ClockGuard? = null,
+    private val errorText: UserErrorText? = null,
 ) : ViewModel() {
     private val _snapshot = MutableStateFlow<TrackerSnapshot?>(null)
     val snapshot: StateFlow<TrackerSnapshot?> = _snapshot
@@ -66,7 +67,10 @@ class TrackerViewModel(
                 repository.snapshots.collect { _snapshot.value = it }
             } catch (exception: Exception) {
                 if (exception is CancellationException) throw exception
-                _error.value = exception.message ?: exception.javaClass.simpleName
+                _error.value =
+                    errorText?.message(exception)
+                        ?: exception.message
+                        ?: exception.javaClass.simpleName
             }
         }
         viewModelScope.launch {
@@ -74,7 +78,10 @@ class TrackerViewModel(
                 settings.preferences.collect { _preferences.value = it }
             } catch (exception: Exception) {
                 if (exception is CancellationException) throw exception
-                _error.value = exception.message ?: exception.javaClass.simpleName
+                _error.value =
+                    errorText?.message(exception)
+                        ?: exception.message
+                        ?: exception.javaClass.simpleName
             }
         }
     }
@@ -101,7 +108,10 @@ class TrackerViewModel(
                 reconcileSafely()
             } catch (exception: Exception) {
                 if (exception is CancellationException) throw exception
-                _error.value = exception.message ?: exception.javaClass.simpleName
+                _error.value =
+                    errorText?.message(exception)
+                        ?: exception.message
+                        ?: exception.javaClass.simpleName
             } finally {
                 _busy.value = false
             }
