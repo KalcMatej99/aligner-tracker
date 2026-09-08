@@ -44,14 +44,6 @@ requires JDK21, Node24, the exact SDK packages and absence of runner credentials
 and engine sockets. The runner retains the reproduced TLS workaround
 `JAVA_TOOL_OPTIONS=-XX:UseAVX=2`; removing it requires a controlled reproduction.
 
-The flag does not eliminate every observed JSSE TLS failure. CI prefetches the
-Robolectric4.16.1/API35 runtime into the existing repository-local Maven cache
-using `scripts/prefetch-robolectric.sh`, strict HTTPS and committed SHA-512 pins
-for both JAR and POM. Existing cache files are reverified and checksum mismatches
-fail the job. Only downloads have bounded retries; tests are not retried or skipped.
-Update these pins from Maven Central when changing the Robolectric version or
-test SDK. No cache is shared between hosted jobs.
-
 Runner capacity is one, each job has a 45-minute deadline and a 6 GiB memory / four
 CPU limit. Fresh jobs download SDK and dependencies; a first build can take longer.
 The runner has no host Docker access and no engine socket or host credentials are

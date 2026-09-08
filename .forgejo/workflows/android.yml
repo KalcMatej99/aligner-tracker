@@ -37,8 +37,6 @@ jobs:
           java -XshowSettings:properties -version 2>&1 | grep 'java.specification.version = 21'
           mkdir -p app/build/reports/ci
           { uname -m; node --version; git --version; java -version; } > app/build/reports/ci/runtime.txt 2>&1
-      - name: Prefetch checksum-pinned Robolectric runtime
-        run: ./scripts/prefetch-robolectric.sh
       - name: Format, test, lint and build
         run: ./scripts/check.sh
       - name: Require complete phone and watch reports and APKs
