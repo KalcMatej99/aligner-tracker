@@ -86,3 +86,10 @@ root cause remains unconfirmed. SDK prefetch now uses strict-HTTPS curl with
 three bounded transfer retries, size/time limits and the same SHA-512 pins.
 A checksum mismatch or exhausted transfer fails the job. Neither certificate
 verification nor any test is retried, disabled or ignored.
+
+The isolated VM now masks AVX-512, VAES and VPCLMULQDQ as a controlled
+compatibility mitigation while retaining AES, PCLMULQDQ and AVX2. The
+`JAVA_TOOL_OPTIONS` workaround is still present. Infrastructure issue3 records
+the cross-runtime probes and uncertainty; successful samples do not establish
+a hardware or upstream root cause. CI includes Gradle stack traces so dependency
+resolution failures retain their underlying causes.
