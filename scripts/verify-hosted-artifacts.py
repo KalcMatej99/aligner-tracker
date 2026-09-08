@@ -77,6 +77,7 @@ def main(run_id, output):
     apks = list((output / "android-test-apks").rglob("*.apk")) + list((output / "android-unsigned-release-apks").rglob("*.apk"))
     if len(apks) != 6:
         raise ValueError(f"Expected six phone/watch test and release APKs, got {len(apks)}")
+    production_test_signers = set()
     for apk in apks:
         with zipfile.ZipFile(apk) as archive:
             if archive.testzip() is not None or "AndroidManifest.xml" not in archive.namelist() or "classes.dex" not in archive.namelist():
@@ -86,9 +87,22 @@ def main(run_id, output):
             raise ValueError("Unexpected Internet permission")
         package = subprocess.check_output([build_tools / "aapt", "dump", "badging", apk], text=True).splitlines()[0]
         signed = "unsigned" not in apk.name
+        certificate = None
         if signed:
-            subprocess.run([build_tools / "apksigner", "verify", apk], check=True, capture_output=True)
-        summary["apks"].append({"path": str(apk.relative_to(output)), "sha256": hashlib.sha256(apk.read_bytes()).hexdigest(), "bytes": apk.stat().st_size, "signed_test_apk": signed, "package": package})
+            signature = subprocess.check_output([build_tools / "apksigner", "verify", "--print-certs", apk], text=True)
+            certificates = [line.split(": ", 1)[1] for line in signature.splitlines() if line.startswith("Signer #1 certificate SHA-256 digest: ")]
+            if len(certificates) != 1:
+                raise ValueError("Missing test signer certificate")
+            certificate = certificates[0]
+            if "androidTest" not in apk.parts:
+                production_test_signers.add(certificate)
+        else:
+            signature = subprocess.run([build_tools / "apksigner", "verify", apk], capture_output=True)
+            if signature.returncode == 0:
+                raise ValueError("Release intermediate unexpectedly signed")
+        summary["apks"].append({"path": str(apk.relative_to(output)), "sha256": hashlib.sha256(apk.read_bytes()).hexdigest(), "bytes": apk.stat().st_size, "signed_test_apk": signed, "certificate_sha256": certificate, "package": package})
+    if len(production_test_signers) != 1:
+        raise ValueError("Phone/watch test signing certificates differ")
     (output / "verification.json").write_text(json.dumps(summary, indent=2) + "\n")
     (output / "SHA256SUMS").write_text("".join(f'{item["sha256"]}  {item["path"]}\n' for item in summary["apks"]))
     print(json.dumps(summary, indent=2))

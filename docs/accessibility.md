@@ -65,7 +65,7 @@ Synthetic API36 screenshots confirmed that the primary state action remains reac
 
 The expanded More/Settings header initially squeezed the title into broken lines. The adaptive header now places the title above separately reachable actions at narrow effective width. Visual review accepted the correction; the new instrumented overflow assertion then found that the title also needed full width. After that focused correction, both navigation/header tests passed in 6.062s with single-line/no-overflow assertions retained. [Focused test result](evidence/api36-header-focused.txt), [before](screenshots/v1/header-before-320dp-font200.png) and [after](screenshots/v1/header-after-320dp-font200.png).
 
-Further samples: [RTL/dark320dp](screenshots/v1/rtl-dark-320dp.png), [calendar at 200% font](screenshots/v1/calendar-font200.png), [photo comparison](screenshots/v1/photo-comparison.png), and [encrypted restore preview](screenshots/v1/encrypted-restore-preview.png). These are sampled views, not an exhaustive matrix. Full phone instrumentation accepted22 tests across the21-pass full run and header correction rerun; [validation](validation-v1.md) separates this from device gates.
+Further samples: [RTL/dark320dp](screenshots/v1/rtl-dark-320dp.png), [calendar at 200% font](screenshots/v1/calendar-font200.png), [photo comparison](screenshots/v1/photo-comparison.png), and [encrypted restore preview](screenshots/v1/encrypted-restore-preview.png). These are sampled views, not an exhaustive matrix. Final full phone instrumentation passed25 tests, including expanded dialog/field/calendar regressions; [validation](validation-v1.md) separates this from device gates.
 
 ## Manual and device gates
 
@@ -85,3 +85,5 @@ issue #12 can be accepted completely; the samples above do not satisfy the full 
 Record screenshots, Android version, density, font scale, locale, theme, and any failures in
 `docs/validation-v1.md`. A passing compile or semantic-tree assertion is supporting evidence, not a
 TalkBack device audit.
+
+The final en-XA/ar-XB320dp/200% pass found and corrected shared dialog action overlap, floating-label overlap and crowded calendar/report rows (#28/#29). Dialogs now scroll as one region with vertically separated actions; fields reserve measured floating-label clearance; month controls and report chips adapt to available width. Three new regression tests pass within the25-test phone suite, and the exact visual/cancellation recheck is linked from [validation-v1.md](validation-v1.md).

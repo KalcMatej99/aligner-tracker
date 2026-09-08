@@ -20,12 +20,13 @@ Android8/API26 or later; target/compile36. Development version1.0.0-dev. See [va
 
 ## Build
 
-Use JDK21 and Android SDK36/build-tools35.0.0; set `ANDROID_HOME` or ignored local.properties.
+Use JDK21, Python3.11+, curl and Android SDK36/build-tools35.0.0; set `ANDROID_HOME` or ignored local.properties.
 
 ```sh
 ./gradlew spotlessApply
 ./scripts/check.sh
-./gradlew connectedDebugAndroidTest  # running emulator/device required
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
+ANDROID_SERIAL=emulator-5556 ./gradlew :wear:connectedDebugAndroidTest
 ```
 
 Phone debug APK: `app/build/outputs/apk/debug/app-debug.apk`; watch: `wear/build/outputs/apk/debug/wear-debug.apk`. Unsigned release APKs are under each module’s `build/outputs/apk/release/`. See [development setup](docs/development.md).

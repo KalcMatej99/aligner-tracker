@@ -1,6 +1,6 @@
 # v1.0 implementation and acceptance checklist
 
-Refreshed 2026-09-08 after expanded phone/watch implementation and bounded emulator acceptance. Foundation and MVP remain accepted historical milestones. Checked items below mean the stated software work and evidence are complete; they do not close the separate physical, pairing, final-build or publication gates. [Validation](validation-v1.md) records exact results and limits; Forgejo remains authoritative for issue status.
+Refreshed 2026-09-08 after expanded phone/watch implementation and bounded emulator acceptance. Foundation and MVP remain accepted historical milestones. Checked items below mean the stated software work and evidence are complete; they do not close the separate physical, pairing, hosted-verification or publication gates. [Validation](validation-v1.md) records exact results and limits; Forgejo remains authoritative for issue status.
 
 ## Implemented and checked software
 
@@ -11,20 +11,20 @@ Refreshed 2026-09-08 after expanded phone/watch implementation and bounded emula
 - [x] #19: private dated photos/import/capture lifecycle, selected-photo comparison, bounded normalization/metadata stripping, archive ownership/deletion recovery and HTML time-lapse; actual browser playback/scrub/no-network checks passed. Physical external-camera behavior remains device acceptance.
 - [x] #20 implementation: installable watch app, Tile/complication, durable outbox and deterministic phone reconciliation, Apache microG transport adapter/correlated replies; 8 JVM and 4 API36 instrumentation tests plus official-GMS local-node delivery evidence. Paired transport is explicitly unchecked below.
 - [x] #22: daily/weekly/monthly/per-tray reports, charts/text, previews/export and neutral optional streaks with historical goals/partial-day rules; automated and synthetic UI evidence.
-- [x] #12 implementation and sampled emulator checks: localized formatting/resources, semantics/contrast/touch targets,320dp/200% font, light/dark, landscape and RTL. Corrected expanded-header assertion passed on focused rerun. This does not establish exhaustive pseudolocale/TalkBack/device acceptance.
+- [x] #12 implementation and sampled emulator checks: localized formatting/resources, semantics/contrast/touch targets,320dp/200% font, light/dark, landscape and RTL. Corrected expanded-header assertion passed on focused rerun. Expanded/RTL pseudolocale rechecks passed after #28/#29 corrections; full physical TalkBack/device acceptance remains separate.
 - [x] #17 emulator measurements: cold launch,50k history, summaries, JSON/CSV/encryption and Reports rendering samples recorded with limitations. Physical battery/wakeup budgets remain unchecked.
 - [x] #21 preparation: updated171-coordinate free-software runtime inventory, GPL preserved, privacy/license/distribution documentation and actual debug-signed upgrade evidence. No signing exception, release key or publication.
 
 ## Remaining integration and external gates
 
-- [ ] Final local integration: `scripts/check.sh` and final count-label build passed; phone/watch debug/test and unsigned release artifacts produced. Final text-screen/pseudolocale rechecks and hosted artifact checksums remain to reconcile. Phone22 instrumentation accepted across full/focused runs.
-- [ ] #23: final expanded commit's hosted workflow success and downloaded phone/watch APKs/reports verified; historical MVP/earlier local results do not satisfy this.
+- [x] Local integration: final formatting,61 JVM tests, debug/release lint, phone/watch debug/test and minified unsigned release builds passed; final API36 phone suite passed25 tests, Wear4 tests and API26focused2 tests. Corrected layout/pseudolocale evidence is recorded in validation.
+- Final hosted integration is tracked in [#23](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/23), which records the exact accepted current-main SHA, run, downloaded reports/APKs and checksums. Its live state is authoritative; historical runs are not final-code acceptance.
 - [ ] #20 paired emulator: compatible phone companion and interactive pairing; actual sync/IN/OUT, offline/reconnect/stale rejection across two nodes. Same-node binder tests do not satisfy this.
 - [ ] #11: physical Android/OEM reminder matrix including Doze/reboot/force-stop.
-- [ ] #12: full TalkBack, keyboard/switch access, complete viewport/pseudolocale and physical-device audit.
+- [ ] #12: full TalkBack, keyboard/switch access and physical-device audit.
 - [ ] #17: matched 24 h physical battery and wakeup observations.
 - [ ] #18: consented usability pilot.
 - [ ] #20: physical watch pairing/reconnect, Tile, complication, accessibility and battery.
 - [ ] #21: user-owned signing, release-signed upgrade matrix, complete notice/source bundle and explicitly authorized distribution. F-Droid acceptance requires maintainer/source-build assessment.
 
-[External acceptance](external-acceptance.md) and [release preparation](release.md) define concrete procedures. Software completion never substitutes for these gates or establishes release readiness. Final integration/issue evidence is coordinator-owned; no additional speculative features are needed. Cloud sync/backend, automatic medical decisions, accounts, billing, analytics and unauthorized publication remain outside scope.
+[External acceptance](external-acceptance.md) and [release preparation](release.md) define concrete procedures. Software completion never substitutes for these gates or establishes release readiness. Final hosted integration/issue evidence is coordinator-owned; no additional speculative features are needed. Cloud sync/backend, automatic medical decisions, accounts, billing, analytics and unauthorized publication remain outside scope.
