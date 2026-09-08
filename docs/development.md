@@ -67,3 +67,11 @@ API36 phone and Wear images are supported for this development procedure. Paired
 ### Pinned test runtime downloads
 
 Python 3.11+ is required by `scripts/check.sh`. Before Gradle tests, `prepare-test-sdks.py` fetches the exact Robolectric 4.16.1 API35/API36 instrumented SDK artifacts through verified system TLS and checks repository-pinned SHA-512 values before atomically promoting them into `.gradle/robolectric-maven`. Existing files are rehashed; corrupt or interrupted downloads cannot be accepted. This avoids lazy Java-TLS SDK fetching inside tests, which failed with AEAD tag errors on hosted job795 even with the runner's AVX workaround. Neither certificate verification nor tests are bypassed. Change the SDK pins only with a Robolectric/API update and independently verified Maven Central digests.
+
+### Hosted memory budget
+
+Run11/job799 completed tests, lint, debug APKs and phone release assembly, then the guest kernel recorded a cgroup OOM kill during Wear R8 (6 GiB job limit, Java RSS about 4 GiB plus retained compiler/worker processes). `scripts/check.sh` now caps Gradle workers at two, compiles Kotlin in the build process, and runs each release shrinker in a fresh single-use daemon after the test/lint/debug stage. All checks and R8 remain enabled. No runner memory limit, shared service or sandbox boundary is changed. Final hosted success must establish acceptance for this resource-budget fix.
+
+### Notification instrumentation permission
+
+On a disposable API33+ emulator, temporarily grant `android.permission.POST_NOTIFICATIONS` to `org.alignertracker.app` before running `NotificationActionsIntegrationTest`. Record the original grant and restore it afterward; the test deliberately does not change user permission itself. The 2026-09-08 API36 run exercised actual AlarmManager delivery, then the original denied permission was restored. Do not change permissions on personal devices without their authorized acceptance scope.
