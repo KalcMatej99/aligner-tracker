@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -66,7 +67,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             )
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 date,
                 { date = it },
                 label = { Text(stringResource(R.string.journal_date)) },
@@ -89,18 +90,12 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 val firstWeekday = java.time.temporal.WeekFields.of(locale).firstDayOfWeek
                 val offset = (month.atDay(1).dayOfWeek.value - firstWeekday.value + 7) % 7
                 Column {
-                    Row {
-                        TextButton(
-                            onClick = { date = parsed.minusMonths(1).withDayOfMonth(1).toString() }
-                        ) {
-                            Text(stringResource(R.string.previous_month))
-                        }
-                        TextButton(
-                            onClick = { date = parsed.plusMonths(1).withDayOfMonth(1).toString() }
-                        ) {
-                            Text(stringResource(R.string.next_month))
-                        }
-                    }
+                    JournalMonthNavigation(
+                        previousLabel = stringResource(R.string.previous_month),
+                        nextLabel = stringResource(R.string.next_month),
+                        onPrevious = { date = parsed.minusMonths(1).withDayOfMonth(1).toString() },
+                        onNext = { date = parsed.plusMonths(1).withDayOfMonth(1).toString() },
+                    )
                     Text(
                         parsed.month.getDisplayName(java.time.format.TextStyle.FULL, locale) +
                             " " +
@@ -197,7 +192,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             }
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 noteText,
                 { noteText = it.take(10000) },
                 label = { Text(stringResource(R.string.note_text)) },
@@ -300,7 +295,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             }
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 title,
                 { title = it.take(200) },
                 label = { Text(stringResource(R.string.appointment_title)) },
@@ -308,7 +303,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             )
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 appointmentTime,
                 { appointmentTime = it },
                 label = { Text(stringResource(R.string.appointment_time)) },
@@ -318,7 +313,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             )
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 duration,
                 { duration = it },
                 label = { Text(stringResource(R.string.appointment_duration)) },
@@ -326,7 +321,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             )
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 reminder,
                 { reminder = it },
                 label = { Text(stringResource(R.string.appointment_reminder)) },
@@ -334,7 +329,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             )
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 appointmentNote,
                 { appointmentNote = it.take(10000) },
                 label = { Text(stringResource(R.string.note_text)) },
@@ -392,7 +387,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
         }
         item { Text(stringResource(R.string.missing_interval_hint)) }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 missingStart,
                 { missingStart = it },
                 label = { Text(stringResource(R.string.interval_start)) },
@@ -400,7 +395,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             )
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 missingEndDate,
                 { missingEndDate = it },
                 label = { Text(stringResource(R.string.interval_end_date)) },
@@ -408,7 +403,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             )
         }
         item {
-            OutlinedTextField(
+            TrackerTextField(
                 missingEnd,
                 { missingEnd = it },
                 label = { Text(stringResource(R.string.interval_end)) },
@@ -446,7 +441,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
         }
     }
     delete?.let { (kind, id) ->
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = { delete = null },
             title = { Text(stringResource(R.string.delete_record)) },
             text = { Text(stringResource(R.string.delete_record_hint)) },
@@ -467,7 +462,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
         )
     }
     if (correctionConfirm)
-        AlertDialog(
+        TrackerDialog(
             onDismissRequest = { correctionConfirm = false },
             title = { Text(stringResource(R.string.review_correction)) },
             text = {
@@ -494,4 +489,44 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 }
             },
         )
+}
+
+@Composable
+internal fun JournalMonthNavigation(
+    previousLabel: String,
+    nextLabel: String,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+) {
+    val fontScale = LocalDensity.current.fontScale
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        if (maxWidth / fontScale < 300.dp) {
+            Column(Modifier.fillMaxWidth()) {
+                TextButton(
+                    onClick = onPrevious,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                ) {
+                    Text(previousLabel)
+                }
+                TextButton(
+                    onClick = onNext,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                ) {
+                    Text(nextLabel)
+                }
+            }
+        } else {
+            Row(Modifier.fillMaxWidth()) {
+                TextButton(
+                    onClick = onPrevious,
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                ) {
+                    Text(previousLabel)
+                }
+                TextButton(onClick = onNext, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text(nextLabel)
+                }
+            }
+        }
+    }
 }
