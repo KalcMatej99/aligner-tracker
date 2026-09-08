@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Aligner Tracker</string>
+    <string name="tile_label">Aligner status</string>
+    <string name="tile_description">See acknowledged aligner status and record the next change.</string>
+    <string name="complication_label">Aligner state</string>
+</resources>
+
