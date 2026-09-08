@@ -9,6 +9,7 @@ plugins {
 android {
     namespace = "org.alignertracker.app"
     compileSdk = 36
+    sourceSets.getByName("main").java.srcDir("../wear-transport/src/main/kotlin")
     defaultConfig {
         applicationId = "org.alignertracker.app"
         minSdk = 26
@@ -35,8 +36,7 @@ ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 spotless { kotlin { target("src/**/*.kt"); ktfmt("0.58").kotlinlangStyle() } }
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2025.11.01"))
-    implementation("com.google.android.gms:play-services-wearable:20.0.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+    implementation("org.microg.gms:play-services-wearable:0.3.14.250932")
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.exifinterface:exifinterface:1.4.1")
     implementation("androidx.activity:activity-compose:1.11.0")

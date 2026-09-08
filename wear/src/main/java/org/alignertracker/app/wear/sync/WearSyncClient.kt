@@ -1,17 +1,15 @@
 package org.alignertracker.app.wear.sync
 
 import android.content.Context
-import com.google.android.gms.wearable.CapabilityClient
-import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.alignertracker.app.wear.data.LocalWearCommand
 import org.alignertracker.app.wear.data.WearRepository
 import org.alignertracker.app.wear.surface.WearSurfaceUpdates
+import org.alignertracker.transport.MicrogWearDataLayer
 
 internal class WearSyncClient(
     context: Context,
@@ -131,21 +129,12 @@ internal interface WatchWearTransport {
 }
 
 private class GmsWatchWearTransport(context: Context) : WatchWearTransport {
-    private val capabilityClient = Wearable.getCapabilityClient(context)
-    private val nodeClient = Wearable.getNodeClient(context)
-    private val messageClient = Wearable.getMessageClient(context)
+    private val dataLayer = MicrogWearDataLayer(context)
 
-    override suspend fun nearbyPhoneNodes(): Set<String> =
-        capabilityClient
-            .getCapability(PHONE_CAPABILITY, CapabilityClient.FILTER_REACHABLE)
-            .await()
-            .nodes
-            .filterTo(linkedSetOf()) { it.isNearby }
-            .mapTo(linkedSetOf()) { it.id }
+    override suspend fun nearbyPhoneNodes(): Set<String> = dataLayer.nearbyNodes(PHONE_CAPABILITY)
 
-    override suspend fun isNearby(nodeId: String): Boolean =
-        nodeClient.connectedNodes.await().any { it.id == nodeId && it.isNearby }
+    override suspend fun isNearby(nodeId: String): Boolean = dataLayer.isNearby(nodeId)
 
     override suspend fun sendRequest(nodeId: String, path: String, payload: ByteArray): ByteArray =
-        messageClient.sendRequest(nodeId, path, payload).await()
+        WearMessageRequests.request(nodeId, path, payload, dataLayer::sendMessage)
 }

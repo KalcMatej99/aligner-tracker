@@ -1,15 +1,13 @@
 package org.alignertracker.app.wear
 
 import android.content.Context
-import com.google.android.gms.wearable.CapabilityClient
-import com.google.android.gms.wearable.Wearable
-import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.alignertracker.app.data.ClockGuard
 import org.alignertracker.app.data.TrackerRepository
 import org.alignertracker.app.domain.CommandSource
 import org.alignertracker.app.domain.WearCommand
+import org.alignertracker.transport.MicrogWearDataLayer
 
 class WearBridge
 internal constructor(
@@ -83,6 +81,18 @@ internal constructor(
         }
     }
 
+    suspend fun handleMessage(senderNodeId: String, path: String, payload: ByteArray) {
+        val (requestPath, requestId) =
+            org.alignertracker.transport.WearMessagePaths.parseRequest(path) ?: return
+        if (payload.size > MAX_WEAR_PAYLOAD_BYTES || !transport.isNearby(senderNodeId)) return
+        val result = handleRequest(senderNodeId, requestPath, payload)
+        transport.sendMessage(
+            senderNodeId,
+            org.alignertracker.transport.WearMessagePaths.reply(requestId),
+            result,
+        )
+    }
+
     suspend fun currentStatus(): WearStatus {
         val snapshot = repository.snapshot()
         return WearStatus(
@@ -132,22 +142,13 @@ internal interface PhoneWearTransport {
 }
 
 private class GmsPhoneWearTransport(context: Context) : PhoneWearTransport {
-    private val nodeClient = Wearable.getNodeClient(context)
-    private val capabilityClient = Wearable.getCapabilityClient(context)
-    private val messageClient = Wearable.getMessageClient(context)
+    private val dataLayer = MicrogWearDataLayer(context)
 
-    override suspend fun isNearby(nodeId: String): Boolean =
-        nodeClient.connectedNodes.await().any { it.id == nodeId && it.isNearby }
+    override suspend fun isNearby(nodeId: String): Boolean = dataLayer.isNearby(nodeId)
 
     override suspend fun nearbyNodes(capability: String): Set<String> =
-        capabilityClient
-            .getCapability(capability, CapabilityClient.FILTER_REACHABLE)
-            .await()
-            .nodes
-            .filterTo(linkedSetOf()) { it.isNearby }
-            .mapTo(linkedSetOf()) { it.id }
+        dataLayer.nearbyNodes(capability)
 
-    override suspend fun sendMessage(nodeId: String, path: String, payload: ByteArray) {
-        messageClient.sendMessage(nodeId, path, payload).await()
-    }
+    override suspend fun sendMessage(nodeId: String, path: String, payload: ByteArray) =
+        dataLayer.sendMessage(nodeId, path, payload)
 }
