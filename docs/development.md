@@ -21,7 +21,7 @@ Debug APK is for internal evaluation, not a signed production release. Release b
 
 The `Android` workflow runs `scripts/check.sh` on `ubuntu-latest`. This label is
 provided by the repository-scoped `kalc-server-aligner-vm` runner, using a
-digest-pinned Ubuntu 22.04 container inside a dedicated KVM guest. The workflow installs
+digest-pinned Ubuntu 24.04 container with Node 24 inside a dedicated KVM guest. The workflow installs
 Temurin JDK21, Android platform36 and build-tools35.0.0. No emulator or release
 signing runs in this lane.
 
@@ -30,7 +30,19 @@ validation. Check the run's commit against current `main`. Download and unzip
 `android-reports` (JUnit XML, HTML unit-test and lint reports) and
 `android-debug-apk` from the run page. Artifacts are retained for 14 days; missing
 artifact files fail the upload step. Checkout credentials are removed before
-build steps, and the workflow requests read-only repository contents access.
+build steps. The workflow declares `contents: read` for portability, but Forgejo
+16.0.3 does **not** enforce that declaration: non-fork job tokens retain repository
+write access until the job finishes. Main-branch push/merge protection permits
+only the owner, and the runner has no deployment credentials. Fork PRs require
+approval and receive read-only tokens; review workflow/code changes before approval.
+
+CI uses immutable pins for checkout v7.0.1, setup-java v6.0.0, setup-android
+v4.0.1 and Forgejo's upload-artifact v5. The setup-java step uses
+`NODE_OPTIONS=--preserve-symlinks-main` because its ESM entrypoint guard otherwise
+skips installation through Forgejo's `/var/run` symlink. The runtime preflight
+requires JDK21, Node24, the exact SDK packages and absence of runner credentials
+and engine sockets. The runner retains the reproduced TLS workaround
+`JAVA_TOOL_OPTIONS=-XX:UseAVX=2`; removing it requires a controlled reproduction.
 
 Runner capacity is one, each job has a 45-minute deadline and a 6 GiB memory / four
 CPU limit. Fresh jobs download SDK and dependencies; a first build can take longer.
