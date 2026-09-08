@@ -17,7 +17,7 @@ Refreshed 2026-09-08 after expanded phone/watch implementation and bounded emula
 
 ## Remaining integration and external gates
 
-- [ ] Final local integration: final `scripts/check.sh`, phone/watch debug/test and unsigned release artifacts/checksums, then reconcile exact commit and evidence. Phone22 instrumentation accepted across full/focused runs; final build is pending.
+- [ ] Final local integration: `scripts/check.sh` and final count-label build passed; phone/watch debug/test and unsigned release artifacts produced. Final text-screen/pseudolocale rechecks and hosted artifact checksums remain to reconcile. Phone22 instrumentation accepted across full/focused runs.
 - [ ] #23: final expanded commit's hosted workflow success and downloaded phone/watch APKs/reports verified; historical MVP/earlier local results do not satisfy this.
 - [ ] #20 paired emulator: compatible phone companion and interactive pairing; actual sync/IN/OUT, offline/reconnect/stale rejection across two nodes. Same-node binder tests do not satisfy this.
 - [ ] #11: physical Android/OEM reminder matrix including Doze/reboot/force-stop.

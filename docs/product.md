@@ -35,7 +35,7 @@ All delivered functionality free, including statistics and portable data that co
 
 ## Privacy, accessibility and ethical design
 
-Treatment timestamps and future photos can reveal health routines. Collect the minimum, use no network permission, log no history, explain plaintext exports, disable automatic backup, allow complete deletion. No shame, leaderboard, pushy streak or guilt messaging; positive neutral feedback. Screen reader labels include action and state; minimum48dp controls, never color alone, scalable scroll layouts, adequate contrast, focus order and accessible error text. Initial language English; string resources allow translation. Distinguish implementation from device-audited accessibility.
+Treatment timestamps and private photos can reveal health routines. Collect the minimum, use no network permission, log no history, explain plaintext exports, disable automatic backup, allow complete deletion. No shame, leaderboard, pushy streak or guilt messaging; positive neutral feedback. Screen reader labels include action and state; minimum48dp controls, never color alone, scalable scroll layouts, adequate contrast, focus order and accessible error text. Initial language English; string resources allow translation. Distinguish implementation from device-audited accessibility.
 
 ## Release gates
 

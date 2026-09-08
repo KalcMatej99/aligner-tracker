@@ -1,0 +1,21 @@
+
+org.alignertracker.app.controls.TrackerControlsTest:.
+org.alignertracker.app.data.TrackerMigrationTest:.
+org.alignertracker.app.data.TrackerPersistenceTest:.
+org.alignertracker.app.integration.TrackerJourneyTest:.
+org.alignertracker.app.performance.LongHistoryTest:.
+org.alignertracker.app.photos.PhotoArchiveTest:.
+org.alignertracker.app.reminders.ReminderPlatformTest:INSTRUMENTATION_STATUS: reminder_delivery=AlarmManager
+INSTRUMENTATION_STATUS_CODE: 0
+.
+org.alignertracker.app.ui.AccessibilityLocalizationTest:.......
+org.alignertracker.app.ui.AdaptiveNavigationTest:..
+org.alignertracker.app.ui.DialogAccessibilityTest:.
+org.alignertracker.app.ui.TextFieldAccessibilityTest:..
+org.alignertracker.app.ui.TrackerScreensTest:......
+
+Time: 78.721
+
+OK (25 tests)
+
+

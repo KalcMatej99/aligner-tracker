@@ -1,0 +1,8 @@
+
+org.alignertracker.app.ui.AdaptiveNavigationTest:..
+
+Time: 6.062
+
+OK (2 tests)
+
+

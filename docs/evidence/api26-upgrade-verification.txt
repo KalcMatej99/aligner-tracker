@@ -1,0 +1,1 @@
+PASS: actual APK replacement retained UID, first-install time and debug certificate, advanced versionCode 1 to 2, migrated Room 1 to 2, preserved complete original plan/all four events exactly, and created only the known actual tray with compatible schedule/target.

@@ -1,0 +1,32 @@
+
+org.alignertracker.app.controls.TrackerControlsTest:.
+org.alignertracker.app.data.TrackerMigrationTest:.
+org.alignertracker.app.data.TrackerPersistenceTest:.
+org.alignertracker.app.integration.TrackerJourneyTest:.
+org.alignertracker.app.performance.LongHistoryTest:.
+org.alignertracker.app.photos.PhotoArchiveTest:.
+org.alignertracker.app.reminders.ReminderPlatformTest:INSTRUMENTATION_STATUS: reminder_delivery=AlarmManager
+INSTRUMENTATION_STATUS_CODE: 0
+.
+org.alignertracker.app.ui.AccessibilityLocalizationTest:.......
+org.alignertracker.app.ui.AdaptiveNavigationTest:
+Error in topBarDoesNotBreakBrandIntoFragmentsAtLargeFont(org.alignertracker.app.ui.AdaptiveNavigationTest):
+java.lang.AssertionError: Header layout size=513 x 111, paragraphHeight=111.0, overflowWidth=true, overflowHeight=false
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.alignertracker.app.ui.AdaptiveNavigationTest.topBarDoesNotBreakBrandIntoFragmentsAtLargeFont(AdaptiveNavigationTest.kt:88)
+.
+org.alignertracker.app.ui.TrackerScreensTest:......
+
+Time: 52.2
+There was 1 failure:
+1) topBarDoesNotBreakBrandIntoFragmentsAtLargeFont(org.alignertracker.app.ui.AdaptiveNavigationTest)
+java.lang.AssertionError: Header layout size=513 x 111, paragraphHeight=111.0, overflowWidth=true, overflowHeight=false
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.alignertracker.app.ui.AdaptiveNavigationTest.topBarDoesNotBreakBrandIntoFragmentsAtLargeFont(AdaptiveNavigationTest.kt:88)
+
+FAILURES!!!
+Tests run: 22,  Failures: 1
+
+

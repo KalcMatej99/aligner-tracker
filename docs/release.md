@@ -1,6 +1,6 @@
 # Release preparation and artifact verification
 
-Status: preparation only. The current configuration is version code 2 and version name `1.0.0-dev`; it is not a public release candidate. No key has been created, no artifact has been signed, and nothing has been uploaded or published.
+Status: preparation only. The current configuration is version code 2 and version name `1.0.0-dev`; it is not a public release candidate. No user-owned release key has been created or used, and no release has been published. Debug APKs use the Android test certificate; hosted CI uploads test APKs, unsigned release intermediates and reports. Exact final-run verification is recorded in Forgejo #23.
 
 ## Candidate inputs
 
@@ -14,7 +14,6 @@ export ANDROID_HOME=/home/matejkalc/.local/share/aligner-android/sdk
 git status --short
 git rev-parse HEAD
 ./scripts/check.sh
-./gradlew --no-daemon :app:assembleRelease :wear:assembleRelease
 ```
 
 Do not accept a dirty tree or a failed check. `assembleRelease` is expected to create unsigned, minified APKs under `app/build/outputs/apk/release/` and `wear/build/outputs/apk/release/`. Confirm the actual filenames from `output-metadata.json`; an unsigned APK is a build intermediate, not an installable release artifact.

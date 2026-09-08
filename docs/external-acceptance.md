@@ -90,4 +90,6 @@ The pilot passes when all five sessions are accounted for, every critical workfl
 
 ## Gate record
 
-As of 2026-09-08, the physical OEM/API matrix, physical TalkBack audit, physical phone/watch battery measurements, physical watch journey, usability pilot, user-owned signing exercise and distribution license clearance have no recorded external acceptance evidence in this repository. Each remains open until its raw evidence and decision are reviewed. No “release ready” statement is valid while any of these gates is open.
+As of 2026-09-08, the physical OEM/API matrix, physical TalkBack audit, physical phone/watch battery measurements, physical watch journey, usability pilot, user-owned signing exercise and distribution approval have no recorded external acceptance evidence in this repository. Each remains open until its raw evidence and decision are reviewed. No “release ready” statement is valid while any of these gates is open.
+
+The bundled dependency/license audit is complete in [dependency-licenses.md](dependency-licenses.md); external store/F-Droid acceptance and publication authorization are separate. Paired-emulator Wear transport also remains open: the available phone lacks the companion/pairing setup described in [wear.md](wear.md). Standalone official-GMS binder delivery does not satisfy that journey.
