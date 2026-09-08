@@ -1,0 +1,366 @@
+[
+  {
+    "number": 1,
+    "title": "Research competitors and accept product/UX/architecture contracts",
+    "milestone": "Foundation",
+    "priority": "P0",
+    "areas": [
+      "product",
+      "ux",
+      "architecture"
+    ],
+    "dependencies": [],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/1",
+    "body": "## Objective\nEstablish an independently designed free local-first app grounded in dated sources.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Foundation. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Cover all requested competitor capability and paid/free categories with uncertainty and platform distinctions\n- [ ] Specify MVP journeys, privacy, screens, time semantics and dependency choices\n- [ ] Document critical path and agent ownership\n\n## Dependencies\nNone\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 2,
+    "title": "Bootstrap reproducible Android app and Forgejo CI",
+    "milestone": "Foundation",
+    "priority": "P0",
+    "areas": [
+      "android",
+      "ci"
+    ],
+    "dependencies": [
+      1
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/2",
+    "body": "## Objective\nCreate a buildable Compose application with pinned tooling and repository standards.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Foundation. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Commit Gradle wrapper with checksum, app manifest, license, setup and contribution docs\n- [ ] Run formatting, unit tests, Android lint and debug assembly\n- [ ] Configure Forgejo CI and document actual runner execution status\n\n## Dependencies\n#1\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 3,
+    "title": "Implement transactional treatment/event persistence and time accounting",
+    "milestone": "Foundation",
+    "priority": "P0",
+    "areas": [
+      "architecture",
+      "tracking",
+      "testing"
+    ],
+    "dependencies": [
+      1,
+      2
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/3",
+    "body": "## Objective\nThe timer must be correct after app closure and across real calendar boundaries.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Foundation. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Implement shared domain and repository contract in docs/architecture.md with Room Flow and atomic snapshots\n- [ ] Validate setup, idempotent transitions, bounded corrections, completion and clock rollback\n- [ ] Test midnight, DST short/long days, partial coverage, completion and invalid state\n\n## Dependencies\n#1, #2\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 4,
+    "title": "Build accessible onboarding, daily dashboard and settings shell",
+    "milestone": "MVP",
+    "priority": "P0",
+    "areas": [
+      "ux",
+      "android",
+      "accessibility"
+    ],
+    "dependencies": [
+      2,
+      3
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/4",
+    "body": "## Objective\nUsers can set up and record prescribed wear quickly without an account.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to MVP. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Implement original Material3 screens with loading/error/empty/completed states\n- [ ] Provide persisted ViewModel state, one-tap IN/OUT and lifecycle-bound ticking\n- [ ] Validate forms, resource strings and basic semantics; exercise emulator journey\n\n## Dependencies\n#2, #3\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 5,
+    "title": "Implement schedule progression and explicit completion",
+    "milestone": "MVP",
+    "priority": "P0",
+    "areas": [
+      "scheduling",
+      "ux"
+    ],
+    "dependencies": [
+      3,
+      4
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/5",
+    "body": "## Objective\nUsers review and explicitly advance their prescribed tray schedule.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to MVP. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Show current tray, due estimate and future schedule\n- [ ] Confirm advancement and completion; prevent passing final tray\n- [ ] Retain history and stop accumulation on completion\n\n## Dependencies\n#3, #4\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 6,
+    "title": "Implement optional reminders and Android recovery",
+    "milestone": "MVP",
+    "priority": "P0",
+    "areas": [
+      "notifications",
+      "settings",
+      "privacy"
+    ],
+    "dependencies": [
+      2,
+      3
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/6",
+    "body": "## Objective\nRemind after a break and on tray due date with truthful platform limitations.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to MVP. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] DataStore preferences, contextual notification permission and settings status\n- [ ] AlarmManager with inexact default, optional exact grant, immutable intents and stale-state checks\n- [ ] Reconcile after boot/update/time change/resume; unique WorkManager recovery; cancel on IN/delete/complete\n- [ ] Test scheduling rules and record emulator/device acceptance limits\n\n## Dependencies\n#2, #3\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 7,
+    "title": "Implement history corrections and covered-time statistics",
+    "milestone": "MVP",
+    "priority": "P0",
+    "areas": [
+      "history",
+      "statistics",
+      "tracking"
+    ],
+    "dependencies": [
+      3,
+      4
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/7",
+    "body": "## Objective\nUsers repair forgotten actions and understand measured coverage.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to MVP. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Date history and validated event time edits with neighbor constraints\n- [ ] 7/30-day statistics exclude future/untracked periods and label current-goal comparisons\n- [ ] No invented wear, shame messaging or misleading streak for partial days\n\n## Dependencies\n#3, #4\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 8,
+    "title": "Implement portable JSON backup, atomic restore and CSV export",
+    "milestone": "MVP",
+    "priority": "P0",
+    "areas": [
+      "data-portability",
+      "privacy"
+    ],
+    "dependencies": [
+      3,
+      4
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/8",
+    "body": "## Objective\nUsers own their treatment history without premium restrictions.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to MVP. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Versioned bounded schema and CSV timezone/coverage semantics\n- [ ] SAF picker; plaintext warning; import preview and explicit replacement confirmation\n- [ ] Malformed/oversized/future/inconsistent data rejects without mutation; round-trip tests\n\n## Dependencies\n#3, #4\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 9,
+    "title": "Verify integrated MVP with emulator and regression tests",
+    "milestone": "MVP",
+    "priority": "P0",
+    "areas": [
+      "testing",
+      "android",
+      "accessibility"
+    ],
+    "dependencies": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/9",
+    "body": "## Objective\nDemonstrate that integrated workflows work beyond compilation.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to MVP. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Run JVM tests, lint, build and relevant Room/Compose instrumentation\n- [ ] Exercise setup\u2192IN/OUT\u2192correction\u2192schedule\u2192history\u2192backup/import\u2192completion\n- [ ] Capture small-screen/dark/large-font review and document any untested device gates\n\n## Dependencies\n#4, #5, #6, #7, #8\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 10,
+    "title": "Audit privacy boundary, permissions and deletion",
+    "milestone": "MVP",
+    "priority": "P0",
+    "areas": [
+      "privacy",
+      "settings"
+    ],
+    "dependencies": [
+      6,
+      8
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/10",
+    "body": "## Objective\nNo sensitive treatment records leave device without explicit user action.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to MVP. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Verify no network/analytics permissions, backup exclusion rules and private notifications\n- [ ] Confirm deletion clears Room and cancels work/alarms\n- [ ] Review import validation and ensure logs contain no health history\n\n## Dependencies\n#6, #8\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 11,
+    "title": "Validate reminders on Android/OEM devices",
+    "milestone": "Beta",
+    "priority": "P0",
+    "areas": [
+      "notifications",
+      "testing",
+      "performance"
+    ],
+    "dependencies": [
+      6,
+      9
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/11",
+    "body": "## Objective\nAlarm behavior depends on OS power and permission controls.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Beta. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Test API26/33/36, Doze, reboot, revoked permission, force-stop and clock changes\n- [ ] Record measured delays and app status text; no promise that force-stop can be bypassed\n- [ ] Resolve reliability bugs before public beta\n\n## Dependencies\n#6, #9\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 12,
+    "title": "Audit TalkBack, large text, contrast and localization readiness",
+    "milestone": "Beta",
+    "priority": "P1",
+    "areas": [
+      "accessibility",
+      "ux",
+      "testing"
+    ],
+    "dependencies": [
+      9
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/12",
+    "body": "## Objective\nDaily controls must be usable with assistive technology.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Beta. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] TalkBack focus/actions, 200% font, 320dp, landscape and dark/light tests\n- [ ] Contrast and touch target audit; no clipped validation or color-only state\n- [ ] Resource and RTL checks with findings fixed or scoped\n\n## Dependencies\n#9\n\n## Priority\nP1\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 13,
+    "title": "Add home-screen widget and safe notification actions",
+    "milestone": "Beta",
+    "priority": "P1",
+    "areas": [
+      "android",
+      "tracking",
+      "ux"
+    ],
+    "dependencies": [
+      6,
+      9
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/13",
+    "body": "## Objective\nReduce friction for frequent interactions.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Beta. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Glance widget with accessible state and in/out controls\n- [ ] Read/write authoritative repository with idempotency and stale action checks\n- [ ] Lock-screen privacy and refresh/power tests\n\n## Dependencies\n#6, #9\n\n## Priority\nP1\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 14,
+    "title": "Support variable schedules, refinements and retention",
+    "milestone": "Beta",
+    "priority": "P1",
+    "areas": [
+      "scheduling",
+      "architecture"
+    ],
+    "dependencies": [
+      5,
+      9
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/14",
+    "body": "## Objective\nReal prescribed treatments can have changing intervals and new phases.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Beta. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Versioned migration to explicit per-tray/phase plan\n- [ ] Preserve original phase/history and target changes\n- [ ] No medical schedule inference; import/export schema migration tests\n\n## Dependencies\n#5, #9\n\n## Priority\nP1\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 15,
+    "title": "Add notes, appointments and calendar history",
+    "milestone": "Beta",
+    "priority": "P2",
+    "areas": [
+      "history",
+      "ux"
+    ],
+    "dependencies": [
+      7,
+      9
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/15",
+    "body": "## Objective\nUsers want context and upcoming visit reminders.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Beta. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Local notes and appointment CRUD, optional reminders\n- [ ] Accessible calendar with list alternative\n- [ ] Export inclusion and deletion rules\n\n## Dependencies\n#7, #9\n\n## Priority\nP2\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 16,
+    "title": "Prototype encrypted portable backup",
+    "milestone": "Beta",
+    "priority": "P1",
+    "areas": [
+      "data-portability",
+      "privacy"
+    ],
+    "dependencies": [
+      8,
+      10
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/16",
+    "body": "## Objective\nPlaintext portability is useful but requires user-managed protection.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Beta. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Standard vetted authenticated encryption with explicit password-recovery limitations\n- [ ] Versioned format and atomic restore; no homegrown cryptography\n- [ ] Tamper/wrong-password tests and plaintext compatibility\n\n## Dependencies\n#8, #10\n\n## Priority\nP1\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 17,
+    "title": "Measure battery, cold start and long-history performance",
+    "milestone": "Beta",
+    "priority": "P1",
+    "areas": [
+      "performance",
+      "testing"
+    ],
+    "dependencies": [
+      9
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/17",
+    "body": "## Objective\nFrequent use should not require a resident service or expensive scans.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Beta. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Profile startup, Compose rendering and 50000-event history/export\n- [ ] Measure idle drain and wakeups over24h on a physical device\n- [ ] Set evidence-based budgets and fix measured regressions\n\n## Dependencies\n#9\n\n## Priority\nP1\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 18,
+    "title": "Conduct internal usability pilot and resolve findings",
+    "milestone": "Beta",
+    "priority": "P1",
+    "areas": [
+      "product",
+      "ux"
+    ],
+    "dependencies": [
+      9,
+      11,
+      12
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/18",
+    "body": "## Objective\nValidate forgotten-tap recovery and reminder comprehension with real users.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to Beta. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Prepare consented local-only pilot script without collecting health records centrally\n- [ ] Test onboarding, corrections, denied notification and restore comprehension\n- [ ] Record anonymous concrete findings and issues; do not contact users without authorization\n\n## Dependencies\n#9, #11, #12\n\n## Priority\nP1\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 19,
+    "title": "Add private progress photos and comparison",
+    "milestone": "v1.0",
+    "priority": "P2",
+    "areas": [
+      "ux",
+      "privacy",
+      "data-portability"
+    ],
+    "dependencies": [
+      10,
+      16
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/19",
+    "body": "## Objective\nOptional visual progress needs a separate sensitive-media design.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to v1.0. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Photo Picker/local private copies, no broad storage permission\n- [ ] Accessible date compare with explicit delete/export; no diagnostic analysis\n- [ ] Storage lifecycle, backup size and EXIF handling tests\n\n## Dependencies\n#10, #16\n\n## Priority\nP2\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 20,
+    "title": "Prototype Wear OS companion and conflict semantics",
+    "milestone": "v1.0",
+    "priority": "P2",
+    "areas": [
+      "android",
+      "tracking"
+    ],
+    "dependencies": [
+      13,
+      14
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/20",
+    "body": "## Objective\nFree watch actions are a later convenience, not an MVP dependency.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to v1.0. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Offline phone/watch event reconciliation prototype with duplicate/conflict handling\n- [ ] Tile/complication and accessible in/out action\n- [ ] Measure battery and define supported devices before production commitment\n\n## Dependencies\n#13, #14\n\n## Priority\nP2\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 21,
+    "title": "Prepare release signing, licensing and distribution",
+    "milestone": "v1.0",
+    "priority": "P0",
+    "areas": [
+      "release",
+      "ci",
+      "privacy"
+    ],
+    "dependencies": [
+      11,
+      12,
+      17,
+      18
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/21",
+    "body": "## Objective\nA public release requires reproducible artifacts and owned signing keys.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to v1.0. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] User-owned signing key external to repo; upgrade/install/restore tests\n- [ ] Dependency license audit, changelog, privacy statement and store declarations\n- [ ] Evaluate F-Droid and direct APK; verify checksums; publish only explicitly authorized release\n\n## Dependencies\n#11, #12, #17, #18\n\n## Priority\nP0\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  },
+  {
+    "number": 22,
+    "title": "Polish reports and optional streaks without misleading coverage",
+    "milestone": "v1.0",
+    "priority": "P2",
+    "areas": [
+      "statistics",
+      "ux"
+    ],
+    "dependencies": [
+      7,
+      14,
+      18
+    ],
+    "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/22",
+    "body": "## Objective\nSummaries should be useful to users and clinicians without prescriptive claims.\n\n## Context\nRead docs/product.md, docs/architecture.md and docs/ux.md. This issue belongs to v1.0. All shipped features remain free and local-first.\n\n## Implementation requirements and acceptance criteria\n- [ ] Accessible charts/text equivalents and sharable report preview\n- [ ] Historical goal semantics and partial-day exclusions\n- [ ] Optional supportive streaks disabled by default with documented formula\n\n## Dependencies\n#7, #14, #18\n\n## Priority\nP2\n\n## Execution\nInspect existing implementation first. Preserve shared APIs or agree changes with coordinator. Add meaningful tests, run focused checks plus formatting/lint/build at integration, document evidence and limitations, commit with this issue reference. Close only after all criteria are evidenced.\n"
+  }
+]
