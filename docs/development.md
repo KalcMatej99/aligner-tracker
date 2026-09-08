@@ -67,3 +67,15 @@ API36 phone and Wear images are supported for this development procedure. Paired
 ### Pinned test runtime downloads
 
 Python 3.11+ is required by `scripts/check.sh`. Before Gradle tests, `prepare-test-sdks.py` fetches the exact Robolectric 4.16.1 API35/API36 instrumented SDK artifacts through verified system TLS and checks repository-pinned SHA-512 values before atomically promoting them into `.gradle/robolectric-maven`. Existing files are rehashed; corrupt or interrupted downloads cannot be accepted. This avoids lazy Java-TLS SDK fetching inside tests, which failed with AEAD tag errors on hosted job795 even with the runner's AVX workaround. Neither certificate verification nor tests are bypassed. Change the SDK pins only with a Robolectric/API update and independently verified Maven Central digests.
+
+### CI memory budget
+
+The expanded phone/watch release build exceeded the job's 6 GiB cgroup limit
+in hosted run11: the kernel killed Gradle while a separate Kotlin compiler
+daemon retained about1.9 GiB. CI now passes `--max-workers=2` and
+`-Pkotlin.compiler.execution.strategy=in-process` through `scripts/check.sh`.
+The compiler shares Gradle's existing3 GiB heap instead of keeping a second
+large heap alive through R8. All formatting, tests, lint and build tasks remain
+required; job/VM memory limits are unchanged. Local invocations may omit these
+CI-specific resource arguments. References: [Kotlin execution strategy](https://kotlinlang.org/docs/compiler-execution-strategy.html),
+[Gradle worker limit](https://docs.gradle.org/current/userguide/command_line_interface.html#sec:command_line_performance).
