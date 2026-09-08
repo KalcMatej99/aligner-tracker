@@ -14,8 +14,14 @@ New material audit findings get independent bounded issues with reproducer, impa
 
 ## Audit additions
 
-#23 tracks hosted CI execution while the existing shared runner is offline. #24 records the discovered320dp/200% font navigation defect and its accepted adaptive-layout fix. See validation.md for exact local acceptance and remaining Beta gates.
+#23 tracks the final expanded commit's hosted CI and downloadable artifact acceptance; historical runner/MVP results are not final evidence. #24 records the discovered320dp/200% font navigation defect and its accepted adaptive-layout fix. See validation.md for exact local acceptance and remaining Beta gates.
 
 ## Expanded v1.0 execution
 
-The 2026-09-08 continuation expands all remaining feature issues into production implementation scope, including #16 encrypted backup and #20 working watch companion rather than prototypes. [v1-checklist.md](v1-checklist.md) is the finite completion contract. Preserve closed Foundation/MVP work. Shared schema/migrations and action revision/ownership lead the critical path, followed by complete phone/watch journeys, portable data/media lifecycle and integrated validation. Device/pilot/signing/publication gates remain distinct and open without evidence. #23 currently has waiting run API576; runner repair ownership must be checked before any shared infrastructure mutation.
+The 2026-09-08 continuation expands all remaining feature issues into production implementation scope, including #16 encrypted backup and #20 working watch companion rather than prototypes. [v1-checklist.md](v1-checklist.md) is the finite completion contract. Preserve closed Foundation/MVP work. Shared schema/migrations and action revision/ownership lead the critical path, followed by complete phone/watch journeys, portable data/media lifecycle and integrated validation. Device/pilot/signing/publication gates remain distinct and open without evidence. The former waiting API576 snapshot is historical. Final hosted SHA/artifacts remain to be reconciled under [#23](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/23); do not change shared infrastructure without confirming ownership.
+
+## Expanded software acceptance checkpoint
+
+Phone software has 53 passing JVM tests and 22 accepted API36 instrumentation tests across a full run and focused header correction. Actual API26 MVP APK replacement preserved all original plan/events; 2 focused API26 photo/crypto tests passed. Complete encrypted SAF wrong-password/cancel/confirmed-photo restore and browser time-lapse playback were exercised. Watch has 8 passing JVM and 4 API36 instrumentation tests; the Apache microG client has actual official-GMS same-node binder evidence. The 171-coordinate runtime inventory no longer contains proprietary Google client artifacts. [Validation](validation-v1.md) records evidence and limits.
+
+The finite remaining integration is the final local full check, hosted final SHA/artifacts and issue reconciliation. Paired-emulator Wear exchange is still open separately from #20 physical watch: no companion/account/pairing was configured, so local-node delivery is not paired acceptance. Physical #11/#12/#17/#18 and signing/publication #21 remain open. Do not restart completed feature work or infer release readiness from software checks.

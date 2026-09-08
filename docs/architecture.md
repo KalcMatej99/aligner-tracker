@@ -1,6 +1,6 @@
 # Architecture and implementation contract
 
-Status: accepted bootstrap decision, 2026-09-08. See [official-source research](android-research.md).
+Status: accepted bootstrap decision, 2026-09-08. The MVP contract below is retained for history; the expanded contract at the end supersedes MVP-only module/data/target/backup limitations. See [official-source research](android-research.md).
 
 ## Scope and structure
 
@@ -69,4 +69,6 @@ Native RemoteViews implements the small two-control home widget without an addit
 
 Portable archives combine strict versioned JSON and normalized private JPEGs. Only validated UUID private filenames from the trusted archive staging service enter photo ownership. ZIP member names never become filesystem paths. [Encrypted envelope](encrypted-backup.md) uses platform JCA primitives, fixed bounded parameters, random salt/nonce and authenticated header. UI operations perform file/crypto work off the main thread and restore only after preview/confirmation. Device-local preferences and sync receipts have explicit nonportable lifecycle rules in privacy.md.
 
-Wear transport exchanges compact status/command DTOs, never complete treatment records. Durable watch queue + phone command ledger provide deterministic duplicate/stale outcomes. Local watch screens, Tile and complication render acknowledged state with pending/rejection labels. Google Data Layer dependencies and physical/local-transport limitations are documented separately; no cloud data synchronization is provided.
+Wear transport exchanges compact status/command DTOs, never complete treatment records. A durable watch queue and phone command ledger provide deterministic duplicate/stale outcomes. Local watch screens, Tile and complication render acknowledged state with pending/rejection labels. Both APKs compile shared `wear-transport` source against the Apache-2.0 microG Wear client. Its Binder adapter queries capabilities/nearby nodes and sends messages to the installed service; modern event binding actions map to the compatible listener binder. Correlation uses UUID request/reply paths under `/aligner/v1`, an expected-node pending map and timeout; durable command IDs survive retries independently of transport UUIDs. The 171-coordinate [runtime inventory](dependency-licenses.md) contains no proprietary Google artifacts.
+
+Phone features remain usable without Google Play services, while watch communication requires a compatible Wear service and paired-device stack. Actual official-GMS local-node binder delivery passed; paired-emulator and physical transport remain unverified. No custom cloud synchronization/backend or INTERNET permission is introduced. Nearby-node checks do not guarantee that Google-controlled Data Layer traffic never uses Google infrastructure. [Wear protocol/evidence](wear.md) and [privacy boundary](privacy.md) define these limits.

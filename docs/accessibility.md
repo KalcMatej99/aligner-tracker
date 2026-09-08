@@ -59,10 +59,18 @@ Compose instrumentation checks cover the following behavior:
 Debug builds enable Android pseudo-locales so `en-XA` exposes expansion/clipping problems and
 `ar-XB` exposes bidi assumptions without claiming a translation.
 
+## Recorded expanded UI checks — 2026-09-08
+
+Synthetic API36 screenshots confirmed that the primary state action remains reachable by scrolling at 320dp/200% font, dark mode remains readable, and short-landscape Reports scrolls inside its content viewport. Arabic locale plus forced RTL mirrored header/navigation and localized dates; strings fall back to English, so this is not Arabic translation acceptance. Selected-photo comparison renders two dated cards vertically.
+
+The expanded More/Settings header initially squeezed the title into broken lines. The adaptive header now places the title above separately reachable actions at narrow effective width. Visual review accepted the correction; the new instrumented overflow assertion then found that the title also needed full width. After that focused correction, both navigation/header tests passed in 6.062s with single-line/no-overflow assertions retained. [Focused test result](evidence/api36-header-focused.txt), [before](screenshots/v1/header-before-320dp-font200.png) and [after](screenshots/v1/header-after-320dp-font200.png).
+
+Further samples: [RTL/dark320dp](screenshots/v1/rtl-dark-320dp.png), [calendar at 200% font](screenshots/v1/calendar-font200.png), [photo comparison](screenshots/v1/photo-comparison.png), and [encrypted restore preview](screenshots/v1/encrypted-restore-preview.png). These are sampled views, not an exhaustive matrix. Full phone instrumentation accepted22 tests across the21-pass full run and header correction rerun; [validation](validation-v1.md) separates this from device gates.
+
 ## Manual and device gates
 
-The following checks need an API 36 emulator pass and then a physical-phone pass before issue #12
-can be accepted completely:
+The following remaining checks need complete recorded coverage and a physical-phone pass before
+issue #12 can be accepted completely; the samples above do not satisfy the full matrix:
 
 - traverse setup, Today, Schedule, History, Progress, Settings, validation, and confirmation dialogs
   with TalkBack; verify focus order, spoken labels/state/actions, announcements after validation, and
@@ -75,5 +83,5 @@ can be accepted completely:
   daylight-saving overlap.
 
 Record screenshots, Android version, density, font scale, locale, theme, and any failures in
-`docs/validation.md`. A passing compile or semantic-tree assertion is supporting evidence, not a
+`docs/validation-v1.md`. A passing compile or semantic-tree assertion is supporting evidence, not a
 TalkBack device audit.
