@@ -22,13 +22,13 @@ Debug APK is for internal evaluation, not a signed production release. Release b
 The `Android` workflow runs `scripts/check.sh` on `ubuntu-latest`. This label is
 provided by the repository-scoped `kalc-server-aligner-vm` runner, using a
 digest-pinned Ubuntu 22.04 container inside a dedicated KVM guest. The workflow installs
-Temurin JDK21, Android platform36 and build-tools35.0.0. No emulator or release
+Temurin JDK21, Android platform36 and build-tools35.0.0. Both debug and unsigned release builds are checked. No emulator or release
 signing runs in this lane.
 
 A push to `main`, a pull request, or **Actions → Android → Run workflow** starts
 validation. Check the run's commit against current `main`. Download and unzip
 `android-reports` (JUnit XML, HTML unit-test and lint reports) and
-`android-debug-apk` from the run page. Artifacts are retained for 14 days; missing
+`android-test-apks` (both phone/watch debug and instrumented-test APKs) and `android-unsigned-release-apks` from the run page. Artifacts are retained for 14 days; missing
 artifact files fail the upload step. Checkout credentials are removed before
 build steps, and the workflow requests read-only repository contents access.
 
@@ -38,3 +38,16 @@ The runner has no host Docker access and no engine socket or host credentials ar
 mounted into jobs. Host-private service ports are blocked; DNS and host HTTPS
 remain reachable for Forgejo. Infrastructure configuration, evidence and rollback:
 [forgejo-runner-ci](https://forgejo.server.matejkalc.com/matejkalc/forgejo-runner-ci).
+
+## Expanded modules and local acceptance
+
+The existing `app` module owns all treatment records; `wear` is the optional companion. Both have the same application ID and must have matching signing certificates. `scripts/check.sh` runs formatting, both JVM suites, debug/release lint, debug/test APK assembly and minified unsigned release builds.
+
+Run emulator instrumentation on the appropriate target only (phone tests must not run on a round watch):
+
+```sh
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
+ANDROID_SERIAL=emulator-5556 ./gradlew :wear:connectedDebugAndroidTest
+```
+
+API36 phone and Wear images are supported for this development procedure. Paired Data Layer acceptance additionally needs the compatible phone companion app and interactive pairing; see [wear.md](wear.md). Standalone watch launch and durable storage tests do not prove phone/watch delivery. Only synthetic records belong in emulator fixtures, screenshots and performance artifacts. No personal device resets are part of setup.

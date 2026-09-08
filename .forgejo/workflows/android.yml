@@ -33,10 +33,25 @@ jobs:
           path: |
             app/build/reports
             app/build/test-results/testDebugUnitTest/*.xml
-      - name: Upload debug APK
+            wear/build/reports
+            wear/build/test-results/testDebugUnitTest/*.xml
+      - name: Upload phone and watch test APKs
         uses: https://code.forgejo.org/forgejo/upload-artifact@16871d9e8cfcf27ff31822cac382bbb5450f1e1e # v4
         with:
-          name: android-debug-apk
+          name: android-test-apks
           if-no-files-found: error
           retention-days: 14
-          path: app/build/outputs/apk/debug/*.apk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/androidTest/debug/*.apk
+            wear/build/outputs/apk/debug/*.apk
+            wear/build/outputs/apk/androidTest/debug/*.apk
+      - name: Upload unsigned release APKs
+        uses: https://code.forgejo.org/forgejo/upload-artifact@16871d9e8cfcf27ff31822cac382bbb5450f1e1e # v4
+        with:
+          name: android-unsigned-release-apks
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            app/build/outputs/apk/release/*-unsigned.apk
+            wear/build/outputs/apk/release/*-unsigned.apk

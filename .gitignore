@@ -12,3 +12,6 @@ local.properties
 *.aab
 captures/
 artifacts/
+
+/wear/build/
+__pycache__/

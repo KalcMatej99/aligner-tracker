@@ -1,4 +1,8 @@
-# MVP validation — 2026-09-08
+# Validation evidence
+
+Current expanded-v1 evidence is tracked in [validation-v1.md](validation-v1.md). The MVP record below is historical and must not be used as acceptance for later changes. Current open gates are in [v1-checklist.md](v1-checklist.md).
+
+## Historical MVP validation — 2026-09-08
 
 **Internal-evaluation MVP accepted locally.** This is a debug build; physical-device reliability and production release signing remain separate gates. No medical effectiveness claim is made.
 
