@@ -1,0 +1,9 @@
+<resources>
+    <string name="channel_break">Break reminders</string>
+    <string name="channel_tray">Tray schedule</string>
+    <string name="reminder_break_title">Ready to put your aligners back in?</string>
+    <string name="reminder_break_body">Your planned break has ended. Open Aligner Tracker when ready.</string>
+    <string name="reminder_tray_title">Review your tray schedule</string>
+    <string name="reminder_tray_body">Your planned change date has arrived. Follow your clinician’s instructions.</string>
+    <string name="reminder_private_title">Aligner Tracker reminder</string>
+</resources>

@@ -1,0 +1,18 @@
+# Development setup
+
+Install Android Studio or official command-line Android SDK; accept SDK licenses. Install JDK21, platform36, build-tools35.0.0 and platform-tools. Set `JAVA_HOME` to JDK21 and `ANDROID_HOME` to SDK, or put your local `sdk.dir` in ignored local.properties. Do not commit machine paths. Gradle wrapper downloads pinned8.13 with SHA256 verification. Linux needs unzip and standard build tools.
+
+```
+./gradlew spotlessApply
+./scripts/check.sh
+./gradlew connectedDebugAndroidTest  # running API26+ emulator/device
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+Open repository root in Android Studio, sync Gradle, run app. App ID `org.alignertracker.app`. Debug build version0.1.0-dev. No backend/keys/account are required. Offline runtime works; first build needs dependency downloads. Seed only synthetic treatment data for screenshots/tests.
+
+Dependencies and rationale: architecture.md and android-research.md. Room schema JSON is checked into app/schemas; migrations must be tested, no destructive migration fallback. Kotlin formatting is ktfmt through Spotless. CI uses the same check script. Instrumented tests require an emulator; hosted runner support and physical acceptance are reported in validation.md.
+
+## Release
+
+Debug APK is for internal evaluation, not a signed production release. Release build uses R8. User-owned signing keys and passwords are supplied outside version control; release pipeline/store publication remains #21. Never generate a long-term signing identity silently. Forgejo artifact retention must avoid real user data. GPL notice and complete corresponding source accompany distribution.

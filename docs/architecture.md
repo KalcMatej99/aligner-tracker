@@ -4,7 +4,7 @@ Status: accepted bootstrap decision, 2026-09-08. See [official-source research](
 
 ## Scope and structure
 
-One native Android `:app` module; Kotlin, Compose Material 3, Room, Preferences DataStore, Coroutines/Flow, ViewModel, WorkManager. Package `com.alignertacker.app` is NOT used: canonical namespace/application ID is **`org.alignertracker.app`**. Minimum API26 (Android8); compile/target36. AGP8.13.2, Gradle8.13, Kotlin2.3.21; JDK21 development, JVM17 bytecode. Conservative compatible versions, not a claim of latest release. Manual constructor injection in `TrackerApplication`/`AppContainer`: three repositories/services do not justify a DI code generator. No network permission, analytics, ads, billing, account, backend, or continuously running timer service.
+One native Android `:app` module; Kotlin, Compose Material 3, Room, Preferences DataStore, Coroutines/Flow, ViewModel, WorkManager. Namespace/application ID: **`org.alignertracker.app`**. Minimum API26 (Android8); compile/target36. AGP8.13.2, Gradle8.13, Kotlin2.3.21; JDK21 development, JVM17 bytecode. Conservative compatible versions, not a claim of latest release. Manual constructor injection in `TrackerApplication`/`AppContainer`: three repositories/services do not justify a DI code generator. No network permission, analytics, ads, billing, account, backend, or continuously running timer service.
 
 ```
 app/src/main/java/org/alignertracker/app/
@@ -43,7 +43,7 @@ Domain data classes in `domain/Models.kt`:
 
 `data/BackupCodec` object: `fun encode(snapshot): String`, `fun decode(json: String): TrackerSnapshot`, `fun csv(snapshot, now: Instant): String`. Versioned schema1 JSON, strict ranges/size/event validation and no merge. UTF8 max5MiB import, 50,000 events limit. CSV daily totals with tracked duration and explicit treatment timezone. Import preview then explicit replace confirmation; SAF CreateDocument/OpenDocument. Backups are plaintext and contain sensitive treatment history; tell user before export, never log contents.
 
-`reminders/ReminderPreferences(enabled: Boolean = false, breakMinutes: Int = 30, trayEnabled: Boolean = false)` and `ReminderSettings(context)` exposes `val preferences: Flow<ReminderPreferences>`, `suspend fun update(preferences)`. DataStore single instance. `ReminderScheduler(context, repository, settings)` exposes `suspend fun reconcile()` and `fun cancelAll()`. Main activity + ViewModel reconciliation on resume and after mutations/settings/import/delete. Agent may add settings fields compatibly with defaults. Receivers access `(context.applicationContext as TrackerApplication).container` whose `repository`, `reminderSettings`, `reminderScheduler` are public vals.
+`reminders/ReminderPreferences(enabled: Boolean = false, breakMinutes: Int = 30, trayEnabled: Boolean = false, precise: Boolean = false)` and `ReminderSettings(context)` exposes `val preferences: Flow<ReminderPreferences>`, `suspend fun update(preferences)`. DataStore single instance. `ReminderScheduler(context, repository, settings)` exposes `suspend fun reconcile()` and `fun cancelAll()`. Main activity + ViewModel reconciliation on resume and after mutations/settings/import/delete. Agent may add settings fields compatibly with defaults. Receivers access `(context.applicationContext as TrackerApplication).container` whose `repository`, `reminderSettings`, `reminderScheduler` are public vals.
 
 ## Invariants and failure behavior
 
