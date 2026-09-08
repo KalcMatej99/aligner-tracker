@@ -51,7 +51,7 @@ class ReminderSchedulerTest {
 
     @Before
     fun setup() = runBlocking {
-        context = RuntimeEnvironment.getApplication<Application>()
+        context = RuntimeEnvironment.getApplication()
         clock = MutableClock(Instant.ofEpochMilli(System.currentTimeMillis()))
         database = Room.inMemoryDatabaseBuilder(context, TrackerDatabase::class.java).build()
         repository = TrackerRepository(database, clock)
@@ -60,7 +60,7 @@ class ReminderSchedulerTest {
         settings.clearDelivered()
         alarms = context.getSystemService(AlarmManager::class.java)
         notifications = context.getSystemService(NotificationManager::class.java)
-        shadowOf(RuntimeEnvironment.getApplication<Application>())
+        shadowOf(RuntimeEnvironment.getApplication())
             .grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
         shadowOf(notifications).setNotificationsEnabled(true)
         ShadowAlarmManager.setCanScheduleExactAlarms(false)
@@ -164,14 +164,14 @@ class ReminderSchedulerTest {
     fun `notification permission denial does not consume a due reminder`() = runBlocking {
         startBreak()
         val pending = payload("break")
-        shadowOf(RuntimeEnvironment.getApplication<Application>())
+        shadowOf(RuntimeEnvironment.getApplication())
             .denyPermissions(Manifest.permission.POST_NOTIFICATIONS)
         deliver(pending)
         assertTrue(shadowOf(notifications).allNotifications.isEmpty())
         assertTrue(settings.delivered().isEmpty())
         assertTrue(scheduled().isEmpty())
 
-        shadowOf(RuntimeEnvironment.getApplication<Application>())
+        shadowOf(RuntimeEnvironment.getApplication())
             .grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
         scheduler.reconcile()
         deliver(payload("break"))
