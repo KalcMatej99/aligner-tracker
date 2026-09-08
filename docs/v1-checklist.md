@@ -17,7 +17,7 @@ Refreshed 2026-09-08 after expanded phone/watch implementation and bounded emula
 
 ## Remaining integration and external gates
 
-- [x] Local integration: final formatting,61 JVM tests, debug/release lint, phone/watch debug/test and minified unsigned release builds passed; final API36 phone suite passed25 tests, Wear4 tests and API26focused2 tests. Corrected layout/pseudolocale evidence is recorded in validation.
+- [x] Local integration: follow-up formatting,63 JVM tests, debug/release lint, phone/watch debug/test and minified unsigned release builds passed; API36 phone coverage is34 general tests plus2 platform tests with real TalkBack enabled. The unchanged Wear4 tests and API26focused2 tests retain their separately recorded prior evidence. Corrected layout/pseudolocale evidence is recorded in validation.
 - Final hosted integration is tracked in [#23](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/23), which records the exact accepted current-main SHA, run, downloaded reports/APKs and checksums. Its live state is authoritative; historical runs are not final-code acceptance.
 - [ ] #20 paired emulator: compatible phone companion and interactive pairing; actual sync/IN/OUT, offline/reconnect/stale rejection across two nodes. Same-node binder tests do not satisfy this.
 - [ ] #11: physical Android/OEM reminder matrix including Doze/reboot/force-stop.

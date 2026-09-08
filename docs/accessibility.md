@@ -87,3 +87,19 @@ Record screenshots, Android version, density, font scale, locale, theme, and any
 TalkBack device audit.
 
 The final en-XA/ar-XB320dp/200% pass found and corrected shared dialog action overlap, floating-label overlap and crowded calendar/report rows (#28/#29). Dialogs now scroll as one region with vertically separated actions; fields reserve measured floating-label clearance; month controls and report chips adapt to available width. Three new regression tests pass within the25-test phone suite, and the exact visual/cancellation recheck is linked from [validation-v1.md](validation-v1.md).
+
+## Owner acceptance follow-up
+
+The next candidate adds contextual record actions for corrections, notes, appointments and photos;
+explicit IN/OUT state on the primary action; a polite dismissible operation message; specific
+expanded-form/password errors; and one factual text description per report/photo summary. The
+running timer is deliberately not a live region. Shared dialogs expose a heading while keeping
+native dialog-window focus behavior. Photo comparison always offers Show all photos, including
+when a selected image is removed.
+
+`TalkBackSemanticsTest` covers these Compose semantics and callbacks. `PlatformAccessibilityTest`
+checks Android's exported accessibility nodes, focus event, action dispatch, error and dialog
+window, using `FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES`. Neither test substitutes for actual
+TalkBack speech/traversal. Exact run results and the separate emulator TalkBack observation are
+recorded with the final candidate evidence in #12/#23. The sole-owner physical Pixel procedure is
+[PX-17](pixel-acceptance.md); no physical result is recorded in advance.

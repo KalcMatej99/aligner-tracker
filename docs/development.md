@@ -58,7 +58,8 @@ The existing `app` module owns all treatment records; `wear` is the optional com
 Run emulator instrumentation on the appropriate target only (phone tests must not run on a round watch):
 
 ```sh
-ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.notClass=org.alignertracker.app.ui.PlatformAccessibilityTest
 ANDROID_SERIAL=emulator-5556 ./gradlew :wear:connectedDebugAndroidTest
 ```
 
@@ -91,3 +92,34 @@ compatibility mitigation while retaining AES, PCLMULQDQ and AVX2. The
 the cross-runtime probes and uncertainty; successful samples do not establish
 a hardware or upstream root cause. CI includes Gradle stack traces so dependency
 resolution failures retain their underlying causes.
+
+
+### Platform accessibility and actual TalkBack
+
+Run the general phone suite separately from `PlatformAccessibilityTest`: the widget test uses
+UiAutomation's default service-suppression mode. On the disposable API36 `aligner-api36` Google APIs
+image, TalkBack is bundled at `/product/app/talkback/talkback.apk` (observed version
+16.0.0.738667889). No account, download or app dependency is needed. Record existing accessibility
+settings, enable TalkBack in emulator Settings, and verify its bound service with
+`adb -s emulator-5554 shell dumpsys accessibility`. Then run both platform tests using the matching
+installed app and instrumentation APKs:
+
+```sh
+adb -s emulator-5554 shell am instrument -w -r \
+  -e class org.alignertracker.app.ui.PlatformAccessibilityTest \
+  org.alignertracker.app.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+The test fails explicitly without an enabled spoken service; it never silently skips that
+prerequisite. It uses `FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES`, temporarily requests touch
+exploration and restores the original UiAutomation service flags afterward. Compose 1.9.5 excludes
+UiAutomation from the enabled-service list used to deliver accessibility events, so a focus action
+alone can return true without emitting an event. With real TalkBack bound, both the focus event and
+focused-node identity are required, alongside real action dispatch, error and dialog cancellation.
+Grouped labels are read within their native actionable/heading parent, not assumed to be flat text.
+
+For actual TalkBack traversal, use real next/previous gestures and activation, with Developer
+settings → Display speech output for observable speech content. Directly assigning focus to a node
+is platform evidence, not traversal evidence. Restore the emulator's original TalkBack/notification
+settings after capture. Physical Pixel ergonomics and owner comprehension remain PX-17 tomorrow;
+never apply emulator setup/reset commands to a personal phone.

@@ -32,3 +32,30 @@ The resolved phone/watch runtime inventory has 171 coordinates: 169 Apache-2.0 a
 The memory-bounded `scripts/check.sh` passed formatting, 53 phone and 8 watch JVM tests (zero failures/errors/skips), debug/release lint and both debug/test/minified unsigned release builds. The final count-label resource correction passed phone debug/test/release assembly and refreshed lint; all six screen tests plus the full 25-test phone suite subsequently passed. Local lint has zero errors and 36 phone/10 watch warnings in each variant. Remaining warnings are retained in reports: dependency/tool update suggestions, a dialog configuration-height query (also bounded by the actual dialog constraints), style/autoboxing/unused resources, a density-independent Tile preview, API31 widget sizing with legacy minimum dimensions, inferred widget overdraw and synchronous capture-journal preference commits needed before handing a URI to another process. No lint severity or test assertion was weakened. Final hosted commit and downloaded artifact verification are recorded in [#23](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/23); historical MVP artifacts do not establish expanded acceptance.
 
 Paired-emulator Wear transport remains open: no phone companion, account or interactive pairing was configured. Local official-GMS binder delivery cannot substitute for a real paired exchange. Also open: #11 physical Android/OEM/Doze/reboot/force-stop, #12 complete manual/device accessibility, #17 matched 24 h physical battery, #18 consented usability pilot, #20 physical watch and #21 user-owned signing/authorized publication. Procedures are in [external acceptance](external-acceptance.md). These gates are separate from implementation completion.
+
+## Sole-owner Pixel candidate — accessibility follow-up
+
+The owner explicitly replaced the five-person pilot with a sole-owner Pixel session planned for
+2026-09-09. [PX-01–PX-19](pixel-acceptance.md) cover every phone feature, with synthetic records,
+backup/signature safeguards and a results template. No physical result or pilot comprehension is
+claimed before that session. Garmin ownership does not establish Wear OS acceptance.
+
+The follow-up adds contextual record actions, specific expanded-form errors, grouped report/photo
+text, primary tracking-state semantics and a polite dismissible operation message. A single
+independent material review found no production regression. All34 general phone tests passed on API36 in65.753s, including the nine new Compose accessibility
+tests. Both additional Android platform-node tests passed with bundled TalkBack16 active, retaining
+strict focus-event, focused-node identity, action, field-error and cancellation assertions. Platform
+focus assignment is separate from actual TalkBack gesture traversal/speech; runtime observations
+are attached to #12/#23. The general and platform suites run separately because widget
+instrumentation temporarily suppresses screen-reader services.
+
+Both historical fixture imports pass the real importer; eight independently calculated past-day
+rows match exact wear/removed/covered time and recorded targets. The 9 September streak expectation
+is two days. Files and correction instructions are [included with the source](../app/src/test/resources/pixel/README.md).
+
+The complete local check passes 55 phone and 8 watch JVM tests, formatting, debug/release lint and
+all six phone/watch APK builds. Lint reports zero errors and 39 phone / 10 watch warnings per
+variant. Three newly unused older generic labels remain among the existing informational warnings;
+no severity or assertion was weakened. Test-harness corrections received a focused formatting,
+debug lint and test-APK rebuild. Final immutable APK/source hashes, signer, hosted run and downloaded
+reports are recorded in #23; CI evidence must match this candidate rather than an older green run.
