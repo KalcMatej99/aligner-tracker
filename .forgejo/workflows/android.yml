@@ -38,7 +38,7 @@ jobs:
           mkdir -p app/build/reports/ci
           { uname -m; node --version; git --version; java -version; } > app/build/reports/ci/runtime.txt 2>&1
       - name: Format, test, lint and build
-        run: ./scripts/check.sh
+        run: ./scripts/check.sh --stacktrace
       - name: Require complete phone and watch reports and APKs
         run: |
           for module in app wear; do

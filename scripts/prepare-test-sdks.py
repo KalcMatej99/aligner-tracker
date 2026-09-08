@@ -7,7 +7,7 @@ A mismatched or incomplete file is never promoted into the test cache.
 import argparse
 import hashlib
 from pathlib import Path
-import urllib.request
+import subprocess
 
 BASE = "https://repo.maven.apache.org/maven2/org/robolectric/android-all-instrumented"
 PINS = {
@@ -37,11 +37,13 @@ def prepare(root):
             if not target.exists() or digest(target) != expected:
                 temporary = directory / (name + ".partial")
                 try:
-                    with urllib.request.urlopen(f"{BASE}/{version}/{name}", timeout=120) as source, temporary.open("wb") as output:
-                        while chunk := source.read(1024 * 1024):
-                            output.write(chunk)
-                            if output.tell() > 256 * 1024 * 1024:
-                                raise ValueError("Unexpectedly large test SDK artifact")
+                    subprocess.run([
+                        "curl", "--fail", "--show-error", "--silent", "--location",
+                        "--proto", "=https", "--proto-redir", "=https",
+                        "--retry", "3", "--retry-all-errors", "--connect-timeout", "15",
+                        "--max-time", "300", "--max-filesize", str(256 * 1024 * 1024),
+                        f"{BASE}/{version}/{name}", "--output", str(temporary),
+                    ], check=True)
                     if digest(temporary) != expected:
                         raise ValueError(f"SHA-512 mismatch for {name}")
                     temporary.replace(target)

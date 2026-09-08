@@ -66,7 +66,7 @@ API36 phone and Wear images are supported for this development procedure. Paired
 
 ### Pinned test runtime downloads
 
-Python 3.11+ is required by `scripts/check.sh`. Before Gradle tests, `prepare-test-sdks.py` fetches the exact Robolectric 4.16.1 API35/API36 instrumented SDK artifacts through verified system TLS and checks repository-pinned SHA-512 values before atomically promoting them into `.gradle/robolectric-maven`. Existing files are rehashed; corrupt or interrupted downloads cannot be accepted. This avoids lazy Java-TLS SDK fetching inside tests, which failed with AEAD tag errors on hosted job795 even with the runner's AVX workaround. Neither certificate verification nor tests are bypassed. Change the SDK pins only with a Robolectric/API update and independently verified Maven Central digests.
+Python 3.11+ and curl are required by `scripts/check.sh`. Before Gradle tests, `prepare-test-sdks.py` fetches the exact Robolectric 4.16.1 API35/API36 instrumented SDK artifacts through verified system TLS and checks repository-pinned SHA-512 values before atomically promoting them into `.gradle/robolectric-maven`. Existing files are rehashed; corrupt or interrupted downloads cannot be accepted. This avoids lazy Java-TLS SDK fetching inside tests, which failed with AEAD tag errors on hosted job795 even with the runner's AVX workaround. Neither certificate verification nor tests are bypassed. Change the SDK pins only with a Robolectric/API update and independently verified Maven Central digests.
 
 ### Hosted memory budget
 
@@ -75,3 +75,19 @@ Run11/job799 completed tests, lint, debug APKs and phone release assembly, then 
 ### Notification instrumentation permission
 
 On a disposable API33+ emulator, temporarily grant `android.permission.POST_NOTIFICATIONS` to `org.alignertracker.app` before running `ReminderPlatformTest`. Record the original grant and restore it afterward; the test deliberately does not change user permission itself. The 2026-09-08 API36 run exercised actual AlarmManager delivery, then the original denied permission was restored. Do not change permissions on personal devices without their authorized acceptance scope.
+
+### Cross-runtime TLS compatibility
+
+Run12 also reproduced a TLS record-integrity failure in Python/OpenSSL before
+Gradle started. This is broader than a demonstrated Java-only problem; the VM
+root cause remains unconfirmed. SDK prefetch now uses strict-HTTPS curl with
+three bounded transfer retries, size/time limits and the same SHA-512 pins.
+A checksum mismatch or exhausted transfer fails the job. Neither certificate
+verification nor any test is retried, disabled or ignored.
+
+The separate infrastructure lane configured the isolated VM to mask AVX-512, VAES and VPCLMULQDQ as a controlled
+compatibility mitigation while retaining AES, PCLMULQDQ and AVX2. The
+`JAVA_TOOL_OPTIONS` workaround is still present. Infrastructure issue3 records
+the cross-runtime probes and uncertainty; successful samples do not establish
+a hardware or upstream root cause. CI includes Gradle stack traces so dependency
+resolution failures retain their underlying causes.
