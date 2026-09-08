@@ -414,8 +414,8 @@ internal fun TrackerNavigation(destination: Destination, onNavigate: (Destinatio
         if (maxWidth / fontScale < 300.dp) {
             Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
                 Column(
-                    Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     tabs.chunked(2).forEach { row ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -433,7 +433,7 @@ internal fun TrackerNavigation(destination: Destination, onNavigate: (Destinatio
                                         Modifier.fillMaxWidth()
                                             .selectable(selected = selected, role = Role.Tab, onClick = { onNavigate(tab) })
                                             .heightIn(min = 48.dp)
-                                            .padding(horizontal = 8.dp, vertical = 10.dp),
+                                            .padding(horizontal = 8.dp, vertical = 4.dp),
                                         contentAlignment = Alignment.Center,
                                     ) {
                                         Text(stringResource(tab.title), style = MaterialTheme.typography.labelLarge,
