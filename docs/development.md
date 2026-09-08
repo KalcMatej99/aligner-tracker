@@ -34,7 +34,7 @@ build steps. The workflow declares `contents: read` for portability, but Forgejo
 16.0.3 does **not** enforce that declaration: non-fork job tokens retain repository
 write access until the job finishes. Main-branch push/merge protection permits
 only the owner, and the runner has no deployment credentials. Fork PRs require
-approval and receive read-only tokens; review workflow/code changes before approval.
+approval for untrusted authors and receive read-only tokens; review workflow/code changes before approval.
 
 CI uses immutable pins for checkout v7.0.1, setup-java v6.0.0, setup-android
 v4.0.1 and Forgejo's upload-artifact v5. The setup-java step uses
@@ -43,6 +43,14 @@ skips installation through Forgejo's `/var/run` symlink. The runtime preflight
 requires JDK21, Node24, the exact SDK packages and absence of runner credentials
 and engine sockets. The runner retains the reproduced TLS workaround
 `JAVA_TOOL_OPTIONS=-XX:UseAVX=2`; removing it requires a controlled reproduction.
+
+The flag does not eliminate every observed JSSE TLS failure. CI prefetches the
+Robolectric4.16.1/API35 runtime into the existing repository-local Maven cache
+using `scripts/prefetch-robolectric.sh`, strict HTTPS and committed SHA-512 pins
+for both JAR and POM. Existing cache files are reverified and checksum mismatches
+fail the job. Only downloads have bounded retries; tests are not retried or skipped.
+Update these pins from Maven Central when changing the Robolectric version or
+test SDK. No cache is shared between hosted jobs.
 
 Runner capacity is one, each job has a 45-minute deadline and a 6 GiB memory / four
 CPU limit. Fresh jobs download SDK and dependencies; a first build can take longer.
