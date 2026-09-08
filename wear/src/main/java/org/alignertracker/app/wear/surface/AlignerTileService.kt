@@ -1,6 +1,6 @@
 package org.alignertracker.app.wear.surface
 
-import androidx.concurrent.futures.ResolvableFuture
+import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders
 import androidx.wear.protolayout.DimensionBuilders
@@ -134,7 +134,10 @@ class AlignerTileService : TileService() {
         immediate(ResourceBuilders.Resources.Builder().setVersion(RESOURCES_VERSION).build())
 
     private fun <T> immediate(value: T): ListenableFuture<T> =
-        ResolvableFuture.create<T>().apply { set(value) }
+        CallbackToFutureAdapter.getFuture { completer ->
+            completer.set(value)
+            "AlignerTileService immediate result"
+        }
 
     private companion object {
         const val RESOURCES_VERSION = "1"
