@@ -110,12 +110,12 @@ class TrackerScreensTest {
             AlignerTheme { ProgressScreen(example(), Instant.parse("2026-09-08T12:00:00Z")) }
         }
         compose
-            .onNodeWithText("1 of 7 days have tracked time")
+            .onNodeWithText("Days with tracked time: 1 of 7")
             .performScrollTo()
             .assertIsDisplayed()
         compose
             .onAllNodesWithText(
-                "0 complete days meet their recorded target, from 0 fully tracked days"
+                "Complete days meeting their recorded target: 0; fully tracked days: 0"
             )[0]
             .assertExists()
     }

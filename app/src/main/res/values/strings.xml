@@ -105,14 +105,14 @@
     <string name="timestamp_invalid">Use a valid time strictly between neighboring changes and no later than now. Ambiguous daylight-saving times require an explicit UTC offset, for example +02:00.</string>
     <string name="event_offset">UTC offset (optional, for example +02:00)</string>
     <string name="progress_heading">Understand your pattern.</string>
-    <string name="progress_period">Last %1$d days</string>
+    <string name="progress_period">Recent days: %1$d</string>
     <string name="progress_description">Includes today’s partial day. Only days with tracked time contribute to the recorded-wear average.</string>
     <string name="average_recorded">Average recorded wear</string>
-    <string name="days_with_data">%1$d of %2$d days have tracked time</string>
-    <string name="full_days">%1$d complete days meet their recorded target, from %2$d fully tracked days</string>
+    <string name="days_with_data">Days with tracked time: %1$d of %2$d</string>
+    <string name="full_days">Complete days meeting their recorded target: %1$d; fully tracked days: %2$d</string>
     <string name="progress_goal_policy">Comparisons use the target effective on each treatment-zone date. Partial days do not count as missed goals. This summary records self-reported time, not clinical treatment assessment.</string>
     <string name="no_progress">Keep recording to build your history. No data is counted before tracking began.</string>
-    <string name="treatment_fraction">%1$d of %2$d trays reached</string>
+    <string name="treatment_fraction">Trays reached: %1$d of %2$d</string>
     <string name="settings_heading">Make it work for you.</string>
     <string name="target_heading">Daily target</string>
     <string name="target_help">Use the target prescribed to you. A change takes effect tomorrow in the treatment time zone. Earlier daily targets remain unchanged.</string>
@@ -142,7 +142,7 @@
     <string name="import_backup">Restore backup</string>
     <string name="import_encrypted_backup">Restore encrypted backup</string>
     <string name="restore_heading">Review this backup</string>
-    <string name="restore_summary">%1$d state changes · %2$s</string>
+    <string name="restore_summary">State changes: %1$d · %2$s</string>
     <string name="restore_plan">Tray %1$d of %2$d · %3$s</string>
     <string name="restore_empty">No treatment in this backup</string>
     <string name="restore_warning">Restoring replaces all treatment records on this phone. It does not merge data. Your current reminder preferences remain. Export your existing records first if you need to keep them.</string>
