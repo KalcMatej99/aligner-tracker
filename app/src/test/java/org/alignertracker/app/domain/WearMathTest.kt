@@ -151,4 +151,31 @@ class WearMathTest {
                 .goalMinutes,
         )
     }
+
+    @Test
+    fun `clock discontinuity gaps are excluded from tracked wear across DST`() {
+        val base = snapshot("2026-03-29")
+        val gapStart = at("2026-03-29", 0)
+        val gapEnd = at("2026-03-29", 4)
+        val state =
+            base.copy(
+                trackingGaps =
+                    listOf(
+                        TrackingGap(
+                            id = 1,
+                            startAt = gapStart,
+                            endAt = gapEnd,
+                            reason = TrackingGapReason.CLOCK_DISCONTINUITY,
+                        )
+                    )
+            )
+        val summary =
+            WearMath.summarize(
+                state,
+                LocalDate.parse("2026-03-29"),
+                Instant.ofEpochMilli(at("2026-03-30", 0)),
+            )
+        assertEquals(20 * 3_600_000L, summary.wornMillis)
+        assertEquals(20 * 3_600_000L, summary.trackedMillis)
+    }
 }

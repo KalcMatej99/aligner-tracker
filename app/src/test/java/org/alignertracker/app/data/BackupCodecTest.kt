@@ -32,16 +32,32 @@ class BackupCodecTest {
     fun `round trip preserves timestamps IDs zone and completion`() {
         val completed =
             state.copy(plan = state.plan!!.copy(completed = true, completedAt = now.toEpochMilli()))
-        assertEquals(completed, BackupCodec.decode(BackupCodec.encode(completed)))
+        assertEquals(
+            TrackerValidation.expandLegacy(completed),
+            BackupCodec.decode(BackupCodec.encode(completed)),
+        )
         assertEquals(TrackerSnapshot(), BackupCodec.decode(BackupCodec.encode(TrackerSnapshot())))
+    }
+
+    @Test
+    fun `schema 1 import expands fixed plan without inventing earlier tray changes`() {
+        val schema1 =
+            """{"schemaVersion":1,"plan":{"id":1,"startDate":"2025-10-25","totalTrays":20,"currentTray":2,"daysPerTray":10,"currentTrayStartedOn":"2025-10-25","dailyGoalMinutes":1200,"zoneId":"Europe/Rome","trackingStartedAt":$start,"completed":false,"completedAt":null},"events":[{"id":1,"at":$start,"wearing":true},{"id":2,"at":${start + 3_600_000},"wearing":false}]}"""
+        val imported = BackupCodec.decode(schema1)
+        assertEquals(1, imported.phases.size)
+        assertEquals(1, imported.scheduleRevisions.size)
+        assertEquals(2, imported.trayHistory.single().trayNumber)
+        assertEquals(start, imported.trayHistory.single().startedAt)
+        assertEquals(1200, imported.targetHistory.single().goalMinutes)
+        assertTrue(BackupCodec.encode(imported).contains("\"schemaVersion\":2"))
     }
 
     @Test
     fun `unknown schema unknown fields duplicate fields and nested bombs reject`() {
         val encoded = BackupCodec.encode(state)
-        rejects(encoded.replace("\"schemaVersion\":1", "\"schemaVersion\":2"))
-        rejects(encoded.replace("\"schemaVersion\":1", "\"schemaVersion\":1,\"extra\":true"))
-        rejects(encoded.replace("\"schemaVersion\":1", "\"schemaVersion\":1,\"schemaVersion\":1"))
+        rejects(encoded.replace("\"schemaVersion\":2", "\"schemaVersion\":99"))
+        rejects(encoded.replace("\"schemaVersion\":2", "\"schemaVersion\":2,\"extra\":true"))
+        rejects(encoded.replace("\"schemaVersion\":2", "\"schemaVersion\":2,\"schemaVersion\":2"))
         rejects("[[[[[[]]]]]]")
         rejects("not JSON")
     }

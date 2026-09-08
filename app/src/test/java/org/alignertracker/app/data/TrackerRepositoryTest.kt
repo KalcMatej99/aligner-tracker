@@ -9,7 +9,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.alignertracker.app.domain.TrackerSnapshot
+import org.alignertracker.app.domain.Appointment
+import org.alignertracker.app.domain.PhotoMetadata
+import org.alignertracker.app.domain.TreatmentNote
+import org.alignertracker.app.domain.TrayIntervalDraft
+import org.alignertracker.app.domain.TreatmentPhaseKind
 import org.alignertracker.app.domain.TreatmentPlan
+import org.alignertracker.app.domain.WearCommand
 import org.alignertracker.app.domain.WearEvent
 import org.alignertracker.app.domain.WearMath
 import org.junit.After
@@ -110,7 +116,8 @@ class TrackerRepositoryTest {
         assertEquals(before, repository.snapshot())
         val replacement = before.copy(plan = before.plan!!.copy(dailyGoalMinutes = 1320))
         repository.replaceFromBackup(replacement)
-        assertEquals(replacement, repository.snapshot())
+        val restored = repository.snapshot()
+        assertEquals(replacement.copy(stateVersion = restored.stateVersion), restored)
     }
 
     @Test
@@ -142,6 +149,150 @@ class TrackerRepositoryTest {
         repository.start(plan(), true)
         rejected { repository.start(plan(), false) }
         assertEquals(1, repository.snapshot().events.size)
+    }
+
+    @Test
+    fun `schedule revisions preserve prior prescription and exact tray actions`() = runBlocking {
+        repository.start(plan(), true)
+        val phase = repository.snapshot().phases.single()
+        rejected {
+            repository.replaceSchedule(
+                phase.id,
+                listOf(TrayIntervalDraft(1, 1, 5), TrayIntervalDraft(3, 3, 10)),
+            )
+        }
+        repository.replaceSchedule(
+            phase.id,
+            listOf(TrayIntervalDraft(1, 1, 5), TrayIntervalDraft(2, 3, 10)),
+            "Clinician changed later trays",
+        )
+        assertEquals(2, repository.snapshot().scheduleRevisions.size)
+        assertEquals(5, repository.snapshot().plan!!.daysPerTray)
+        assertEquals(
+            java.time.LocalDate.parse("2025-10-25"),
+            WearMath.nextChangeDate(repository.snapshot()),
+        )
+        repository.advanceTray()
+        val state = repository.snapshot()
+        assertEquals(10, state.plan!!.daysPerTray)
+        assertEquals(2, state.trayHistory.size)
+        assertEquals(clock.millis(), state.trayHistory[0].endedAt)
+        assertEquals(clock.millis(), state.trayHistory[1].startedAt)
+    }
+
+    @Test
+    fun `goal changes default to tomorrow and preserve today's prescribed target`() = runBlocking {
+        repository.start(plan(), true)
+        repository.updateGoal(1320)
+        val state = repository.snapshot()
+        assertEquals("2025-10-27", state.targetHistory.last().effectiveFrom)
+        assertEquals(
+            1200,
+            WearMath.summarize(state, java.time.LocalDate.parse("2025-10-26"), clock.instant())
+                .goalMinutes,
+        )
+        assertEquals(
+            1320,
+            WearMath.targetForDate(state, java.time.LocalDate.parse("2025-10-27")),
+        )
+    }
+
+    @Test
+    fun `missing interval splits one known interval and remains correctable after completion`() =
+        runBlocking {
+            repository.start(plan(), true)
+            val start = clock.millis()
+            clock.value = clock.value.plusSeconds(600)
+            repository.completeTreatment()
+            repository.insertMissingInterval(start + 60_000, start + 120_000, false)
+            val corrected = repository.snapshot()
+            assertEquals(listOf(true, false, true), corrected.events.map { it.wearing })
+            rejected {
+                repository.insertMissingInterval(start + 60_000, start + 90_000, false)
+            }
+            repository.updateEvent(corrected.events[1].id, start + 70_000)
+            assertEquals(start + 70_000, repository.snapshot().events[1].at)
+        }
+
+    @Test
+    fun `stale and duplicate watch commands have durable deterministic outcomes`() = runBlocking {
+        repository.start(plan(), true)
+        val initial = repository.snapshot().stateVersion
+        val stale = WearCommand("watch-stale-0001", initial.generation, initial.revision - 1, false, clock.millis())
+        val firstRejection = repository.applyWearCommand(stale)
+        assertEquals(firstRejection, repository.applyWearCommand(stale.copy(wearing = true)))
+        assertEquals("STALE_REVISION", firstRejection.rejection!!.name)
+
+        clock.value = clock.value.plusSeconds(60)
+        val accepted =
+            repository.applyWearCommand(
+                WearCommand("watch-valid-0001", initial.generation, initial.revision, false, clock.millis() - 30_000)
+            )
+        assertEquals("ACCEPTED", accepted.status.name)
+        assertEquals(clock.millis(), repository.snapshot().events.last().at)
+
+        val beforeRestore = repository.snapshot()
+        repository.replaceFromBackup(beforeRestore.copy(stateVersion = org.alignertracker.app.domain.StateVersion()))
+        val restored = repository.snapshot().stateVersion
+        assertTrue(restored.generation != initial.generation)
+        val replay = repository.applyWearCommand(
+            WearCommand("watch-after-restore", initial.generation, accepted.stateAfter.revision, true, clock.millis())
+        )
+        assertEquals("STALE_GENERATION", replay.rejection!!.name)
+    }
+
+    @Test
+    fun `completed phase pause is untracked when refinement begins`() = runBlocking {
+        repository.start(plan(), true)
+        clock.value = clock.value.plusSeconds(60)
+        repository.completeTreatment()
+        val completedAt = clock.millis()
+        clock.value = clock.value.plusSeconds(3600)
+        repository.beginPhase(TreatmentPhaseKind.REFINEMENT, "Refinement 1", 2, 5)
+        val state = repository.snapshot()
+        assertFalse(state.plan!!.completed)
+        assertEquals(2, state.phases.size)
+        assertEquals(completedAt, state.trackingGaps.single().startAt)
+        assertEquals(clock.millis(), state.trackingGaps.single().endAt)
+    }
+
+    @Test
+    fun `journal records and trusted photo ownership restore atomically`() = runBlocking {
+        repository.start(plan(), true)
+        val state = repository.snapshot()
+        val phaseId = state.phases.single().id
+        val trayId = state.trayHistory.single().id
+        val noteId =
+            repository.addNote(
+                TreatmentNote(occurredAt = clock.millis(), text = "Attachment changed", phaseId = phaseId, trayHistoryId = trayId)
+            )
+        val appointmentId =
+            repository.addAppointment(
+                Appointment(startsAt = clock.millis() + 86_400_000, durationMinutes = 30, title = "Check-up")
+            )
+        val oldFile = "11111111-1111-4111-8111-111111111111.jpg"
+        val photoId =
+            repository.addPhoto(
+                PhotoMetadata(
+                    capturedAt = clock.millis(),
+                    mimeType = "image/jpeg",
+                    byteSize = 123,
+                    sha256 = "a".repeat(64),
+                    phaseId = phaseId,
+                    trayHistoryId = trayId,
+                    width = 100,
+                    height = 80,
+                    ownedFileName = oldFile,
+                )
+            )
+        assertEquals(noteId, repository.snapshot().notes.single().id)
+        assertEquals(appointmentId, repository.snapshot().appointments.single().id)
+        val portable = repository.snapshot().copy(
+            photos = repository.snapshot().photos.map { it.copy(ownedFileName = null) }
+        )
+        val newFile = "22222222-2222-4222-8222-222222222222.jpg"
+        assertEquals(listOf(oldFile), repository.replaceFromBackupWithCleanup(portable, mapOf(photoId to newFile)))
+        assertEquals(newFile, repository.snapshot().photos.single().ownedFileName)
     }
 
     private suspend fun rejected(block: suspend () -> Unit) {

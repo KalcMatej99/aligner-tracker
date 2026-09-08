@@ -11,6 +11,35 @@ object WearMath {
     fun nextChangeDate(plan: TreatmentPlan): LocalDate =
         LocalDate.parse(plan.currentTrayStartedOn).plusDays(plan.daysPerTray.toLong())
 
+    fun nextChangeDate(snapshot: TrackerSnapshot): LocalDate {
+        val plan = checkNotNull(snapshot.plan) { "Set up a treatment first." }
+        val openTray = snapshot.trayHistory.singleOrNull { it.endedOn == null }
+        val activePhase = snapshot.phases.singleOrNull { it.active }
+        val revision =
+            activePhase?.let { phase ->
+                snapshot.scheduleRevisions
+                    .filter { it.phaseId == phase.id }
+                    .maxWithOrNull(compareBy<ScheduleRevision> { it.createdAt }.thenBy { it.id })
+            }
+        val currentDays =
+            revision?.let { current ->
+                snapshot.trayIntervals.singleOrNull {
+                    it.scheduleRevisionId == current.id && plan.currentTray in it.firstTray..it.lastTray
+                }
+            }?.daysPerTray ?: plan.daysPerTray
+        return LocalDate.parse(openTray?.startedOn ?: plan.currentTrayStartedOn)
+            .plusDays(currentDays.toLong())
+    }
+
+    fun targetForDate(snapshot: TrackerSnapshot, date: LocalDate): Int {
+        val plan = snapshot.plan ?: return 0
+        return snapshot.targetHistory
+            .asSequence()
+            .filter { LocalDate.parse(it.effectiveFrom) <= date }
+            .maxByOrNull { it.effectiveFrom }
+            ?.goalMinutes ?: plan.dailyGoalMinutes
+    }
+
     fun summarize(snapshot: TrackerSnapshot, date: LocalDate, now: Instant): DaySummary {
         val plan = snapshot.plan ?: return DaySummary(date.toString(), 0, 0, 0, 0)
         val zone = ZoneId.of(plan.zoneId)
@@ -36,10 +65,15 @@ object WearMath {
             val event = events[index]
             val intervalStart = maxOf(start, event.at, plan.trackingStartedAt)
             val intervalEnd = minOf(end, events.getOrNull(index + 1)?.at ?: end)
-            val duration = (intervalEnd - intervalStart).coerceAtLeast(0)
+            val obscured =
+                snapshot.trackingGaps.sumOf { gap ->
+                    (minOf(intervalEnd, gap.endAt) - maxOf(intervalStart, gap.startAt))
+                        .coerceAtLeast(0)
+                }
+            val duration = ((intervalEnd - intervalStart).coerceAtLeast(0) - obscured).coerceAtLeast(0)
             if (event.wearing) worn += duration else removed += duration
             index++
         }
-        return DaySummary(date.toString(), worn, removed, worn + removed, plan.dailyGoalMinutes)
+        return DaySummary(date.toString(), worn, removed, worn + removed, targetForDate(snapshot, date))
     }
 }
