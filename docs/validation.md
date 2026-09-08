@@ -1,6 +1,6 @@
 # MVP validation — 2026-09-08
 
-**Internal-evaluation MVP accepted locally.** This is a debug build; physical-device reliability, hosted CI execution and production release signing remain separate gates. No medical effectiveness claim is made.
+**Internal-evaluation MVP accepted locally.** This is a debug build; physical-device reliability and production release signing remain separate gates. No medical effectiveness claim is made.
 
 ## Automated evidence
 
@@ -44,8 +44,8 @@ One read-only reminder/privacy review found no material source blocker. Integrat
 
 ## CI and remaining gates
 
-Forgejo Actions workflow is configured to run formatting, unit tests, lint and debug build and preserve report/APK artifacts. **Hosted execution is not accepted:** live Forgejo admin API reports shared runner `kalc-server-docker` offline; repository has no dedicated runner. #23 records the exact dependency. A local passing build is not reported as a hosted CI pass; shared runner infrastructure was not reconfigured.
+Forgejo Actions runs formatting, unit tests, lint and debug assembly through `scripts/check.sh`. The repository-scoped `kalc-server-aligner-vm` runner executes jobs inside a dedicated KVM guest, without host filesystem or host Docker access. The original global runner remains disabled under the July 29 security policy. The hosted acceptance record, including the exact validated main SHA, run URL, downloaded report counts and APK checksum, is maintained in [issue #23](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/23). Download `android-reports` and `android-debug-apk` from the relevant run; missing files fail artifact upload. Local evidence above is independent of the hosted result. Setup and limits are documented in [development.md](development.md#hosted-forgejo-ci).
 
 Open Beta gates: API26/33 and OEM physical-device alarms, reboot/Doze/force-stop/revocation matrix (#11); TalkBack, contrast audit, localization/RTL and broader layout validation (#12);24h battery/startup/large-history measurements (#17); consented real-user pilot (#18). Clock-forward jumps while no events are created cannot be distinguished from real elapsed time by this wall-clock MVP; rollback behind an event is rejected. Reports use a fixed treatment zone and the current goal; historical goals/variable phases are #14. Notifications cannot bypass force-stop, channel controls or OEM restrictions. Post-before-persist delivery markers allow a duplicate in a narrow crash window; no exactly-once claim is made.
 
-Encrypted backups (#16), widgets (#13), photos (#19), Wear OS (#20), richer reports/streaks (#22), and signing/distribution (#21) are explicit backlog work. There is no published production/store release or hosted CI result yet.
+Encrypted backups (#16), widgets (#13), photos (#19), Wear OS (#20), richer reports/streaks (#22), and signing/distribution (#21) are explicit backlog work. There is no published production/store release.

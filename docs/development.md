@@ -16,3 +16,25 @@ Dependencies and rationale: architecture.md and android-research.md. Room schema
 ## Release
 
 Debug APK is for internal evaluation, not a signed production release. Release build uses R8. User-owned signing keys and passwords are supplied outside version control; release pipeline/store publication remains #21. Never generate a long-term signing identity silently. Forgejo artifact retention must avoid real user data. GPL notice and complete corresponding source accompany distribution.
+
+## Hosted Forgejo CI
+
+The `Android` workflow runs `scripts/check.sh` on `ubuntu-latest`. This label is
+provided by the repository-scoped `kalc-server-aligner-vm` runner, using a
+digest-pinned Ubuntu 22.04 container inside a dedicated KVM guest. The workflow installs
+Temurin JDK21, Android platform36 and build-tools35.0.0. No emulator or release
+signing runs in this lane.
+
+A push to `main`, a pull request, or **Actions → Android → Run workflow** starts
+validation. Check the run's commit against current `main`. Download and unzip
+`android-reports` (JUnit XML, HTML unit-test and lint reports) and
+`android-debug-apk` from the run page. Artifacts are retained for 14 days; missing
+artifact files fail the upload step. Checkout credentials are removed before
+build steps, and the workflow requests read-only repository contents access.
+
+Runner capacity is one, each job has a 45-minute deadline and a 6 GiB memory / four
+CPU limit. Fresh jobs download SDK and dependencies; a first build can take longer.
+The runner has no host Docker access and no engine socket or host credentials are
+mounted into jobs. Host-private service ports are blocked; DNS and host HTTPS
+remain reachable for Forgejo. Infrastructure configuration, evidence and rollback:
+[forgejo-runner-ci](https://forgejo.server.matejkalc.com/matejkalc/forgejo-runner-ci).
