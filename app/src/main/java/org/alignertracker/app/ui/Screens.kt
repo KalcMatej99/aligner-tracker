@@ -32,8 +32,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.os.ConfigurationCompat
@@ -60,6 +62,7 @@ internal fun ScreenColumn(content: @Composable ColumnScope.() -> Unit) {
     Column(
         Modifier.widthIn(max = 680.dp)
             .fillMaxWidth()
+            .semantics { isTraversalGroup = true }
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -276,16 +279,56 @@ fun OnboardingScreen(
         Text(stringResource(R.string.welcome_body), style = MaterialTheme.typography.bodyLarge)
         Section(R.string.setup_title) {
             Text(stringResource(R.string.setup_body))
-            Entry(total, { total = it }, R.string.total_trays, numeric = true, enabled = !busy)
-            Entry(current, { current = it }, R.string.current_tray, numeric = true, enabled = !busy)
+            Entry(
+                total,
+                { total = it },
+                R.string.total_trays,
+                numeric = true,
+                enabled = !busy,
+                error = attempted && parseUserInteger(total) !in 1..1000,
+                errorMessage =
+                    if (attempted && parseUserInteger(total) !in 1..1000)
+                        R.string.tray_count_invalid
+                    else null,
+            )
+            Entry(
+                current,
+                { current = it },
+                R.string.current_tray,
+                numeric = true,
+                enabled = !busy,
+                error =
+                    attempted && parseUserInteger(current) !in 1..(parseUserInteger(total) ?: 0),
+                errorMessage =
+                    if (
+                        attempted && parseUserInteger(current) !in 1..(parseUserInteger(total) ?: 0)
+                    )
+                        R.string.current_tray_invalid
+                    else null,
+            )
             Entry(
                 interval,
                 { interval = it },
                 R.string.days_per_tray,
+                error = attempted && parseUserInteger(interval) !in 1..365,
+                errorMessage =
+                    if (attempted && parseUserInteger(interval) !in 1..365)
+                        R.string.tray_days_invalid
+                    else null,
                 numeric = true,
                 enabled = !busy,
             )
-            Entry(goal, { goal = it }, R.string.goal_hours, numeric = true, enabled = !busy)
+            Entry(
+                goal,
+                { goal = it },
+                R.string.goal_hours,
+                numeric = true,
+                enabled = !busy,
+                error = attempted && parseUserHours(goal) !in 1..1440,
+                errorMessage =
+                    if (attempted && parseUserHours(goal) !in 1..1440) R.string.goal_hours_invalid
+                    else null,
+            )
             Entry(start, { start = it }, R.string.treatment_start, enabled = !busy)
             Entry(currentStart, { currentStart = it }, R.string.tray_start, enabled = !busy)
             Entry(zone, { zone = it }, R.string.treatment_zone, enabled = !busy)
@@ -381,6 +424,7 @@ fun TodayScreen(
     val plan = snapshot.plan ?: return
     val zone = ZoneId.of(plan.zoneId)
     val wearing = WearMath.isWearing(snapshot)
+    val currentState = stringResource(if (wearing) R.string.state_in else R.string.state_out)
     val summary = WearMath.summarize(snapshot, now.atZone(zone).toLocalDate(), now)
     ScreenColumn {
         Heading(R.string.wear_heading)
@@ -413,7 +457,11 @@ fun TodayScreen(
                 Button(
                     onClick = { onToggle(!wearing) },
                     enabled = !busy,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp),
+                    modifier =
+                        Modifier.fillMaxWidth().heightIn(min = 64.dp).semantics {
+                            stateDescription = currentState
+                            liveRegion = LiveRegionMode.Polite
+                        },
                 ) {
                     Text(
                         stringResource(
@@ -563,6 +611,14 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
         Section(R.string.events_heading) {
             if (events.isEmpty()) Text(stringResource(R.string.no_changes))
             events.forEach { event ->
+                val editDescription =
+                    stringResource(
+                        R.string.edit_transition_accessibility,
+                        stringResource(
+                            if (event.wearing) R.string.state_in else R.string.state_out
+                        ),
+                        readableTime(event.at, zone),
+                    )
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         stringResource(
@@ -580,7 +636,7 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                         OutlinedButton(
                             onClick = { onEdit(event.id) },
                             enabled = !busy,
-                            modifier = Modifier.heightIn(min = 48.dp),
+                            modifier = Modifier.heightIn(min = 48.dp).recordAction(editDescription),
                         ) {
                             Text(stringResource(R.string.edit_time))
                         }

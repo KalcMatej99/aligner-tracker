@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
@@ -88,7 +87,8 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
                 { date = it },
                 label = { Text(stringResource(R.string.photo_date)) },
                 isError = !validDate,
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth().fieldError(!validDate, R.string.photo_date_invalid),
             )
         }
         if (!validDate) item { FormFeedback(R.string.photo_date_invalid) }
@@ -146,10 +146,14 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         item {
             Button(
                 onClick = { comparing = !comparing },
-                enabled = selected.size == 2,
+                enabled = comparing || selected.size == 2,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(stringResource(R.string.photo_compare))
+                Text(
+                    stringResource(
+                        if (comparing) R.string.photo_show_all else R.string.photo_compare
+                    )
+                )
             }
         }
         item {
@@ -168,20 +172,15 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
                 .sortedByDescending { it.capturedAt },
             key = { it.id },
         ) { photo ->
+            val description = photoDescription(photo, zone)
+            val selectDescription = stringResource(R.string.select_photo_accessibility, description)
+            val deleteDescription = stringResource(R.string.delete_photo_accessibility, description)
             ElevatedCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    PhotoPreview(photo, model)
-                    Text(
-                        Instant.ofEpochMilli(photo.capturedAt)
-                            .atZone(zone)
-                            .toLocalDate()
-                            .format(
-                                java.time.format.DateTimeFormatter.ofLocalizedDate(
-                                    java.time.format.FormatStyle.MEDIUM
-                                )
-                            )
-                    )
-                    if (photo.caption.isNotBlank()) Text(photo.caption)
+                    Column(Modifier.semantics(mergeDescendants = true) {}) {
+                        PhotoPreview(photo, model)
+                        Text(description)
+                    }
                     FilterChip(
                         selected = photo.id in selected,
                         onClick = {
@@ -190,8 +189,13 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
                                 else selected + photo.id
                         },
                         label = { Text(stringResource(R.string.photo_select)) },
+                        modifier = Modifier.recordAction(selectDescription),
                     )
-                    TextButton(onClick = { deleteId = photo.id }, enabled = !busy) {
+                    TextButton(
+                        onClick = { deleteId = photo.id },
+                        enabled = !busy,
+                        modifier = Modifier.recordAction(deleteDescription),
+                    ) {
                         Text(stringResource(R.string.photo_delete))
                     }
                 }
@@ -263,8 +267,16 @@ private fun PhotoPreview(photo: PhotoMetadata, model: TrackerViewModel) {
     if (image != null)
         Image(
             image.asImageBitmap(),
-            contentDescription = photo.caption.ifBlank { stringResource(R.string.photo_image) },
+            contentDescription = null,
             modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp),
         )
     else Text(stringResource(R.string.photo_loading))
 }
+
+@Composable
+internal fun photoDescription(photo: PhotoMetadata, zone: ZoneId): String =
+    stringResource(
+        R.string.dated_photo_accessibility,
+        readableTime(photo.capturedAt, zone),
+        photo.caption.ifBlank { stringResource(R.string.photo_no_caption) },
+    )

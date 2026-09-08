@@ -60,7 +60,9 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
             TrackerTextField(
                 intervals,
                 { intervals = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(parsed == null, R.string.schedule_format_invalid),
                 label = { Text(stringResource(R.string.variable_intervals)) },
                 supportingText = { Text(stringResource(R.string.interval_example)) },
                 isError = parsed == null,
@@ -89,8 +91,11 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
         TrackerTextField(
             phaseName,
             { phaseName = it.take(100) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .fieldError(phaseName.isBlank(), R.string.phase_name_required),
             label = { Text(stringResource(R.string.phase_name)) },
+            isError = phaseName.isBlank(),
         )
         for (phaseKind in
             listOf(TreatmentPhaseKind.REFINEMENT, TreatmentPhaseKind.RETENTION)) FilterChip(
@@ -108,14 +113,20 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
         TrackerTextField(
             count,
             { count = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .fieldError(count.toIntOrNull() !in 1..1000, R.string.tray_count_invalid),
             label = { Text(stringResource(R.string.phase_count)) },
+            isError = count.toIntOrNull() !in 1..1000,
         )
         TrackerTextField(
             days,
             { days = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .fieldError(days.toIntOrNull() !in 1..365, R.string.tray_days_invalid),
             label = { Text(stringResource(R.string.phase_days)) },
+            isError = days.toIntOrNull() !in 1..365,
         )
         Text(stringResource(R.string.phase_choose_state))
         for (state in listOf(true, false)) FilterChip(

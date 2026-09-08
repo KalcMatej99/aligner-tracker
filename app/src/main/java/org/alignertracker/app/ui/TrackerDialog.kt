@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
@@ -40,11 +41,12 @@ internal fun TrackerDialog(
                                 48.dp
                             )
                     )
+                    .semantics { isTraversalGroup = true }
                     .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
-                Column(Modifier.semantics { heading() }) {
+                Column(Modifier.semantics(mergeDescendants = true) { heading() }) {
                     ProvideTextStyle(MaterialTheme.typography.headlineSmall, title)
                 }
                 ProvideTextStyle(MaterialTheme.typography.bodyMedium, text)

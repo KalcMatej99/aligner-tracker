@@ -15,6 +15,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import java.time.*
 import org.alignertracker.app.R
@@ -72,10 +73,12 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 { date = it },
                 label = { Text(stringResource(R.string.journal_date)) },
                 isError = parsed == null,
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(parsed == null, R.string.journal_date_invalid),
             )
         }
-        if (parsed == null) item { FormFeedback(R.string.photo_date_invalid) }
+        if (parsed == null) item { FormFeedback(R.string.journal_date_invalid) }
         item {
             FilterChip(
                 selected = calendar,
@@ -174,6 +177,16 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
         }
         if (notes.isEmpty()) item { Text(stringResource(R.string.notes_empty)) }
         items(notes, key = { "note${it.id}" }) { note ->
+            val noteDescription =
+                stringResource(
+                    R.string.note_record_accessibility,
+                    readableTime(note.occurredAt, zone),
+                    note.text.take(80),
+                )
+            val editDescription =
+                stringResource(R.string.edit_record_accessibility, noteDescription)
+            val deleteDescription =
+                stringResource(R.string.delete_record_accessibility, noteDescription)
             ElevatedCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp)) {
                     Text(note.text)
@@ -181,11 +194,16 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                         onClick = {
                             noteId = note.id
                             noteText = note.text
-                        }
+                        },
+                        modifier = Modifier.recordAction(editDescription),
                     ) {
                         Text(stringResource(R.string.edit_record))
                     }
-                    TextButton(onClick = { delete = "note" to note.id }, enabled = !busy) {
+                    TextButton(
+                        onClick = { delete = "note" to note.id },
+                        enabled = !busy,
+                        modifier = Modifier.recordAction(deleteDescription),
+                    ) {
                         Text(stringResource(R.string.delete_record))
                     }
                 }
@@ -195,7 +213,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             TrackerTextField(
                 noteText,
                 { noteText = it.take(10000) },
-                label = { Text(stringResource(R.string.note_text)) },
+                label = { Text(stringResource(R.string.journal_note_text)) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -221,7 +239,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                         noteText.isNotBlank(),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(stringResource(R.string.save_note))
+                Text(stringResource(R.string.save_journal_note))
             }
         }
         item { Text(stringResource(R.string.appointment_permission_hint)) }
@@ -236,6 +254,29 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             item { Text(stringResource(R.string.appointments_empty)) }
         items(snapshot.appointments.sortedBy { it.startsAt }, key = { "appointment${it.id}" }) {
             appointment ->
+            val description =
+                stringResource(
+                    R.string.appointment_record_accessibility,
+                    appointment.title,
+                    readableTime(appointment.startsAt, zone),
+                )
+            val editDescription = stringResource(R.string.edit_record_accessibility, description)
+            val deleteDescription =
+                stringResource(R.string.delete_record_accessibility, description)
+            val completionDescription =
+                stringResource(
+                    R.string.record_action_accessibility,
+                    stringResource(
+                        if (appointment.completed) R.string.appointment_reopen
+                        else R.string.appointment_complete
+                    ),
+                    description,
+                )
+            val completionState =
+                stringResource(
+                    if (appointment.completed) R.string.appointment_completed_state
+                    else R.string.appointment_upcoming_state
+                )
             ElevatedCard(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp)) {
                     Text(appointment.title, style = MaterialTheme.typography.titleMedium)
@@ -266,7 +307,8 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                             duration = appointment.durationMinutes.toString()
                             reminder = appointment.reminderMinutesBefore?.toString() ?: ""
                             appointmentNote = appointment.note
-                        }
+                        },
+                        modifier = Modifier.recordAction(editDescription),
                     ) {
                         Text(stringResource(R.string.edit_record))
                     }
@@ -276,6 +318,10 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                                 appointment.copy(completed = !appointment.completed)
                             )
                         },
+                        modifier =
+                            Modifier.recordAction(completionDescription).semantics {
+                                stateDescription = completionState
+                            },
                         enabled = !busy,
                     ) {
                         Text(
@@ -287,6 +333,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                     }
                     TextButton(
                         onClick = { delete = "appointment" to appointment.id },
+                        modifier = Modifier.recordAction(deleteDescription),
                         enabled = !busy,
                     ) {
                         Text(stringResource(R.string.delete_record))
@@ -299,7 +346,9 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 title,
                 { title = it.take(200) },
                 label = { Text(stringResource(R.string.appointment_title)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth().fieldError(title.isBlank(), R.string.title_required),
+                isError = title.isBlank(),
             )
         }
         item {
@@ -309,7 +358,9 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 label = { Text(stringResource(R.string.appointment_time)) },
                 supportingText = { Text(stringResource(R.string.local_time_hint, zone.id)) },
                 isError = appointmentAt == null,
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(appointmentAt == null, R.string.appointment_time_invalid),
             )
         }
         item {
@@ -317,7 +368,13 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 duration,
                 { duration = it },
                 label = { Text(stringResource(R.string.appointment_duration)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(
+                            duration.toIntOrNull() !in 1..1440,
+                            R.string.appointment_duration_invalid,
+                        ),
+                isError = duration.toIntOrNull() !in 1..1440,
             )
         }
         item {
@@ -325,14 +382,20 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 reminder,
                 { reminder = it },
                 label = { Text(stringResource(R.string.appointment_reminder)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(
+                            reminder.isNotBlank() && reminder.toIntOrNull() !in 0..10080,
+                            R.string.appointment_reminder_invalid,
+                        ),
+                isError = reminder.isNotBlank() && reminder.toIntOrNull() !in 0..10080,
             )
         }
         item {
             TrackerTextField(
                 appointmentNote,
                 { appointmentNote = it.take(10000) },
-                label = { Text(stringResource(R.string.note_text)) },
+                label = { Text(stringResource(R.string.appointment_note_text)) },
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -391,7 +454,10 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 missingStart,
                 { missingStart = it },
                 label = { Text(stringResource(R.string.interval_start)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(start == null, R.string.correction_form_invalid),
+                isError = start == null,
             )
         }
         item {
@@ -399,7 +465,10 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 missingEndDate,
                 { missingEndDate = it },
                 label = { Text(stringResource(R.string.interval_end_date)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(end == null, R.string.correction_form_invalid),
+                isError = end == null,
             )
         }
         item {
@@ -407,7 +476,17 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 missingEnd,
                 { missingEnd = it },
                 label = { Text(stringResource(R.string.interval_end)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(
+                            end == null ||
+                                start == null ||
+                                start >= end ||
+                                end > System.currentTimeMillis(),
+                            R.string.correction_form_invalid,
+                        ),
+                isError =
+                    end == null || start == null || start >= end || end > System.currentTimeMillis(),
             )
         }
         item {
@@ -480,7 +559,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                     },
                     enabled = !busy,
                 ) {
-                    Text(stringResource(R.string.save_note))
+                    Text(stringResource(R.string.save_correction))
                 }
             },
             dismissButton = {

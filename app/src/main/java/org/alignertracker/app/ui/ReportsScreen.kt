@@ -11,6 +11,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -99,7 +100,10 @@ fun ReportsScreen(
             }
         items(days, key = { it.date }) { day ->
             ElevatedCard(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    Modifier.padding(12.dp).semantics(mergeDescendants = true) {},
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     Text(
                         LocalDate.parse(day.date)
                             .format(
@@ -120,7 +124,7 @@ fun ReportsScreen(
                     val total = ReportMath.dayMillis(LocalDate.parse(day.date), zone)
                     LinearProgressIndicator(
                         progress = { (day.wornMillis.toFloat() / total).coerceIn(0f, 1f) },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
                     )
                     Text(
                         stringResource(

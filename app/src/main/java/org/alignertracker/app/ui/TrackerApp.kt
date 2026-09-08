@@ -244,7 +244,7 @@ fun TrackerApp(model: TrackerViewModel) {
                         TrackerViewModel.Notice.REMINDER_RETRY -> R.string.notice_reminder_retry
                         TrackerViewModel.Notice.CLEANUP_RETRY -> R.string.notice_cleanup_retry
                     }
-                TextButton(onClick = model::dismissMessage) { Text(stringResource(text)) }
+                OperationNotice(stringResource(text), model::dismissMessage)
             }
             val state = snapshot
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
@@ -376,6 +376,23 @@ fun TrackerApp(model: TrackerViewModel) {
                         value = backupPassword,
                         onValueChange = { backupPassword = it.take(1024) },
                         label = { Text(stringResource(R.string.backup_password)) },
+                        isError =
+                            exporting && backupPassword.isNotEmpty() && backupPassword.length < 12,
+                        modifier =
+                            Modifier.fieldError(
+                                exporting &&
+                                    backupPassword.isNotEmpty() &&
+                                    backupPassword.length < 12,
+                                R.string.password_short,
+                            ),
+                        supportingText = {
+                            if (
+                                exporting &&
+                                    backupPassword.isNotEmpty() &&
+                                    backupPassword.length < 12
+                            )
+                                Text(stringResource(R.string.password_short))
+                        },
                         visualTransformation =
                             androidx.compose.ui.text.input.PasswordVisualTransformation(),
                         singleLine = true,
@@ -385,6 +402,17 @@ fun TrackerApp(model: TrackerViewModel) {
                             value = repeatPassword,
                             onValueChange = { repeatPassword = it.take(1024) },
                             label = { Text(stringResource(R.string.repeat_password)) },
+                            isError =
+                                repeatPassword.isNotEmpty() && repeatPassword != backupPassword,
+                            modifier =
+                                Modifier.fieldError(
+                                    repeatPassword.isNotEmpty() && repeatPassword != backupPassword,
+                                    R.string.password_mismatch,
+                                ),
+                            supportingText = {
+                                if (repeatPassword.isNotEmpty() && repeatPassword != backupPassword)
+                                    Text(stringResource(R.string.password_mismatch))
+                            },
                             visualTransformation =
                                 androidx.compose.ui.text.input.PasswordVisualTransformation(),
                             singleLine = true,

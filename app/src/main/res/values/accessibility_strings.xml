@@ -1,0 +1,32 @@
+<resources>
+    <string name="dismiss_notice">Dismiss message</string>
+    <string name="edit_transition_accessibility">Edit time for %1$s, %2$s</string>
+    <string name="dated_photo_accessibility">Progress photo, %1$s. %2$s</string>
+    <string name="photo_no_caption">No caption</string>
+    <string name="select_photo_accessibility">Select for comparison or export: %1$s</string>
+    <string name="delete_photo_accessibility">Delete %1$s</string>
+    <string name="photo_show_all">Show all photos</string>
+    <string name="note_record_accessibility">Note, %1$s. %2$s</string>
+    <string name="appointment_record_accessibility">Appointment, %1$s, %2$s</string>
+    <string name="edit_record_accessibility">Edit %1$s</string>
+    <string name="delete_record_accessibility">Delete %1$s</string>
+    <string name="record_action_accessibility">%1$s: %2$s</string>
+    <string name="appointment_completed_state">Completed</string>
+    <string name="appointment_upcoming_state">Upcoming</string>
+    <string name="journal_note_text">Journal note</string>
+    <string name="appointment_note_text">Appointment note (optional)</string>
+    <string name="save_journal_note">Save note</string>
+    <string name="save_correction">Save correction</string>
+    <string name="journal_date_invalid">Enter a valid date as YYYY-MM-DD between 1970 and 2100.</string>
+    <string name="title_required">Enter an appointment title.</string>
+    <string name="appointment_duration_invalid">Enter a duration from 1 to 1440 minutes.</string>
+    <string name="appointment_reminder_invalid">Enter 0 to 10080 minutes, or leave blank for no reminder.</string>
+    <string name="phase_name_required">Enter a phase name.</string>
+    <string name="tray_count_invalid">Enter a whole number from 1 to 1000.</string>
+    <string name="tray_days_invalid">Enter a whole number from 1 to 365 days.</string>
+    <string name="appointment_time_invalid">Enter a valid HH:mm time and date. Include a UTC offset for a repeated daylight-saving time.</string>
+    <string name="password_short">Use at least 12 characters for a new backup password.</string>
+    <string name="password_mismatch">The repeated password must match the backup password.</string>
+    <string name="current_tray_invalid">Enter your current tray number between 1 and the total number of trays.</string>
+    <string name="goal_hours_invalid">Enter prescribed hours greater than 0 and no more than 24, in whole minutes.</string>
+</resources>
