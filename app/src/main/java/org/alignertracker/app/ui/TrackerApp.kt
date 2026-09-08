@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
@@ -188,21 +189,14 @@ fun TrackerApp(model: TrackerViewModel) {
     BackHandler(destination != Destination.TODAY) { destinationName = Destination.TODAY.name }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(
-                            if (destination == Destination.SETTINGS) R.string.settings
-                            else R.string.app_name
-                        )
-                    )
-                },
-                navigationIcon = {
-                    if (destination == Destination.SETTINGS)
-                        TextButton(onClick = { destinationName = Destination.TODAY.name }) {
-                            Text(stringResource(R.string.back))
-                        }
-                },
+            AdaptiveTrackerTopBar(
+                title =
+                    stringResource(
+                        if (destination == Destination.SETTINGS) R.string.settings
+                        else R.string.app_name
+                    ),
+                showBack = destination == Destination.SETTINGS,
+                onBack = { destinationName = Destination.TODAY.name },
                 actions = {
                     if (snapshot?.plan != null)
                         Box {
@@ -645,6 +639,57 @@ internal fun TrackerNavigation(destination: Destination, onNavigate: (Destinatio
                     )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AdaptiveTrackerTopBar(
+    title: String,
+    showBack: Boolean,
+    onBack: () -> Unit,
+    actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit,
+) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val stacked =
+            maxWidth / androidx.compose.ui.platform.LocalDensity.current.fontScale < 300.dp
+        if (stacked) {
+            Surface {
+                Column(
+                    Modifier.fillMaxWidth()
+                        .then(
+                            Modifier.windowInsetsPadding(
+                                androidx.compose.material3.TopAppBarDefaults.windowInsets
+                            )
+                        )
+                ) {
+                    Text(
+                        title,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier =
+                            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (showBack)
+                            TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                        actions()
+                    }
+                }
+            }
+        } else {
+            TopAppBar(
+                title = { Text(title) },
+                navigationIcon = {
+                    if (showBack)
+                        TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                },
+                actions = actions,
+            )
         }
     }
 }

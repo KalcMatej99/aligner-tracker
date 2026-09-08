@@ -57,4 +57,40 @@ class AdaptiveNavigationTest {
             )
         }
     }
+
+    @Test
+    fun topBarDoesNotBreakBrandIntoFragmentsAtLargeFont() {
+        compose.setContent {
+            CompositionLocalProvider(
+                LocalDensity provides Density(LocalDensity.current.density, fontScale = 2f)
+            ) {
+                AlignerTheme {
+                    Box(Modifier.width(320.dp)) {
+                        AdaptiveTrackerTopBar("Aligner Tracker", false, {}) {
+                            androidx.compose.material3.TextButton(onClick = {}) {
+                                androidx.compose.material3.Text("More")
+                            }
+                            androidx.compose.material3.TextButton(onClick = {}) {
+                                androidx.compose.material3.Text("Settings")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        val layouts = mutableListOf<TextLayoutResult>()
+        compose.onNodeWithText("Aligner Tracker").performSemanticsAction(
+            SemanticsActions.GetTextLayoutResult
+        ) {
+            it(layouts)
+        }
+        assertEquals(1, layouts.single().lineCount)
+        assertTrue(
+            "Header layout size=${layouts.single().size}, paragraphHeight=${layouts.single().multiParagraph.height}, overflowWidth=${layouts.single().didOverflowWidth}, overflowHeight=${layouts.single().didOverflowHeight}",
+            !layouts.single().hasVisualOverflow,
+        )
+        listOf("More", "Settings").forEach {
+            compose.onNodeWithText(it).assertIsDisplayed().performClick()
+        }
+    }
 }
