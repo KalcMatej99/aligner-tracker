@@ -1,14 +1,14 @@
 # External acceptance procedures
 
-Status: procedures only. No physical device, participant, account, signing or publication action is authorized or claimed here. Accelerated emulator results are useful internal evidence but do not satisfy these gates.
+Status: procedures only; no physical acceptance results are claimed. The owner has chosen to be the sole tester and to install/test all phone features on their Pixel on **2026-09-09**. Follow the ordered [Pixel acceptance session](pixel-acceptance.md). This replaces the former five-person pilot requirement. Account changes, release signing/publication and unrelated device changes are not part of that session. Accelerated emulator results supplement human/device evidence.
 
-Use only synthetic treatment data. Give every run an evidence ID and record the source commit, APK SHA-256, signer fingerprint, device model, Android/Wear OS version, security patch, OEM build, Google Play Services version, locale, time zone, permission/channel state, battery restrictions, exact steps, wall-clock timestamps, screen recording or screenshots, redacted logs, expected result, observed result and pass/fail. Never collect a participant's medical schedule, photos, name, email or account identifier.
+Use only synthetic treatment data. Give every run an evidence ID and record the source commit, APK SHA-256, signer fingerprint, device model, Android/Wear OS version, security patch, OEM build, Google Play Services version, locale, time zone, permission/channel state, battery restrictions, exact steps, wall-clock timestamps, screen recording or screenshots, redacted logs, expected result, observed result and pass/fail. Keep private treatment records, personal photos and device/account identifiers out of committed evidence. The owner may use their own records after synthetic acceptance, but destructive cases must use disposable synthetic records only.
 
 ## Physical phone and OEM reminder matrix (#11)
 
-Run the entire matrix on physical devices covering API 26, API 33 and API 36. Include a current Pixel/AOSP-like device and at least two non-Google OEM software builds; record their exact background and auto-start controls rather than assigning an unverified “aggressive” label. Test the lowest supported API, the notification-runtime-permission boundary and the current target API. If one device covers two properties, retain at least three distinct physical devices overall.
+The wider release matrix remains open independently of the owner Pixel pilot; it is not an entry requirement for that session. For broad device acceptance, run the entire matrix on physical devices covering API 26, API 33 and API 36. Include a current Pixel/AOSP-like device and at least two non-Google OEM software builds; record their exact background and auto-start controls rather than assigning an unverified “aggressive” label. Test the lowest supported API, the notification-runtime-permission boundary and the current target API. If one device covers two properties, retain at least three distinct physical devices overall.
 
-For each device, start from a fresh candidate install and execute these cases with a synthetic plan:
+For each dedicated test device, use a fresh candidate install and a synthetic plan. On the personal Pixel preserve any existing install and records; verify signer compatibility before an in-place update and never uninstall to work around a signature mismatch. Coordinate reboot, time changes, force-stop, Doze and system settings changes with the owner during the scheduled session, restore original settings, and record any case not run:
 
 1. Leave notification permission denied or the app channel blocked. Schedule break, tray and appointment reminders. Confirm the app reports the block truthfully, does not claim delivery, and tracking remains usable.
 2. Grant notifications. Test the normal inexact path, then the exact-alarm path where the OS exposes and grants special access. Revoke exact access and confirm reconciliation selects the documented fallback without a crash or stale exact-alarm claim.
@@ -25,7 +25,7 @@ Useful captures include `adb -s SERIAL shell dumpsys alarm`, `dumpsys jobschedul
 
 ## Physical 24-hour battery and wakeup study (#17)
 
-Measure phone and watch separately on the same candidate. Use a stable device configuration, connectivity, brightness/always-on setting, notification settings and daily interaction script. Do not compare an idle baseline with an unusually busy candidate day.
+These longer measurements are a separate release gate, not a fixed-duration obligation or prerequisite for the one-owner pilot. Measure phone and watch separately on the same candidate when the hardware is available. Use a stable device configuration, connectivity, brightness/always-on setting, notification settings and daily interaction script. Do not compare an idle baseline with an unusually busy candidate day.
 
 Run at least two 24-hour baseline periods and two 24-hour candidate periods per device, alternating their order. The phone baseline keeps the app installed with no active plan, reminders or watch connection; the candidate period uses a synthetic active plan, paired watch, three IN/OUT cycles, one note, one history view, one scheduled reminder and the normal Tile/complication refresh pattern. The watch baseline keeps the companion installed but inactive and the candidate period uses the same paired script. Start each run at a matched charge level, unplugged, and record ambient display/radio conditions and unrelated device use.
 
@@ -54,7 +54,7 @@ For every screen verify that all actionable elements are reachable once in a log
 
 ## Physical Wear OS acceptance (#20)
 
-Use a physical Google Play Services-capable Wear OS device paired to the physical phone. Install phone and watch APKs built from the same commit, version and signing certificate. Record Wear OS and Play Services versions. Keep phone history authoritative throughout.
+The owner has a Garmin, not a Wear OS watch. This gate remains untested; the Pixel session neither satisfies it nor adds Garmin support or removes Wear from v1 scope. When suitable hardware is available, use a physical Google Play Services-capable Wear OS device paired to the physical phone. Install phone and watch APKs built from the same commit, version and signing certificate. Record Wear OS and Play Services versions. Keep phone history authoritative throughout.
 
 1. With no phone plan, sync and verify the watch says setup is required. Create the phone plan, sync, and compare tray, completion and acknowledged IN/OUT state in app, Tile and complication.
 2. From a fresh acknowledged revision, record the opposite state on the watch. Verify a pending indication appears immediately, the phone records one event at phone receipt time, and all watch surfaces show the accepted phone revision after acknowledgement.
@@ -68,28 +68,18 @@ Use a physical Google Play Services-capable Wear OS device paired to the physica
 
 No physical duplicate-message injector exists in the release UI. Exact idempotency-ID replay remains an automated repository/protocol test unless a reviewed test-only transport harness is built and excluded from release. This limitation must remain visible in #20 evidence; do not imply the physical test proved wire-level duplicate replay.
 
-## Consented usability pilot (#18)
+## Owner usability pilot (#18)
 
-Recruit or contact nobody until the user explicitly authorizes the pilot and its participant-facing text. After authorization, target five adults who use removable aligners or can realistically follow a synthetic scenario. Participation is voluntary, uncompensated unless separately approved, and may stop at any time. Obtain documented consent before observation. Assign a random participant code; keep the code key out of the repository and destroy it after follow-up. Use synthetic schedules and sample photos only.
+The owner's 2026-09-08 instruction replaces recruitment and five-person observation with **one tester: the owner**, using their Pixel on 2026-09-09. No participant recruitment, random participant codes, external contact, additional consent form or minimum number of days is required. The owner has authorized this session; the test procedure is [pixel-acceptance.md](pixel-acceptance.md). Broader OEM, battery and Wear coverage remain separate gates and do not prevent the phone pilot.
 
-Give each participant the same candidate and neutral task cards, without demonstrating first:
+Use the short core journey first, then the complete phone checklist. Record what the owner actually did and understood, including confusion, wrong turns, help needed and any difference from expected behavior. Automation may prepare synthetic fixtures, verify APKs and calculate expected totals, but it cannot count as the owner's completion or comprehension. If help was needed, record it and repeat the affected task after a concrete fix or explanation; do not silently count an assisted attempt as an independent success.
 
-1. Set up a prescribed plan starting on a non-first tray and record taking aligners out and putting them back in.
-2. Repair a forgotten interval from yesterday and explain what time the app counts and what remains unknown.
-3. Find why a reminder will not appear when notifications are denied, then recover after the facilitator grants permission.
-4. Change a future tray interval, advance a tray, complete a phase and start refinement or retention with an explicitly chosen current state.
-5. Add/edit/delete a note and appointment, import/delete a sample photo, and find daily and per-tray reporting.
-6. Export an encrypted backup, cancel one restore, try a wrong password, inspect a valid preview, and explain what confirmed replacement will delete or retain before proceeding.
-7. If the participant uses the watch scenario, record a watch action offline, change the phone state, reconnect, and explain the rejection.
+The owner should explain in their own words when tracking begins, what missing/partial coverage means, when a target change takes effect, why denied notifications prevent reminders, and what plaintext exports and confirmed replacement restore expose or replace. Keep concise synthetic reproduction steps and paraphrased findings locally; commit no personal treatment/photo content. Create issues only for concrete material findings.
 
-The facilitator may repeat the task but must not name a control or route. Record task completion, time, wrong turns, requests for help, facilitator interventions and the participant's own explanation of coverage, prescribed targets, restore replacement, photo privacy and watch acknowledgement. After each task ask “What did you expect to happen?” and “What would you change?” Do not ask for treatment details or diagnose behavior.
-
-Store only anonymous structured results and paraphrased findings locally. Delete recordings after transcription unless the consent form explicitly authorizes retention. A participant can withdraw their record by code. Escalate only concrete reproducible findings into issues, with synthetic reproduction steps and no participant identity.
-
-The pilot passes when all five sessions are accounted for, every critical workflow has observed evidence, and there is no unresolved data-loss risk, mistaken unacknowledged watch state, misleading medical interpretation, privacy misunderstanding that could cause exposure, or accessibility blocker. Lesser findings need a triaged decision and owner. Documentation alone, fewer unaccounted sessions, or facilitator-assisted success does not close #18.
+The pilot passes when the owner has recorded an outcome for each phone case, completed the core journey and understood these boundaries, with no unresolved data loss, misleading medical interpretation, privacy exposure or blocker in the tested phone workflows. Untested cases stay NOT RUN/BLOCKED; they do not inherit a PASS from emulator results. Lesser findings need a triaged decision and owner. #18 and its #22 dependency remain open until actual human results are reviewed. Passing this owner pilot is evidence for this tester/device, not a general usability or release-readiness claim.
 
 ## Gate record
 
-As of 2026-09-08, the physical OEM/API matrix, physical TalkBack audit, physical phone/watch battery measurements, physical watch journey, usability pilot, user-owned signing exercise and distribution approval have no recorded external acceptance evidence in this repository. Each remains open until its raw evidence and decision are reviewed. No “release ready” statement is valid while any of these gates is open.
+As of 2026-09-08, the physical OEM/API matrix, physical TalkBack audit, physical phone/watch battery measurements, physical watch journey, usability pilot, user-owned signing exercise and distribution approval have no recorded external acceptance evidence in this repository. The owner Pixel session is scheduled for 2026-09-09; it has not occurred. Each gate remains open until its applicable evidence and decision are reviewed. No “release ready” statement is valid while any of these gates is open.
 
 The bundled dependency/license audit is complete in [dependency-licenses.md](dependency-licenses.md); external store/F-Droid acceptance and publication authorization are separate. Paired-emulator Wear transport also remains open: the available phone lacks the companion/pairing setup described in [wear.md](wear.md). Standalone official-GMS binder delivery does not satisfy that journey.

@@ -23,8 +23,10 @@ Refreshed 2026-09-08 after expanded phone/watch implementation and bounded emula
 - [ ] #11: physical Android/OEM reminder matrix including Doze/reboot/force-stop.
 - [ ] #12: full TalkBack, keyboard/switch access and physical-device audit.
 - [ ] #17: matched 24 h physical battery and wakeup observations.
-- [ ] #18: consented usability pilot.
+- [ ] #18: sole-owner Pixel usability pilot scheduled for 2026-09-09; [all-phone-feature cases](pixel-acceptance.md) require actual owner outcomes. This replaces five-person recruitment. #22 stays open for this human-evidence dependency despite accepted report software.
 - [ ] #20: physical watch pairing/reconnect, Tile, complication, accessibility and battery.
 - [ ] #21: user-owned signing, release-signed upgrade matrix, complete notice/source bundle and explicitly authorized distribution. F-Droid acceptance requires maintainer/source-build assessment.
+
+The owner Pixel pilot can proceed while broader OEM/battery/Wear gates remain open. The owner has a Garmin, so physical Wear acceptance is unavailable in this session; Wear scope remains unchanged and no Garmin integration is included.
 
 [External acceptance](external-acceptance.md) and [release preparation](release.md) define concrete procedures. Software completion never substitutes for these gates or establishes release readiness. Final hosted integration/issue evidence is coordinator-owned; no additional speculative features are needed. Cloud sync/backend, automatic medical decisions, accounts, billing, analytics and unauthorized publication remain outside scope.
