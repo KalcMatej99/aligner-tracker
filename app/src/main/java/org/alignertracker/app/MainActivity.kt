@@ -15,11 +15,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val container = (application as TrackerApplication).container
-        val model = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                TrackerViewModel(container.repository, container.reminderSettings, container.reminderScheduler) as T
-        })[TrackerViewModel::class.java]
+        val model =
+            ViewModelProvider(
+                this,
+                object : ViewModelProvider.Factory {
+                    @Suppress("UNCHECKED_CAST")
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                        TrackerViewModel(
+                            container.repository,
+                            container.reminderSettings,
+                            container.reminderScheduler,
+                        )
+                            as T
+                },
+            )[TrackerViewModel::class.java]
         setContent { AlignerTheme { TrackerApp(model) } }
     }
 }

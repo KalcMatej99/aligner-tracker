@@ -5,21 +5,22 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 object WearMath {
-    fun isWearing(snapshot: TrackerSnapshot): Boolean = snapshot.events.lastOrNull()?.wearing ?: false
+    fun isWearing(snapshot: TrackerSnapshot): Boolean =
+        snapshot.events.lastOrNull()?.wearing ?: false
 
     fun nextChangeDate(plan: TreatmentPlan): LocalDate =
         LocalDate.parse(plan.currentTrayStartedOn).plusDays(plan.daysPerTray.toLong())
 
     fun summarize(snapshot: TrackerSnapshot, date: LocalDate, now: Instant): DaySummary {
-        val plan = snapshot.plan
-            ?: return DaySummary(date.toString(), 0, 0, 0, 0)
+        val plan = snapshot.plan ?: return DaySummary(date.toString(), 0, 0, 0, 0)
         val zone = ZoneId.of(plan.zoneId)
         val start = date.atStartOfDay(zone).toInstant().toEpochMilli()
-        val end = minOf(
-            date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli(),
-            now.toEpochMilli(),
-            plan.completedAt ?: Long.MAX_VALUE,
-        )
+        val end =
+            minOf(
+                date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli(),
+                now.toEpochMilli(),
+                plan.completedAt ?: Long.MAX_VALUE,
+            )
         var worn = 0L
         var removed = 0L
         val events = snapshot.events

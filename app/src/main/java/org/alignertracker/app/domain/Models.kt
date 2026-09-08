@@ -17,8 +17,7 @@ data class TreatmentPlan(
     val completedAt: Long? = null,
 )
 
-@Serializable
-data class WearEvent(val id: Long = 0, val at: Long, val wearing: Boolean)
+@Serializable data class WearEvent(val id: Long = 0, val at: Long, val wearing: Boolean)
 
 @Serializable
 data class TrackerSnapshot(

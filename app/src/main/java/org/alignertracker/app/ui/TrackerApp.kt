@@ -13,26 +13,26 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -48,8 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
@@ -404,7 +404,6 @@ fun TrackerApp(model: TrackerViewModel) {
         )
 }
 
-
 /** Gives enlarged labels room without reducing the user's font scale or hiding destinations. */
 @Composable
 internal fun TrackerNavigation(destination: Destination, onNavigate: (Destination) -> Unit) {
@@ -414,30 +413,45 @@ internal fun TrackerNavigation(destination: Destination, onNavigate: (Destinatio
         if (maxWidth / fontScale < 300.dp) {
             Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
                 Column(
-                    Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 4.dp),
+                    Modifier.fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     tabs.chunked(2).forEach { row ->
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
                             row.forEach { tab ->
                                 val selected = destination == tab
                                 Surface(
                                     modifier = Modifier.weight(1f),
                                     shape = MaterialTheme.shapes.medium,
-                                    color = if (selected) MaterialTheme.colorScheme.secondaryContainer
+                                    color =
+                                        if (selected) MaterialTheme.colorScheme.secondaryContainer
                                         else MaterialTheme.colorScheme.surfaceContainerLow,
-                                    contentColor = if (selected) MaterialTheme.colorScheme.onSecondaryContainer
+                                    contentColor =
+                                        if (selected) MaterialTheme.colorScheme.onSecondaryContainer
                                         else MaterialTheme.colorScheme.onSurface,
                                 ) {
                                     Box(
                                         Modifier.fillMaxWidth()
-                                            .selectable(selected = selected, role = Role.Tab, onClick = { onNavigate(tab) })
+                                            .selectable(
+                                                selected = selected,
+                                                role = Role.Tab,
+                                                onClick = { onNavigate(tab) },
+                                            )
                                             .heightIn(min = 48.dp)
                                             .padding(horizontal = 8.dp, vertical = 4.dp),
                                         contentAlignment = Alignment.Center,
                                     ) {
-                                        Text(stringResource(tab.title), style = MaterialTheme.typography.labelLarge,
-                                            textAlign = TextAlign.Center)
+                                        Text(
+                                            stringResource(tab.title),
+                                            modifier = Modifier.fillMaxWidth(),
+                                            style = MaterialTheme.typography.labelLarge,
+                                            textAlign = TextAlign.Center,
+                                        )
                                     }
                                 }
                             }

@@ -25,11 +25,20 @@ class ReminderSettings(context: Context) {
     private val minutesKey = intPreferencesKey("break_minutes")
     private val trayKey = booleanPreferencesKey("tray_enabled")
     private val preciseKey = booleanPreferencesKey("precise")
-    val preferences: Flow<ReminderPreferences> = store.data.map {
-        ReminderPreferences(it[enabledKey] ?: false, it[minutesKey] ?: 30, it[trayKey] ?: false, it[preciseKey] ?: false)
-    }
+    val preferences: Flow<ReminderPreferences> =
+        store.data.map {
+            ReminderPreferences(
+                it[enabledKey] ?: false,
+                it[minutesKey] ?: 30,
+                it[trayKey] ?: false,
+                it[preciseKey] ?: false,
+            )
+        }
+
     suspend fun update(preferences: ReminderPreferences) {
-        require(preferences.breakMinutes in 1..240) { "Break reminder must be between 1 and 240 minutes." }
+        require(preferences.breakMinutes in 1..240) {
+            "Break reminder must be between 1 and 240 minutes."
+        }
         store.edit {
             it[enabledKey] = preferences.enabled
             it[minutesKey] = preferences.breakMinutes
@@ -37,14 +46,24 @@ class ReminderSettings(context: Context) {
             it[preciseKey] = preferences.precise
         }
     }
+
     internal suspend fun delivered(): Set<String> {
         val data = store.data.first()
-        return listOfNotNull(data[stringPreferencesKey("delivered_break")], data[stringPreferencesKey("delivered_tray")]).toSet()
+        return listOfNotNull(
+                data[stringPreferencesKey("delivered_break")],
+                data[stringPreferencesKey("delivered_tray")],
+            )
+            .toSet()
     }
+
     internal suspend fun markDelivered(candidate: ReminderCandidate) {
         store.edit { it[stringPreferencesKey("delivered_${candidate.kind}")] = candidate.key }
     }
+
     internal suspend fun clearDelivered() {
-        store.edit { it.remove(stringPreferencesKey("delivered_break")); it.remove(stringPreferencesKey("delivered_tray")) }
+        store.edit {
+            it.remove(stringPreferencesKey("delivered_break"))
+            it.remove(stringPreferencesKey("delivered_tray"))
+        }
     }
 }

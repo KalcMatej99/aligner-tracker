@@ -1,6 +1,6 @@
 # Product requirements
 
-Working name: Aligner Tracker. Independent GPL-3.0-or-later Android app. Every shipped feature is free; no ads, subscriptions, paid export or watch unlock. Research: [competitor evidence](research.md), gathered September 2026. Initial brief is retained in git history.
+Working name: Aligner Tracker. Independent GPL-3.0-or-later Android app. Every shipped feature is free; no ads, subscriptions, paid export or watch unlock. Research: [competitor evidence](research.md), gathered September 2026. The original setup brief is archived in [initial-brief.md](initial-brief.md).
 
 ## Problem and audience
 

@@ -36,8 +36,22 @@ class ReminderScheduler(
     private val mutex = Mutex()
 
     init {
-        notificationManager.createNotificationChannel(NotificationChannel(BREAK_CHANNEL, context.getString(R.string.channel_break), NotificationManager.IMPORTANCE_DEFAULT).apply { lockscreenVisibility = NotificationCompat.VISIBILITY_PRIVATE })
-        notificationManager.createNotificationChannel(NotificationChannel(TRAY_CHANNEL, context.getString(R.string.channel_tray), NotificationManager.IMPORTANCE_DEFAULT).apply { lockscreenVisibility = NotificationCompat.VISIBILITY_PRIVATE })
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                    BREAK_CHANNEL,
+                    context.getString(R.string.channel_break),
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                )
+                .apply { lockscreenVisibility = NotificationCompat.VISIBILITY_PRIVATE }
+        )
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                    TRAY_CHANNEL,
+                    context.getString(R.string.channel_tray),
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                )
+                .apply { lockscreenVisibility = NotificationCompat.VISIBILITY_PRIVATE }
+        )
     }
 
     suspend fun reconcile() = mutex.withLock { reconcileLocked() }
@@ -45,18 +59,31 @@ class ReminderScheduler(
     private suspend fun reconcileLocked() {
         val snapshot = repository.snapshot()
         val prefs = settings.preferences.first()
-        if (snapshot.plan == null || snapshot.plan.completed || (!prefs.enabled && !prefs.trayEnabled)) {
+        if (
+            snapshot.plan == null ||
+                snapshot.plan.completed ||
+                (!prefs.enabled && !prefs.trayEnabled)
+        ) {
             cancelAll()
             return
         }
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(RECOVERY_WORK, ExistingPeriodicWorkPolicy.KEEP, PeriodicWorkRequestBuilder<ReminderRecoveryWorker>(12, TimeUnit.HOURS).build())
+        WorkManager.getInstance(context)
+            .enqueueUniquePeriodicWork(
+                RECOVERY_WORK,
+                ExistingPeriodicWorkPolicy.KEEP,
+                PeriodicWorkRequestBuilder<ReminderRecoveryWorker>(12, TimeUnit.HOURS).build(),
+            )
         val pending = ReminderRules.pending(snapshot, prefs, settings.delivered())
         for (kind in listOf("break", "tray")) {
             alarmManager.cancel(intent(kind))
             val candidate = pending.find { it.kind == kind }
             if (candidate == null) {
                 // IN, completion and changed preferences clear old visible prompts too.
-                if (kind == "break" && (snapshot.events.lastOrNull()?.wearing != false || !prefs.enabled)) notificationManager.cancel(code(kind))
+                if (
+                    kind == "break" &&
+                        (snapshot.events.lastOrNull()?.wearing != false || !prefs.enabled)
+                )
+                    notificationManager.cancel(code(kind))
                 if (kind == "tray" && !prefs.trayEnabled) notificationManager.cancel(code(kind))
                 continue
             }
@@ -67,38 +94,76 @@ class ReminderScheduler(
             val exactAllowed = Build.VERSION.SDK_INT < 31 || alarmManager.canScheduleExactAlarms()
             if (prefs.precise && exactAllowed) {
                 try {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, whenAt, pendingIntent)
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        whenAt,
+                        pendingIntent,
+                    )
                     continue
-                } catch (_: SecurityException) { /* Grant may be revoked between check and call. */ }
+                } catch (_: SecurityException) {
+                    /* Grant may be revoked between check and call. */
+                }
             }
             alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, whenAt, pendingIntent)
         }
     }
 
-    suspend fun handleAlarm(kind: String, key: String) = mutex.withLock {
-        if (kind !in listOf("break", "tray")) return@withLock
-        val prefs = settings.preferences.first()
-        val candidate = ReminderRules.pending(repository.snapshot(), prefs, settings.delivered()).find { it.kind == kind && it.key == key }
-        if (candidate == null || candidate.dueAt > System.currentTimeMillis() || !canNotify(kind)) {
+    suspend fun handleAlarm(kind: String, key: String) =
+        mutex.withLock {
+            if (kind !in listOf("break", "tray")) return@withLock
+            val prefs = settings.preferences.first()
+            val candidate =
+                ReminderRules.pending(repository.snapshot(), prefs, settings.delivered()).find {
+                    it.kind == kind && it.key == key
+                }
+            if (
+                candidate == null ||
+                    candidate.dueAt > System.currentTimeMillis() ||
+                    !canNotify(kind)
+            ) {
+                reconcileLocked()
+                return@withLock
+            }
+            val open =
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    Intent(context, MainActivity::class.java),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                )
+            val title =
+                if (kind == "break") context.getString(R.string.reminder_break_title)
+                else context.getString(R.string.reminder_tray_title)
+            val body =
+                if (kind == "break") context.getString(R.string.reminder_break_body)
+                else context.getString(R.string.reminder_tray_body)
+            val notification =
+                NotificationCompat.Builder(context, channel(kind))
+                    .setSmallIcon(R.drawable.ic_tracker)
+                    .setContentTitle(title)
+                    .setContentText(body)
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+                    .setContentIntent(open)
+                    .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
+                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                    .setPublicVersion(
+                        NotificationCompat.Builder(context, channel(kind))
+                            .setSmallIcon(R.drawable.ic_tracker)
+                            .setContentTitle(context.getString(R.string.reminder_private_title))
+                            .build()
+                    )
+                    .build()
+            try {
+                notificationManager.notify(code(kind), notification)
+                // Post first: a crash before this write can repeat, but cannot silently consume a
+                // reminder.
+                settings.markDelivered(candidate)
+            } catch (_: SecurityException) {
+                /* Permission revoked: do not consume. */
+            }
             reconcileLocked()
-            return@withLock
         }
-        val open = PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val title = if (kind == "break") context.getString(R.string.reminder_break_title) else context.getString(R.string.reminder_tray_title)
-        val body = if (kind == "break") context.getString(R.string.reminder_break_body) else context.getString(R.string.reminder_tray_body)
-        val notification = NotificationCompat.Builder(context, channel(kind))
-            .setSmallIcon(R.drawable.ic_tracker).setContentTitle(title).setContentText(body)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body)).setContentIntent(open)
-            .setAutoCancel(true).setOnlyAlertOnce(true).setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-            .setPublicVersion(NotificationCompat.Builder(context, channel(kind)).setSmallIcon(R.drawable.ic_tracker).setContentTitle(context.getString(R.string.reminder_private_title)).build())
-            .build()
-        try {
-            notificationManager.notify(code(kind), notification)
-            // Post first: a crash before this write can repeat, but cannot silently consume a reminder.
-            settings.markDelivered(candidate)
-        } catch (_: SecurityException) { /* Permission revoked: do not consume. */ }
-        reconcileLocked()
-    }
 
     fun cancelAll() {
         for (kind in listOf("break", "tray")) {
@@ -109,28 +174,49 @@ class ReminderScheduler(
         WorkManager.getInstance(context).cancelUniqueWork(IMMEDIATE_WORK)
     }
 
-    suspend fun resetAfterRestore() = mutex.withLock {
-        cancelAll()
-        settings.clearDelivered()
-        reconcileLocked()
-    }
+    suspend fun resetAfterRestore() =
+        mutex.withLock {
+            cancelAll()
+            settings.clearDelivered()
+            reconcileLocked()
+        }
 
     private fun canNotify(kind: String): Boolean =
-        (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) &&
+        (Build.VERSION.SDK_INT < 33 ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED) &&
             NotificationManagerCompat.from(context).areNotificationsEnabled() &&
-            notificationManager.getNotificationChannel(channel(kind))?.importance != NotificationManager.IMPORTANCE_NONE
+            notificationManager.getNotificationChannel(channel(kind))?.importance !=
+                NotificationManager.IMPORTANCE_NONE
 
-    private fun intent(kind: String, key: String = ""): PendingIntent = PendingIntent.getBroadcast(context, code(kind), Intent(context, ReminderReceiver::class.java).setAction("org.alignertracker.app.REMINDER_$kind").putExtra("kind", kind).putExtra("key", key), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    private fun intent(kind: String, key: String = ""): PendingIntent =
+        PendingIntent.getBroadcast(
+            context,
+            code(kind),
+            Intent(context, ReminderReceiver::class.java)
+                .setAction("org.alignertracker.app.REMINDER_$kind")
+                .putExtra("kind", kind)
+                .putExtra("key", key),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
 
     companion object {
         const val BREAK_CHANNEL = "break_reminders"
         const val TRAY_CHANNEL = "tray_reminders"
         const val RECOVERY_WORK = "reminder_periodic_recovery"
         const val IMMEDIATE_WORK = "reminder_event_recovery"
+
         private fun code(kind: String) = if (kind == "break") 1001 else 1002
+
         private fun channel(kind: String) = if (kind == "break") BREAK_CHANNEL else TRAY_CHANNEL
+
         fun enqueueRecovery(context: Context) {
-            WorkManager.getInstance(context).enqueueUniqueWork(IMMEDIATE_WORK, ExistingWorkPolicy.REPLACE, OneTimeWorkRequestBuilder<ReminderRecoveryWorker>().build())
+            WorkManager.getInstance(context)
+                .enqueueUniqueWork(
+                    IMMEDIATE_WORK,
+                    ExistingWorkPolicy.REPLACE,
+                    OneTimeWorkRequestBuilder<ReminderRecoveryWorker>().build(),
+                )
         }
     }
 }

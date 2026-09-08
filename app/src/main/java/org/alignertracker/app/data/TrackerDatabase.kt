@@ -27,31 +27,66 @@ data class PlanEntity(
     val completed: Boolean,
     val completedAt: Long?,
 ) {
-    fun model() = TreatmentPlan(id, startDate, totalTrays, currentTray, daysPerTray,
-        currentTrayStartedOn, dailyGoalMinutes, zoneId, trackingStartedAt, completed, completedAt)
+    fun model() =
+        TreatmentPlan(
+            id,
+            startDate,
+            totalTrays,
+            currentTray,
+            daysPerTray,
+            currentTrayStartedOn,
+            dailyGoalMinutes,
+            zoneId,
+            trackingStartedAt,
+            completed,
+            completedAt,
+        )
 
     companion object {
-        fun from(plan: TreatmentPlan) = PlanEntity(plan.id, plan.startDate, plan.totalTrays,
-            plan.currentTray, plan.daysPerTray, plan.currentTrayStartedOn, plan.dailyGoalMinutes,
-            plan.zoneId, plan.trackingStartedAt, plan.completed, plan.completedAt)
+        fun from(plan: TreatmentPlan) =
+            PlanEntity(
+                plan.id,
+                plan.startDate,
+                plan.totalTrays,
+                plan.currentTray,
+                plan.daysPerTray,
+                plan.currentTrayStartedOn,
+                plan.dailyGoalMinutes,
+                plan.zoneId,
+                plan.trackingStartedAt,
+                plan.completed,
+                plan.completedAt,
+            )
     }
 }
 
 @Entity(tableName = "wear_events")
-data class EventEntity(@PrimaryKey(autoGenerate = true) val id: Long = 0, val at: Long, val wearing: Boolean) {
+data class EventEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val at: Long,
+    val wearing: Boolean,
+) {
     fun model() = WearEvent(id, at, wearing)
 }
 
 @Dao
 interface TrackerDao {
     @Query("SELECT * FROM treatment WHERE id = 1") suspend fun plan(): PlanEntity?
+
     @Query("SELECT * FROM wear_events ORDER BY at, id") suspend fun events(): List<EventEntity>
+
     @Insert suspend fun insertPlan(plan: PlanEntity)
+
     @Update suspend fun updatePlan(plan: PlanEntity)
+
     @Insert suspend fun insertEvent(event: EventEntity): Long
+
     @Insert suspend fun insertEvents(events: List<EventEntity>)
+
     @Update suspend fun updateEvent(event: EventEntity)
+
     @Query("DELETE FROM wear_events") suspend fun deleteEvents()
+
     @Query("DELETE FROM treatment") suspend fun deletePlan()
 }
 
@@ -61,6 +96,11 @@ abstract class TrackerDatabase : RoomDatabase() {
 
     companion object {
         fun create(context: Context): TrackerDatabase =
-            Room.databaseBuilder(context.applicationContext, TrackerDatabase::class.java, "aligner-tracker.db").build()
+            Room.databaseBuilder(
+                    context.applicationContext,
+                    TrackerDatabase::class.java,
+                    "aligner-tracker.db",
+                )
+                .build()
     }
 }

@@ -179,15 +179,16 @@ class ReminderSchedulerTest {
     }
 
     @Test
-    fun `system notification switch prevents scheduling without consuming reminder`() = runBlocking {
-        startBreak()
-        val pending = payload("break")
-        shadowOf(notifications).setNotificationsEnabled(false)
-        deliver(pending)
-        assertTrue(scheduled().isEmpty())
-        assertTrue(shadowOf(notifications).allNotifications.isEmpty())
-        assertTrue(settings.delivered().isEmpty())
-    }
+    fun `system notification switch prevents scheduling without consuming reminder`() =
+        runBlocking {
+            startBreak()
+            val pending = payload("break")
+            shadowOf(notifications).setNotificationsEnabled(false)
+            deliver(pending)
+            assertTrue(scheduled().isEmpty())
+            assertTrue(shadowOf(notifications).allNotifications.isEmpty())
+            assertTrue(settings.delivered().isEmpty())
+        }
 
     @Test
     fun `blocked break channel prevents delivery while tray channel remains scheduled`() =
@@ -208,7 +209,10 @@ class ReminderSchedulerTest {
             deliver(pending)
             assertTrue(shadowOf(notifications).allNotifications.isEmpty())
             assertTrue(settings.delivered().isEmpty())
-            assertEquals(listOf("tray"), scheduled().map { alarmPayload(it).getStringExtra("kind") })
+            assertEquals(
+                listOf("tray"),
+                scheduled().map { alarmPayload(it).getStringExtra("kind") },
+            )
         }
 
     @Test
@@ -273,7 +277,9 @@ class ReminderSchedulerTest {
 
     private class MutableClock(var value: Instant) : Clock() {
         override fun getZone(): ZoneId = ZoneOffset.UTC
+
         override fun withZone(zone: ZoneId): Clock = fixed(value, zone)
+
         override fun instant(): Instant = value
     }
 }

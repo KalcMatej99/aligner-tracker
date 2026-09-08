@@ -11,3 +11,7 @@ Highest risks/prototype early: time/DST/clock rollback and import invariants (#3
 MVP test entry requires a debug APK plus setup, tracking, corrections, explicit tray progression/completion, covered-time summaries, opted-in reminders and local backup/restore; build/lint/JVM checks and emulator smoke recorded. Real-user pilot remains gated by explicit physical-device checks and user consent. A compiled APK alone does not close device acceptance issues.
 
 New material audit findings get independent bounded issues with reproducer, impact, acceptance and dependencies. No endless speculative audit loops. Finish the requested MVP and retain clear open Beta/v1 work.
+
+## Audit additions
+
+#23 tracks hosted CI execution while the existing shared runner is offline. #24 records the discovered320dp/200% font navigation defect and its accepted adaptive-layout fix. See validation.md for exact local acceptance and remaining Beta gates.

@@ -20,6 +20,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -28,27 +29,32 @@ import org.junit.Test
 class AdaptiveNavigationTest {
     @get:Rule val compose = createComposeRule()
 
-    @Test fun narrowLargeTextTabsStayReadableAndSelectable() {
+    @Test
+    fun narrowLargeTextTabsStayReadableAndSelectable() {
         compose.setContent {
             val density = LocalDensity.current.density
             CompositionLocalProvider(LocalDensity provides Density(density, fontScale = 2f)) {
                 AlignerTheme {
                     var selected by remember { mutableStateOf(Destination.TODAY) }
-                    Box(Modifier.width(320.dp)) {
-                        TrackerNavigation(selected) { selected = it }
-                    }
+                    Box(Modifier.width(320.dp)) { TrackerNavigation(selected) { selected = it } }
                 }
             }
         }
         listOf("Today", "Schedule", "History", "Progress").forEach { label ->
             val tab = compose.onNodeWithText(label)
             tab.assertIsDisplayed().performClick().assertIsSelected()
-            assertTrue("Tab target must remain at least 48dp", tab.getUnclippedBoundsInRoot().height >= 48.dp)
+            assertTrue(
+                "Tab target must remain at least 48dp",
+                tab.getUnclippedBoundsInRoot().height >= 48.dp,
+            )
             val layouts = mutableListOf<TextLayoutResult>()
             tab.performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(layouts) }
             assertEquals("Expected one full text label", 1, layouts.size)
             assertEquals("Destination must not break mid-word", 1, layouts.single().lineCount)
-            assertTrue("Label must not be clipped", !layouts.single().hasVisualOverflow)
+            assertTrue(
+                "$label clipped: size=${layouts.single().size}, width=${layouts.single().didOverflowWidth}, height=${layouts.single().didOverflowHeight}, paragraph=${layouts.single().multiParagraph.height}",
+                !layouts.single().hasVisualOverflow,
+            )
         }
     }
 }

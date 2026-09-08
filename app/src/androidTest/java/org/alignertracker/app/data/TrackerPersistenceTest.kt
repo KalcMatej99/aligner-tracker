@@ -16,7 +16,8 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TrackerPersistenceTest {
-    @Test fun treatmentEventsCorrectionAndCompletionSurviveDatabaseReopen() = runBlocking {
+    @Test
+    fun treatmentEventsCorrectionAndCompletionSurviveDatabaseReopen() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val name = "restart-verification.db"
         context.deleteDatabase(name)
@@ -24,12 +25,26 @@ class TrackerPersistenceTest {
         val start = Instant.parse("2025-10-26T12:00:00Z")
         try {
             val initial = TrackerRepository(database, Clock.fixed(start, ZoneOffset.UTC))
-            initial.start(TreatmentPlan(startDate = "2025-10-01", totalTrays = 20, currentTray = 1,
-                daysPerTray = 7, currentTrayStartedOn = "2025-10-20", dailyGoalMinutes = 1200,
-                zoneId = "Europe/Rome", trackingStartedAt = start.toEpochMilli()), true)
-            val later = TrackerRepository(database, Clock.fixed(start.plusSeconds(120), ZoneOffset.UTC))
+            initial.start(
+                TreatmentPlan(
+                    startDate = "2025-10-01",
+                    totalTrays = 20,
+                    currentTray = 1,
+                    daysPerTray = 7,
+                    currentTrayStartedOn = "2025-10-20",
+                    dailyGoalMinutes = 1200,
+                    zoneId = "Europe/Rome",
+                    trackingStartedAt = start.toEpochMilli(),
+                ),
+                true,
+            )
+            val later =
+                TrackerRepository(database, Clock.fixed(start.plusSeconds(120), ZoneOffset.UTC))
             later.setWearing(false)
-            later.updateEvent(later.snapshot().events.last().id, start.plusSeconds(60).toEpochMilli())
+            later.updateEvent(
+                later.snapshot().events.last().id,
+                start.plusSeconds(60).toEpochMilli(),
+            )
             later.completeTreatment()
             val expected = later.snapshot()
             database.close()
