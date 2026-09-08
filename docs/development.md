@@ -63,3 +63,7 @@ ANDROID_SERIAL=emulator-5556 ./gradlew :wear:connectedDebugAndroidTest
 ```
 
 API36 phone and Wear images are supported for this development procedure. Paired Data Layer acceptance additionally needs the compatible phone companion app and interactive pairing; see [wear.md](wear.md). Standalone watch launch and durable storage tests do not prove phone/watch delivery. Only synthetic records belong in emulator fixtures, screenshots and performance artifacts. No personal device resets are part of setup.
+
+### Pinned test runtime downloads
+
+Python 3.11+ is required by `scripts/check.sh`. Before Gradle tests, `prepare-test-sdks.py` fetches the exact Robolectric 4.16.1 API35/API36 instrumented SDK artifacts through verified system TLS and checks repository-pinned SHA-512 values before atomically promoting them into `.gradle/robolectric-maven`. Existing files are rehashed; corrupt or interrupted downloads cannot be accepted. This avoids lazy Java-TLS SDK fetching inside tests, which failed with AEAD tag errors on hosted job795 even with the runner's AVX workaround. Neither certificate verification nor tests are bypassed. Change the SDK pins only with a Robolectric/API update and independently verified Maven Central digests.
