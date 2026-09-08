@@ -8,41 +8,37 @@ The audit covers the resolved `releaseRuntimeClasspath` graphs for `:app` and `:
 
 | Evidence | SHA-256 |
 |---|---|
-| Phone Gradle report | `555df6c982686eaa190e1bb53a2e47d09021cc044def56d5e6da6b14e28a798f` |
-| Wear Gradle report | `74f53e0df0f4ad5e95485f9f7d5e6949f7e204538cddccb3f1ffcfb72869bf5d` |
-| Markdown inventory | `64421f4fdbba6220b1249eff8a675699d858d6395ab4a545437e4e8e5885f888` |
+| Phone Gradle report | `07bdc2e59617a611758e573b5f89a6eab54bded71679f15a9e08a96329ecba5d` |
+| Wear Gradle report | `38f94d3a6e8a397677688ecb5626f41ef663cdad9b97276704d43108ee0e574c` |
+| Markdown inventory | `9720cff8a4ed58e8c118e4a357fc48eb195d08b2716d759441fee3b64542cd3f` |
 
-The combined graph contains 166 unique coordinates: 22 direct and 144 transitive. Local Gradle-cache POMs declared a license for every coordinate. The declarations group as 160 Apache-2.0 variants, two BSD-3-Clause components and four Google components declaring the Android Software Development Kit License. “Declared” describes the POM evidence; it does not independently prove copyright ownership, notice completeness or compatibility with this project's GPL-3.0-only license.
+The combined graph contains 171 unique coordinates: 21 direct and 150 transitive. Local Gradle-cache POMs declared a license for every coordinate: 169 Apache-2.0 variants and two BSD-3-Clause components. No `com.google.android.gms` artifact or Android SDK License declaration appears in either resolved runtime graph. “Declared” describes the POM evidence; it does not independently prove copyright ownership or notice completeness. This project's license remains GPL-3.0-or-later.
 
-The non-Apache entries are:
+The two non-Apache entries are:
 
 | Dependency | Relationship | POM declaration |
 |---|---|---|
 | `androidx.datastore:datastore-preferences-external-protobuf:1.2.1` | transitive | BSD-3-Clause |
 | `androidx.wear.protolayout:protolayout-external-protobuf:1.4.2` | transitive | BSD-3-Clause |
-| `com.google.android.gms:play-services-wearable:20.0.1` | direct in phone and watch | Android Software Development Kit License |
-| `com.google.android.gms:play-services-base:18.5.0` | transitive | Android Software Development Kit License |
-| `com.google.android.gms:play-services-basement:18.9.0` | transitive | Android Software Development Kit License |
-| `com.google.android.gms:play-services-tasks:18.2.0` | transitive | Android Software Development Kit License |
 
-The 22 direct coordinates are the Compose BOM, Activity Compose, Compose Foundation, Material 3, UI tooling preview, Core KTX, Concurrent Futures, DataStore Preferences, ExifInterface, Lifecycle runtime/view-model Compose, Room runtime/KTX, WorkManager runtime KTX, Wear ProtoLayout/Tiles/complication data-source KTX, Kotlin standard library, coroutines Android/Play Services, serialization JSON, and `play-services-wearable`. The inventory script records the exact resolved version, direct/transitive relationship, POM declaration and any local archive `META-INF/LICENSE*` or `META-INF/NOTICE*` evidence for every coordinate.
+Both modules directly use `org.microg.gms:play-services-wearable:0.3.14.250932`, with Apache-2.0 base, basement and tasks dependencies under the same `org.microg.gms` group. `kotlinx-coroutines-play-services` was removed. The inventory records exact resolved versions, direct/transitive relationships, POM declarations and any local archive `META-INF/LICENSE*` or `META-INF/NOTICE*` evidence. The checked shared `wear-transport` source is also part of the corresponding application source; it is not an additional Maven artifact.
 
 Regenerate the evidence from a clean release candidate after dependency resolution, without committing the reports:
 
 ```bash
 ./gradlew --no-daemon :app:dependencies --configuration releaseRuntimeClasspath \
-  > /tmp/aligner-phone-dependencies.txt
+  > /tmp/aligner-phone-microg-dependencies.txt
 ./gradlew --no-daemon :wear:dependencies --configuration releaseRuntimeClasspath \
-  > /tmp/aligner-wear-dependencies.txt
+  > /tmp/aligner-wear-microg-dependencies.txt
 python3 scripts/license-inventory.py \
-  /tmp/aligner-phone-dependencies.txt \
-  /tmp/aligner-wear-dependencies.txt \
-  > /tmp/aligner-license-inventory.md
-sha256sum /tmp/aligner-{phone,wear}-dependencies.txt \
-  /tmp/aligner-license-inventory.md
+  /tmp/aligner-phone-microg-dependencies.txt \
+  /tmp/aligner-wear-microg-dependencies.txt \
+  > /tmp/aligner-microg-license-inventory.md
+sha256sum /tmp/aligner-{phone,wear}-microg-dependencies.txt \
+  /tmp/aligner-microg-license-inventory.md
 ```
 
-The script exits nonzero if a coordinate, POM or POM license declaration is unresolved. Review the complete output manually, archive it beside the candidate artifacts, and compare its hashes and counts with the release manifest. A successful run does not replace review of the actual license texts and required notices.
+First verify both Gradle reports completed successfully and contain no `FAILED` dependency entries: the inventory parser skips those entries. The script exits nonzero when the parsed coordinates have missing or unresolved POM license evidence. Review the complete output manually, archive it beside the candidate artifacts, and compare its hashes and counts with the release manifest. A successful run does not replace review of the actual license texts and required notices.
 
 ## Full resolved inventory
 
@@ -195,38 +191,43 @@ This is the exact generated union of both audited runtime reports. Duplicate coo
 | `androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0` | direct | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `androidx.work:work-runtime:2.11.2` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `androidx.work:work-runtime-ktx:2.11.2` | direct | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
-| `com.google.android.gms:play-services-base:18.5.0` | transitive | Android Software Development Kit License (https://developer.android.com/studio/terms.html) | none found |
-| `com.google.android.gms:play-services-basement:18.9.0` | transitive | Android Software Development Kit License (https://developer.android.com/studio/terms.html) | none found |
-| `com.google.android.gms:play-services-tasks:18.2.0` | transitive | Android Software Development Kit License (https://developer.android.com/studio/terms.html) | none found |
-| `com.google.android.gms:play-services-wearable:20.0.1` | direct | Android Software Development Kit License (https://developer.android.com/studio/terms.html) | none found |
 | `com.google.guava:listenablefuture:1.0` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `com.squareup.okio:okio:3.7.0` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `com.squareup.okio:okio:3.9.1` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `com.squareup.okio:okio-jvm:3.7.0` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `com.squareup.okio:okio-jvm:3.9.1` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `com.squareup.wire:wire-runtime:4.9.9` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0) | none found |
+| `com.squareup.wire:wire-runtime-jvm:4.9.9` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0) | none found |
 | `org.jetbrains:annotations:23.0.0` | transitive | The Apache Software License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlin:kotlin-stdlib:2.3.21` | direct | Apache-2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlin:kotlin-stdlib-common:2.3.21` | transitive | Apache-2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10` | transitive | The Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10` | transitive | The Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2` | direct | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
-| `org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2` | direct | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.9.0` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0` | direct | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.9.0` | transitive | Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 | `org.jspecify:jspecify:1.0.0` | transitive | The Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `org.microg.gms:play-services-base:0.3.14.250932` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `org.microg.gms:play-services-basement:0.3.14.250932` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `org.microg.gms:play-services-tasks:0.3.14.250932` | transitive | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
+| `org.microg.gms:play-services-wearable:0.3.14.250932` | direct | The Apache Software License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt) | none found |
 
-Coordinates: 166; unresolved POM license declarations: 0.
+Coordinates: 171; unresolved POM license declarations: 0.
 
 ## Distribution assessment
 
-The repository is GPL-3.0-only. The [GNU GPL FAQ](https://www.gnu.org/licenses/gpl-faq.en.html) explains that distributing a linked combined work requires compatible terms and corresponding source for the covered work, subject to the GPL's defined exceptions. Publish the exact tagged source and build instructions with any distributed binary; do not rely on a moving branch.
+The project remains GPL-3.0-or-later, as stated in README and CONTRIBUTING. No license exception or relicensing was added. The bundled Wear client is now microG `0.3.14.250932`: its [tagged source](https://github.com/microg/GmsCore/tree/v0.3.14.250932/play-services-wearable) and [license](https://github.com/microg/GmsCore/blob/v0.3.14.250932/LICENSE) identify Apache-2.0. Its base, basement and tasks artifacts also declare Apache-2.0 in the resolved POMs. The shared `wear-transport` adapter is project source compiled into both APKs; imports under `com.google.android.gms` name microG's compatible API namespace, not evidence of a proprietary Maven artifact.
 
-The full phone and watch builds directly include `play-services-wearable`, whose POM declares the proprietary [Android SDK License](https://developer.android.com/studio/terms.html). The [F-Droid developer FAQ](https://f-droid.org/en/docs/FAQ_-_App_Developers/) requires all dependencies to be free/libre software and specifically says apps using proprietary Google Play Services libraries cannot enter the main repository. Therefore the current full build is ineligible for the main F-Droid repository. Making every product feature free of charge does not change this result. A separate stripped flavor is outside the current scope.
+The fresh graphs above replace the earlier audit of four proprietary Google client artifacts; none of those coordinates or their Android SDK License declarations remains in this runtime inventory. Apache-2.0 code can be included in GPLv3 projects under the [Apache Software Foundation's compatibility guidance](https://www.apache.org/licenses/GPL-compatibility). This resolves the specific bundled proprietary-client blocker. Distribution still requires exact corresponding source, build scripts, GPL text and the applicable Apache/BSD license texts and notices. A POM inventory is not a completed notice bundle; absence of a notice at the script's inspected archive paths does not waive upstream license obligations.
 
-Google's [Play Services overview](https://developers.google.com/android/guides/overview) also confirms that the client library communicates with the Google Play Services package and that devices without it are unsupported. Device support and software licensing are separate questions.
+Runtime is a separate boundary. The APKs contain a free client library that communicates with an installed Wear Data Layer service. It neither bundles nor installs the Google Play services application. The phone's treatment features work without that service; paired watch communication requires a compatible service/pairing stack. Current binder, capability/node-query and same-node message/listener acceptance used official Google Play services, not a replacement microG service runtime. Paired phone/watch delivery remains unverified. No claim is made that using a free client removes Google's transport infrastructure; see [privacy](privacy.md) and [Wear validation](wear.md).
 
-The available evidence does not establish that combining and distributing the GPL-3.0-only application with the proprietary wearable client library satisfies the GPL. Whether a GPL-defined exception or license-compatible packaging applies requires a concrete, documented analysis; this repository audit does not resolve it. Public direct-APK distribution remains gated on that resolution or removal/replacement of the proprietary client dependency. If the gate is cleared, the release archive still needs the project GPL text, the exact corresponding source, reproducible build instructions, this inventory, and all dependency notices required by their licenses.
+F-Droid's current [inclusion policy](https://f-droid.org/en/docs/Inclusion_Policy/) permits freely licensed Maven dependencies from trusted repositories, requires source/build review, and excludes embedded proprietary libraries. The updated runtime graph addresses the old embedded-library problem. It does not establish F-Droid build acceptance. F-Droid also documents [Non-Free Dependencies](https://f-droid.org/en/docs/Anti-Features/#Non-Free-Dependencies) for free apps requiring separately installed non-free software, and Non-Free Addons for promotion of non-free software. These labels do not themselves mean proprietary code is bundled.
 
-For F-Droid-specific preparation, use its current [build documentation](https://f-droid.org/en/docs/Building_Applications/), [metadata reference](https://f-droid.org/en/docs/Build_Metadata_Reference/) and [anti-feature definitions](https://f-droid.org/en/docs/Anti-Features/). No F-Droid metadata or publication is authorized by this document.
+Assessment for a future submission: disclose the useful standalone phone app with optional Wear integration separately from the companion's transport runtime requirement. Ask maintainers to determine applicable labels and inclusion after inspecting build provenance and actual functionality. Do not state either definite exclusion based on the removed Google AARs or guaranteed acceptance because the client is Apache-licensed. No F-Droid metadata, build or maintainer approval is recorded; source-built packaging and [release acceptance](release.md) remain separate work before authorized publication.
