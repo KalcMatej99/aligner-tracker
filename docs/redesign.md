@@ -75,3 +75,19 @@ name is intentionally non-translatable, consistent with #31. The adaptive
 navigation still displays all four full destination labels and their selected
 state. These changes preserve space for a readable current-state region when
 translated labels expand.
+
+## Signed validation finding (#34)
+
+The first signed backup-preview/cancel exercise exposed a real phone-process crash:
+`ConcurrentModificationException` in microG `MultiConnectionKeeper.Connection`'s
+service callback. The tagged initial visual candidate is superseded. The pinned
+[0.3.14.250932 dependency source](https://repo1.maven.org/maven2/org/microg/gms/play-services-base/0.3.14.250932/play-services-base-0.3.14.250932-sources.jar)
+shows a mutable listener set and callback-side failed-binding removal.
+The adapter now serializes clients process-wide and uses queued Android Main
+dispatch. A started operation has bounded (10-second) cleanup before another
+client can connect; caller cancellation prevents starting a new message.
+[Coroutine Main documentation](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-main.html)
+supports thread confinement, while serialization is the dependency-specific fix.
+The regression reproduced the original callback crash; the corrected version passes
+96 concurrent probes plus 12 cancellation attempts against the installed phone
+service, accepting its normal unavailable response. Protocol/payloads are unchanged.

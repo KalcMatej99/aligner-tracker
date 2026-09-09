@@ -14,13 +14,24 @@ import com.google.android.gms.wearable.internal.SendMessageResponse
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.microg.gms.wearable.BaseWearableCallbacks
 import org.microg.gms.wearable.WearableClientImpl
 
 /** Apache-licensed microG client talking to the installed Wear Data Layer service. */
 internal class MicrogWearDataLayer(private val context: Context) {
+    private companion object {
+        val connectionMutex = Mutex()
+    }
+
     suspend fun isNearby(nodeId: String): Boolean = withClient { client ->
         connectedNodes(client).any { it.id == nodeId && it.isNearby }
     }
@@ -99,39 +110,53 @@ internal class MicrogWearDataLayer(private val context: Context) {
         }
 
     private suspend fun <T> withClient(block: suspend (WearableClientImpl) -> T): T =
-        withTimeout(10_000) {
-            var apiClient: GoogleApiClient? = null
-            try {
-                val connection = CompletableDeferred<WearableClientImpl>()
-                val client =
-                    GoogleApiClient.Builder(context)
-                        .addApi(Wearable.API)
-                        .addConnectionCallbacks(
-                            object : GoogleApiClient.ConnectionCallbacks {
-                                override fun onConnected(bundle: Bundle?) {
-                                    val connected = WearableClientImpl.get(apiClient)
-                                    if (connected != null) connection.complete(connected)
-                                    else
-                                        connection.completeExceptionally(
-                                            IllegalStateException("Wear connection is unavailable.")
-                                        )
-                                }
+        // microG iterates a mutable connection listener set on Android's main thread.
+        // Queue resumptions (not Main.immediate), so disconnect cannot mutate that set
+        // from an IO caller or re-enter the service callback while it is iterating.
+        // The broker can also remove failed bindings from its callback. Serialize clients
+        // process-wide. Finish bounded connection cleanup on cancellation before admitting
+        // another client; never start a message after its caller has been cancelled.
+        connectionMutex.withLock {
+            val callerContext = currentCoroutineContext()
+            withContext(Dispatchers.Main + NonCancellable) {
+                withTimeout(10_000) {
+                    var apiClient: GoogleApiClient? = null
+                    try {
+                        val connection = CompletableDeferred<WearableClientImpl>()
+                        val client =
+                            GoogleApiClient.Builder(context)
+                                .addApi(Wearable.API)
+                                .addConnectionCallbacks(
+                                    object : GoogleApiClient.ConnectionCallbacks {
+                                        override fun onConnected(bundle: Bundle?) {
+                                            val connected = WearableClientImpl.get(apiClient)
+                                            if (connected != null) connection.complete(connected)
+                                            else
+                                                connection.completeExceptionally(
+                                                    IllegalStateException(
+                                                        "Wear connection is unavailable."
+                                                    )
+                                                )
+                                        }
 
-                                override fun onConnectionSuspended(cause: Int) = Unit
-                            }
-                        )
-                        .addOnConnectionFailedListener {
-                            connection.completeExceptionally(
-                                IllegalStateException("Wear connection is unavailable.")
-                            )
-                        }
-                        .build()
-                apiClient = client
-                client.connect()
-                val connected = connection.await()
-                block(connected)
-            } finally {
-                apiClient?.disconnect()
+                                        override fun onConnectionSuspended(cause: Int) = Unit
+                                    }
+                                )
+                                .addOnConnectionFailedListener {
+                                    connection.completeExceptionally(
+                                        IllegalStateException("Wear connection is unavailable.")
+                                    )
+                                }
+                                .build()
+                        apiClient = client
+                        client.connect()
+                        val connected = connection.await()
+                        callerContext.ensureActive()
+                        block(connected)
+                    } finally {
+                        apiClient?.disconnect()
+                    }
+                }
             }
         }
 }
