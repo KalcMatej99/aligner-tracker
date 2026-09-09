@@ -1,6 +1,7 @@
 package org.alignertracker.app.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
@@ -12,7 +13,6 @@ import org.alignertracker.app.domain.TrackerSnapshot
 import org.alignertracker.app.domain.TreatmentPlan
 import org.alignertracker.app.domain.WearEvent
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 
@@ -20,39 +20,90 @@ class TrackerScreensTest {
     @get:Rule val compose = createComposeRule()
 
     @Test
-    fun onboardingRejectsEmptyPlanAndAcceptsExplicitOutState() {
-        var saved: TreatmentPlan? = null
-        var wearing = true
+    fun quickStartRequiresExplicitStateAndNoTypedFields() {
+        var savedZone: String? = null
+        var wearing: Boolean? = null
         compose.setContent {
             AlignerTheme {
                 OnboardingScreen(
                     false,
-                    { plan, state ->
-                        saved = plan
+                    { state, zone ->
                         wearing = state
+                        savedZone = zone
                     },
                     {},
                 )
             }
         }
-        compose.onNodeWithText("Start tracking").performScrollTo().performClick()
-        compose.runOnIdle { assertEquals(null, saved) }
-        compose.onNodeWithText("Total trays").performScrollTo().performTextReplacement("20")
-        compose
-            .onNodeWithText("Prescribed days per tray")
-            .performScrollTo()
-            .performTextReplacement("7")
-        compose
-            .onNodeWithText("Prescribed daily hours (for example 22)")
-            .performScrollTo()
-            .performTextReplacement("21.5")
+        compose.onNodeWithText("Start tracking").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Total trays").assertDoesNotExist()
         compose.onNodeWithText("Aligners out").performScrollTo().performClick()
         compose.onNodeWithText("Start tracking").performScrollTo().performClick()
         compose.runOnIdle {
-            assertEquals(20, saved?.totalTrays)
-            assertEquals(1290, saved?.dailyGoalMinutes)
-            assertFalse(wearing)
+            assertEquals(java.time.ZoneId.systemDefault().id, savedZone)
+            assertEquals(false, wearing)
         }
+    }
+
+    @Test
+    fun quickStartBusyPreventsDuplicateSubmission() {
+        compose.setContent {
+            AlignerTheme { OnboardingScreen(true, { _, _ -> error("Busy") }, {}) }
+        }
+        compose.onNodeWithText("Aligners in").assertIsNotEnabled()
+        compose.onNodeWithText("Saving…").performScrollTo().assertIsNotEnabled()
+        val instrumentation =
+            androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+        if (
+            androidx.test.platform.app.InstrumentationRegistry.getArguments()
+                .getString("capture") == "true"
+        ) {
+            val file =
+                java.io.File(
+                    instrumentation.targetContext.getExternalFilesDir(null),
+                    "quick-start-saving.png",
+                )
+            instrumentation.uiAutomation.takeScreenshot().let { bitmap ->
+                file.outputStream().use {
+                    bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+                }
+                bitmap.recycle()
+            }
+        }
+    }
+
+    @Test
+    fun explicitChoiceSurvivesActivityStateRestoration() {
+        val restoration = androidx.compose.ui.test.junit4.StateRestorationTester(compose)
+        var wearing: Boolean? = null
+        restoration.setContent {
+            AlignerTheme { OnboardingScreen(false, { state, _ -> wearing = state }, {}) }
+        }
+        compose.onNodeWithText("Aligners in").performScrollTo().performClick()
+        restoration.emulateSavedInstanceStateRestore()
+        compose.onNodeWithText("Start tracking").performScrollTo().performClick()
+        compose.runOnIdle { assertEquals(true, wearing) }
+    }
+
+    @Test
+    fun partialTrackingHasNoInventedTrayOrGoal() {
+        val existing = example()
+        val partial =
+            existing.copy(
+                plan =
+                    TreatmentPlan(
+                        zoneId = "UTC",
+                        trackingStartedAt = existing.plan!!.trackingStartedAt,
+                    )
+            )
+        compose.setContent {
+            AlignerTheme { TodayScreen(partial, Instant.parse("2026-09-08T12:00:00Z"), false, {}) }
+        }
+        compose.onNodeWithText("Tray not recorded").assertExists()
+        compose.onNodeWithText("Prescribed goal not set").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Add your treatment details").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Not now").performScrollTo().performClick()
+        compose.onNodeWithText("Add your treatment details").assertDoesNotExist()
     }
 
     @Test

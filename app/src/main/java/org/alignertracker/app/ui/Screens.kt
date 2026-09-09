@@ -192,7 +192,12 @@ internal fun readableTime(at: Long, zone: ZoneId): String {
 
 @Composable
 internal fun readableZone(zoneId: String): String =
-    BidiFormatter.getInstance(currentLocale()).unicodeWrap(zoneId)
+    BidiFormatter.getInstance(currentLocale())
+        .unicodeWrap(
+            ZoneId.of(zoneId).getDisplayName(java.time.format.TextStyle.FULL, currentLocale()) +
+                " · " +
+                zoneId.replace('_', ' ')
+        )
 
 internal fun parseUserInteger(value: String): Int? {
     val input = value.trim()
@@ -228,156 +233,82 @@ internal fun parseUserHours(value: String): Int? {
 }
 
 @Composable
-fun OnboardingScreen(
-    busy: Boolean,
-    onStart: (TreatmentPlan, Boolean) -> Unit,
-    onImport: () -> Unit,
-) {
-    var total by rememberSaveable { mutableStateOf("") }
-    var current by rememberSaveable { mutableStateOf("1") }
-    var interval by rememberSaveable { mutableStateOf("") }
-    var goal by rememberSaveable { mutableStateOf("") }
+fun OnboardingScreen(busy: Boolean, onStart: (Boolean, String) -> Unit, onImport: () -> Unit) {
     var zone by rememberSaveable { mutableStateOf(ZoneId.systemDefault().id) }
-    var start by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
-    var currentStart by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
-    var wearing by rememberSaveable { mutableStateOf(true) }
-    var attempted by rememberSaveable { mutableStateOf(false) }
-    fun plan(): TreatmentPlan? =
-        runCatching {
-                val zoneId = ZoneId.of(zone.trim())
-                val today = LocalDate.now(zoneId)
-                val first = LocalDate.parse(start.trim())
-                val trayDate = LocalDate.parse(currentStart.trim())
-                val trays = requireNotNull(parseUserInteger(total))
-                val tray = requireNotNull(parseUserInteger(current))
-                val days = requireNotNull(parseUserInteger(interval))
-                val minutes = requireNotNull(parseUserHours(goal))
-                require(
-                    trays in 1..1000 && tray in 1..trays && days in 1..365 && minutes in 1..1440
-                )
-                require(
-                    first <= trayDate &&
-                        trayDate <= today &&
-                        first.year in 1970..2100 &&
-                        trayDate.year in 1970..2100
-                )
-                TreatmentPlan(
-                    startDate = first.toString(),
-                    totalTrays = trays,
-                    currentTray = tray,
-                    daysPerTray = days,
-                    currentTrayStartedOn = trayDate.toString(),
-                    dailyGoalMinutes = minutes,
-                    zoneId = zoneId.id,
-                    trackingStartedAt = Instant.now().toEpochMilli(),
-                )
-            }
-            .getOrNull()
-    val candidate = plan()
+    var wearing by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var chooseZone by rememberSaveable { mutableStateOf(false) }
+    var query by rememberSaveable { mutableStateOf("") }
     ScreenColumn {
-        Heading(R.string.welcome_title)
-        Text(stringResource(R.string.welcome_body), style = MaterialTheme.typography.bodyLarge)
-        Section(R.string.setup_title) {
-            Text(stringResource(R.string.setup_body))
-            Entry(
-                total,
-                { total = it },
-                R.string.total_trays,
-                numeric = true,
-                enabled = !busy,
-                error = attempted && parseUserInteger(total) !in 1..1000,
-                errorMessage =
-                    if (attempted && parseUserInteger(total) !in 1..1000)
-                        R.string.tray_count_invalid
-                    else null,
-            )
-            Entry(
-                current,
-                { current = it },
-                R.string.current_tray,
-                numeric = true,
-                enabled = !busy,
-                error =
-                    attempted && parseUserInteger(current) !in 1..(parseUserInteger(total) ?: 0),
-                errorMessage =
-                    if (
-                        attempted && parseUserInteger(current) !in 1..(parseUserInteger(total) ?: 0)
-                    )
-                        R.string.current_tray_invalid
-                    else null,
-            )
-            Entry(
-                interval,
-                { interval = it },
-                R.string.days_per_tray,
-                error = attempted && parseUserInteger(interval) !in 1..365,
-                errorMessage =
-                    if (attempted && parseUserInteger(interval) !in 1..365)
-                        R.string.tray_days_invalid
-                    else null,
-                numeric = true,
-                enabled = !busy,
-            )
-            Entry(
-                goal,
-                { goal = it },
-                R.string.goal_hours,
-                numeric = true,
-                enabled = !busy,
-                error = attempted && parseUserHours(goal) !in 1..1440,
-                errorMessage =
-                    if (attempted && parseUserHours(goal) !in 1..1440) R.string.goal_hours_invalid
-                    else null,
-            )
-            Entry(start, { start = it }, R.string.treatment_start, enabled = !busy)
-            Entry(currentStart, { currentStart = it }, R.string.tray_start, enabled = !busy)
-            Entry(zone, { zone = it }, R.string.treatment_zone, enabled = !busy)
-            Text(stringResource(R.string.zone_helper), style = MaterialTheme.typography.bodySmall)
-            if (candidate != null)
-                Text(
-                    stringResource(
-                        R.string.setup_date_preview,
-                        readableDate(WearMath.nextChangeDate(candidate)),
-                    )
-                )
-            if (attempted && candidate == null) ErrorText(R.string.setup_invalid)
-        }
+        Heading(R.string.quick_start_title)
+        Text(stringResource(R.string.quick_start_body))
         Section(R.string.setup_state) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(
-                    selected = wearing,
-                    onClick = { wearing = true },
-                    enabled = !busy,
-                    label = { Text(stringResource(R.string.state_in)) },
-                )
-                FilterChip(
-                    selected = !wearing,
-                    onClick = { wearing = false },
-                    enabled = !busy,
-                    label = { Text(stringResource(R.string.state_out)) },
-                )
-            }
+            for (state in listOf(true, false)) FilterChip(
+                selected = wearing == state,
+                onClick = { wearing = state },
+                enabled = !busy,
+                label = {
+                    Text(stringResource(if (state) R.string.state_in else R.string.state_out))
+                },
+            )
+            if (wearing == null) Text(stringResource(R.string.choose_tracking_state))
             Text(stringResource(R.string.setup_coverage))
             Button(
-                onClick = {
-                    attempted = true
-                    plan()?.let { onStart(it, wearing) }
-                },
-                enabled = !busy,
+                onClick = { wearing?.let { onStart(it, zone) } },
+                enabled = !busy && wearing != null,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
             ) {
                 Text(stringResource(if (busy) R.string.saving else R.string.setup_start))
             }
         }
-        OutlinedButton(
-            onClick = onImport,
-            enabled = !busy,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-        ) {
+        Text(stringResource(R.string.zone_value, readableZone(zone)))
+        TextButton(onClick = { chooseZone = true }, enabled = !busy) {
+            Text(stringResource(R.string.change_accounting_zone))
+        }
+        OutlinedButton(onClick = onImport, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.setup_import))
         }
     }
+    if (chooseZone)
+        TrackerDialog(
+            onDismissRequest = { chooseZone = false },
+            title = { Text(stringResource(R.string.treatment_zone)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.fixed_zone_help))
+                    Entry(query, { query = it }, R.string.search_zones)
+                    ZoneId.getAvailableZoneIds()
+                        .sorted()
+                        .filter { it.replace('_', ' ').contains(query.trim(), ignoreCase = true) }
+                        .take(40)
+                        .forEach { id ->
+                            TextButton(
+                                onClick = {
+                                    zone = id
+                                    chooseZone = false
+                                    query = ""
+                                }
+                            ) {
+                                Text(readableZone(id))
+                            }
+                        }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { chooseZone = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
 }
+
+@Composable
+internal fun trayLabel(plan: TreatmentPlan): String =
+    when {
+        plan.currentTray == null -> stringResource(R.string.tray_unknown)
+        plan.totalTrays == null -> stringResource(R.string.tray_number_only, plan.currentTray)
+        else -> stringResource(R.string.tray_fraction, plan.currentTray, plan.totalTrays)
+    }
 
 @Composable
 internal fun Totals(
@@ -420,18 +351,25 @@ fun TodayScreen(
     now: Instant,
     busy: Boolean,
     onToggle: (Boolean) -> Unit,
+) = TodayScreen(snapshot, now, busy, {}, onToggle)
+
+@Composable
+fun TodayScreen(
+    snapshot: TrackerSnapshot,
+    now: Instant,
+    busy: Boolean,
+    onDetails: () -> Unit,
+    onToggle: (Boolean) -> Unit,
 ) {
     val plan = snapshot.plan ?: return
     val zone = ZoneId.of(plan.zoneId)
     val wearing = WearMath.isWearing(snapshot)
     val currentState = stringResource(if (wearing) R.string.state_in else R.string.state_out)
     val summary = WearMath.summarize(snapshot, now.atZone(zone).toLocalDate(), now)
+    var detailsDismissed by rememberSaveable(plan.trackingStartedAt) { mutableStateOf(false) }
     ScreenColumn {
         Heading(R.string.wear_heading)
-        Text(
-            stringResource(R.string.tray_fraction, plan.currentTray, plan.totalTrays),
-            style = MaterialTheme.typography.titleMedium,
-        )
+        Text(trayLabel(plan), style = MaterialTheme.typography.titleMedium)
         Section(
             if (plan.completed) R.string.completed_title
             else if (wearing) R.string.state_in else R.string.state_out
@@ -475,7 +413,30 @@ fun TodayScreen(
         Section(R.string.today_summary) {
             Totals(summary, now, zone, !plan.completed)
             HorizontalDivider()
-            Text(stringResource(R.string.goal_value, durationLabel(summary.goalMinutes * 60_000L)))
+            Text(
+                summary.goalMinutes?.let {
+                    stringResource(R.string.goal_value, durationLabel(it * 60_000L))
+                }
+                    ?: stringResource(
+                        if (plan.dailyGoalMinutes == null) R.string.goal_unknown
+                        else R.string.goal_comparison_unavailable
+                    )
+            )
+        }
+        if (
+            !detailsDismissed &&
+                !plan.completed &&
+                (plan.dailyGoalMinutes == null || !plan.hasSchedule)
+        ) {
+            Section(R.string.optional_details_invitation) {
+                Text(stringResource(R.string.optional_details_help))
+                TextButton(onClick = onDetails) {
+                    Text(stringResource(R.string.add_treatment_details))
+                }
+                TextButton(onClick = { detailsDismissed = true }) {
+                    Text(stringResource(R.string.not_now))
+                }
+            }
         }
         Text(stringResource(R.string.edit_hint))
         Text(
@@ -491,30 +452,28 @@ fun ScheduleScreen(
     busy: Boolean,
     onAdvance: () -> Unit,
     onComplete: () -> Unit,
+    onDetails: () -> Unit = {},
 ) {
     val plan = snapshot.plan ?: return
     val due = WearMath.nextChangeDate(snapshot)
     ScreenColumn {
         Heading(R.string.plan_heading)
         Section(R.string.schedule) {
+            Text(trayLabel(plan), style = MaterialTheme.typography.headlineSmall)
             Text(
-                stringResource(R.string.tray_fraction, plan.currentTray, plan.totalTrays),
-                style = MaterialTheme.typography.headlineSmall,
-            )
-            Text(
-                stringResource(
-                    R.string.current_started,
-                    readableDate(LocalDate.parse(plan.currentTrayStartedOn)),
-                )
+                plan.currentTrayStartedOn?.let {
+                    stringResource(R.string.current_started, readableDate(LocalDate.parse(it)))
+                } ?: stringResource(R.string.tray_date_unknown)
             )
             if (plan.completed) Text(stringResource(R.string.completed_body))
             else {
                 Text(
-                    stringResource(R.string.next_change, readableDate(due)),
+                    due?.let { stringResource(R.string.next_change, readableDate(it)) }
+                        ?: stringResource(R.string.schedule_missing_details),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(stringResource(R.string.schedule_note))
-                if (plan.currentTray < plan.totalTrays)
+                if (plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
                     Button(
                         onClick = onAdvance,
                         enabled = !busy,
@@ -522,7 +481,7 @@ fun ScheduleScreen(
                     ) {
                         Text(stringResource(R.string.advance_tray))
                     }
-                else
+                else if (plan.hasSchedule)
                     Button(
                         onClick = onComplete,
                         enabled = !busy,
@@ -532,12 +491,16 @@ fun ScheduleScreen(
                     }
             }
         }
-        if (!plan.completed && plan.currentTray < plan.totalTrays)
+        if (!plan.completed)
+            TextButton(onClick = onDetails) {
+                Text(stringResource(R.string.edit_treatment_details))
+            }
+        if (!plan.completed && plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
             Section(R.string.future_schedule) {
                 WearMath.futureTrayStarts(snapshot).forEach { (tray, startDate) ->
                     Text(stringResource(R.string.future_tray, tray, readableDate(startDate)))
                 }
-                if (plan.totalTrays > plan.currentTray + 12)
+                if (plan.totalTrays!! > plan.currentTray!! + 12)
                     Text(stringResource(R.string.future_more))
             }
         Text(
@@ -658,10 +621,7 @@ fun ProgressScreen(snapshot: TrackerSnapshot, now: Instant) {
     val today = now.atZone(zone).toLocalDate()
     ScreenColumn {
         Heading(R.string.progress_heading)
-        Text(
-            stringResource(R.string.treatment_fraction, plan.currentTray, plan.totalTrays),
-            style = MaterialTheme.typography.titleLarge,
-        )
+        Text(trayLabel(plan), style = MaterialTheme.typography.titleLarge)
         listOf(7, 30).forEach { period ->
             val summaries =
                 (0 until period).map {
@@ -677,7 +637,7 @@ fun ProgressScreen(snapshot: TrackerSnapshot, now: Instant) {
                                 date.plusDays(1).atStartOfDay(zone),
                             )
                             .toMillis()
-                    date < today && it.trackedMillis == fullDay
+                    date < today && it.trackedMillis == fullDay && it.goalMinutes != null
                 }
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -696,7 +656,11 @@ fun ProgressScreen(snapshot: TrackerSnapshot, now: Instant) {
                         Text(
                             stringResource(
                                 R.string.full_days,
-                                fullyTracked.count { it.wornMillis >= it.goalMinutes * 60_000L },
+                                fullyTracked.count {
+                                    it.goalMinutes?.let { goal ->
+                                        it.wornMillis >= goal * 60_000L
+                                    } == true
+                                },
                                 fullyTracked.size,
                             )
                         )

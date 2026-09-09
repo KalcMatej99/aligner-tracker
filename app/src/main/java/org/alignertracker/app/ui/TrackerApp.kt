@@ -87,6 +87,7 @@ fun TrackerApp(model: TrackerViewModel) {
     var permissionEpoch by androidx.compose.runtime.remember { mutableIntStateOf(0) }
     var destinationName by rememberSaveable { mutableStateOf(Destination.TODAY.name) }
     val destination = Destination.valueOf(destinationName)
+    val screenState = androidx.compose.runtime.saveable.rememberSaveableStateHolder()
     var moreExpanded by androidx.compose.runtime.remember { mutableStateOf(false) }
     var confirmation by rememberSaveable { mutableStateOf<String?>(null) }
     var editId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -248,108 +249,127 @@ fun TrackerApp(model: TrackerViewModel) {
             }
             val state = snapshot
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-                if (state == null) {
-                    Column(
-                        Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        CircularProgressIndicator()
-                        Text(stringResource(R.string.loading))
-                    }
-                } else if (destination == Destination.SETTINGS) {
-                    SettingsScreen(
-                        state.plan,
-                        preferences,
-                        busy,
-                        notificationsAllowed,
-                        exactAllowed,
-                        breakChannelAllowed,
-                        trayChannelAllowed,
-                        onRequestNotifications = {
-                            if (Build.VERSION.SDK_INT >= 33)
-                                notificationPermission.launch(
-                                    Manifest.permission.POST_NOTIFICATIONS
-                                )
-                            else
+                screenState.SaveableStateProvider(
+                    "$destinationName:${state?.plan?.trackingStartedAt ?: 0}"
+                ) {
+                    if (state == null) {
+                        Column(
+                            Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            CircularProgressIndicator()
+                            Text(stringResource(R.string.loading))
+                        }
+                    } else if (destination == Destination.SETTINGS) {
+                        SettingsScreen(
+                            state.plan,
+                            preferences,
+                            busy,
+                            notificationsAllowed,
+                            exactAllowed,
+                            breakChannelAllowed,
+                            trayChannelAllowed,
+                            onRequestNotifications = {
+                                if (Build.VERSION.SDK_INT >= 33)
+                                    notificationPermission.launch(
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    )
+                                else
+                                    launchIntent(
+                                        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                            .putExtra(
+                                                Settings.EXTRA_APP_PACKAGE,
+                                                context.packageName,
+                                            )
+                                    )
+                            },
+                            onOpenNotificationSettings = {
                                 launchIntent(
                                     Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                                         .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                                 )
-                        },
-                        onOpenNotificationSettings = {
-                            launchIntent(
-                                Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                            )
-                        },
-                        onRequestExact = {
-                            if (Build.VERSION.SDK_INT >= 31)
-                                launchIntent(
-                                    Intent(
-                                        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                                        Uri.parse("package:${context.packageName}"),
-                                    )
-                                )
-                        },
-                        appointmentChannelAllowed =
-                            context
-                                .getSystemService(android.app.NotificationManager::class.java)
-                                .getNotificationChannel(
-                                    org.alignertracker.app.reminders.ReminderScheduler
-                                        .APPOINTMENT_CHANNEL
-                                )
-                                ?.importance != android.app.NotificationManager.IMPORTANCE_NONE,
-                        onGoal = model::updateGoal,
-                        onReminders = model::updateReminders,
-                        onExport = { confirmation = if (it) "exportCsv" else "exportBackup" },
-                        onImport = ::openImport,
-                        onDelete = { confirmation = "delete" },
-                        onEncryptedExport = {
-                            runCatching { encryptedExporter.launch("aligner-backup.atbk") }
-                                .onFailure { model.reportError(pickerFailure) }
-                        },
-                        onEncryptedImport = {
-                            runCatching {
-                                    encryptedImporter.launch(
-                                        arrayOf(
-                                            "application/octet-stream",
-                                            "application/zip",
-                                            "*/*",
+                            },
+                            onRequestExact = {
+                                if (Build.VERSION.SDK_INT >= 31)
+                                    launchIntent(
+                                        Intent(
+                                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                                            Uri.parse("package:${context.packageName}"),
                                         )
                                     )
+                            },
+                            appointmentChannelAllowed =
+                                context
+                                    .getSystemService(android.app.NotificationManager::class.java)
+                                    .getNotificationChannel(
+                                        org.alignertracker.app.reminders.ReminderScheduler
+                                            .APPOINTMENT_CHANNEL
+                                    )
+                                    ?.importance != android.app.NotificationManager.IMPORTANCE_NONE,
+                            onGoal = model::updateGoal,
+                            onDetails = { destinationName = Destination.DETAILS.name },
+                            onReminders = model::updateReminders,
+                            onExport = { confirmation = if (it) "exportCsv" else "exportBackup" },
+                            onImport = ::openImport,
+                            onDelete = { confirmation = "delete" },
+                            onEncryptedExport = {
+                                runCatching { encryptedExporter.launch("aligner-backup.atbk") }
+                                    .onFailure { model.reportError(pickerFailure) }
+                            },
+                            onEncryptedImport = {
+                                runCatching {
+                                        encryptedImporter.launch(
+                                            arrayOf(
+                                                "application/octet-stream",
+                                                "application/zip",
+                                                "*/*",
+                                            )
+                                        )
+                                    }
+                                    .onFailure { model.reportError(pickerFailure) }
+                            },
+                        )
+                    } else if (state.plan == null) {
+                        OnboardingScreen(busy, model::startTracking, ::openImport)
+                    } else
+                        when (destination) {
+                            Destination.TODAY ->
+                                TodayScreen(
+                                    state,
+                                    now,
+                                    busy,
+                                    onDetails = { destinationName = Destination.DETAILS.name },
+                                    onToggle = model::setWearing,
+                                )
+                            Destination.SCHEDULE ->
+                                ScheduleScreen(
+                                    state,
+                                    busy,
+                                    { confirmation = "advance" },
+                                    { confirmation = "complete" },
+                                    onDetails = { destinationName = Destination.DETAILS.name },
+                                )
+                            Destination.HISTORY ->
+                                HistoryScreen(state, now.truncatedTo(ChronoUnit.MINUTES), busy) {
+                                    editId = it
                                 }
-                                .onFailure { model.reportError(pickerFailure) }
-                        },
-                    )
-                } else if (state.plan == null) {
-                    OnboardingScreen(busy, model::start, ::openImport)
-                } else
-                    when (destination) {
-                        Destination.TODAY -> TodayScreen(state, now, busy, model::setWearing)
-                        Destination.SCHEDULE ->
-                            ScheduleScreen(
-                                state,
-                                busy,
-                                { confirmation = "advance" },
-                                { confirmation = "complete" },
-                            )
-                        Destination.HISTORY ->
-                            HistoryScreen(state, now.truncatedTo(ChronoUnit.MINUTES), busy) {
-                                editId = it
-                            }
-                        Destination.PROGRESS ->
-                            ReportsScreen(
-                                state,
-                                model,
-                                now.truncatedTo(ChronoUnit.MINUTES),
-                                preferences,
-                            )
-                        Destination.PHOTOS -> PhotosScreen(state, model, busy)
-                        Destination.DETAILS -> TreatmentDetailsScreen(state, model, busy)
-                        Destination.JOURNAL -> JournalScreen(state, model, busy)
-                        Destination.SETTINGS -> Unit
-                    }
+                            Destination.PROGRESS ->
+                                ReportsScreen(
+                                    state,
+                                    model,
+                                    now.truncatedTo(ChronoUnit.MINUTES),
+                                    preferences,
+                                )
+                            Destination.PHOTOS -> PhotosScreen(state, model, busy)
+                            Destination.DETAILS ->
+                                TreatmentDetailsScreen(state, model, busy) {
+                                    destinationName = Destination.TODAY.name
+                                }
+                            Destination.JOURNAL -> JournalScreen(state, model, busy)
+                            Destination.SETTINGS -> Unit
+                        }
+                }
             }
         }
     }
@@ -477,10 +497,9 @@ fun TrackerApp(model: TrackerViewModel) {
                         if (plan == null) stringResource(R.string.restore_empty)
                         else
                             stringResource(
-                                R.string.restore_plan,
-                                plan.currentTray,
-                                plan.totalTrays,
-                                plan.zoneId,
+                                R.string.restore_partial_plan,
+                                trayLabel(plan),
+                                readableZone(plan.zoneId),
                             )
                     Text(
                         stringResource(R.string.restore_summary, restored.events.size, description)

@@ -83,17 +83,19 @@ fun ReportsScreen(
             )
         }
         item {
-            FilterChip(
-                selected = preferences.streaksEnabled,
-                onClick = {
-                    model.updateReminders(
-                        preferences.copy(streaksEnabled = !preferences.streaksEnabled)
-                    )
-                },
-                label = { Text(stringResource(R.string.optional_streaks)) },
-            )
+            if (snapshot.targetHistory.isEmpty()) Text(stringResource(R.string.streak_needs_goal))
+            else
+                FilterChip(
+                    selected = preferences.streaksEnabled,
+                    onClick = {
+                        model.updateReminders(
+                            preferences.copy(streaksEnabled = !preferences.streaksEnabled)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.optional_streaks)) },
+                )
         }
-        if (preferences.streaksEnabled)
+        if (preferences.streaksEnabled && snapshot.targetHistory.isNotEmpty())
             item {
                 Text(stringResource(R.string.streak_value, ReportMath.streak(snapshot, now)))
                 Text(stringResource(R.string.streak_rules))
@@ -113,13 +115,21 @@ fun ReportsScreen(
                             )
                     )
                     Text(
-                        stringResource(
-                            R.string.daily_report,
-                            day.wornMillis / 60000,
-                            day.removedMillis / 60000,
-                            day.trackedMillis / 60000,
-                            day.goalMinutes,
-                        )
+                        if (day.goalMinutes == null)
+                            stringResource(
+                                R.string.daily_report_no_goal,
+                                day.wornMillis / 60000,
+                                day.removedMillis / 60000,
+                                day.trackedMillis / 60000,
+                            )
+                        else
+                            stringResource(
+                                R.string.daily_report,
+                                day.wornMillis / 60000,
+                                day.removedMillis / 60000,
+                                day.trackedMillis / 60000,
+                                day.goalMinutes,
+                            )
                     )
                     val total = ReportMath.dayMillis(LocalDate.parse(day.date), zone)
                     LinearProgressIndicator(
@@ -143,6 +153,8 @@ fun ReportsScreen(
                 modifier = Modifier.semantics { heading() },
             )
         }
+        if (snapshot.trayHistory.isEmpty())
+            item { Text(stringResource(R.string.tray_history_empty)) }
         items(snapshot.trayHistory, key = { "tray${it.id}" }) { tray ->
             val start =
                 tray.startedAt

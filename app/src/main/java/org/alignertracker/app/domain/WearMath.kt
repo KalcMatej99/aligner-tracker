@@ -8,34 +8,39 @@ object WearMath {
     fun isWearing(snapshot: TrackerSnapshot): Boolean =
         snapshot.events.lastOrNull()?.wearing ?: false
 
-    fun nextChangeDate(plan: TreatmentPlan): LocalDate =
-        LocalDate.parse(plan.currentTrayStartedOn).plusDays(plan.daysPerTray.toLong())
+    fun nextChangeDate(plan: TreatmentPlan): LocalDate? {
+        if (plan.currentTray == null) return null
+        val start = plan.currentTrayStartedOn ?: return null
+        val days = plan.daysPerTray ?: return null
+        return LocalDate.parse(start).plusDays(days.toLong())
+    }
 
     fun futureTrayStarts(snapshot: TrackerSnapshot, limit: Int = 12): List<Pair<Int, LocalDate>> {
         val plan = snapshot.plan ?: return emptyList()
-        if (plan.completed) return emptyList()
+        if (plan.completed || !plan.hasSchedule) return emptyList()
         val phase = snapshot.phases.singleOrNull { it.active }
         val revision =
             snapshot.scheduleRevisions
                 .filter { it.phaseId == phase?.id }
                 .maxWithOrNull(compareBy<ScheduleRevision> { it.createdAt }.thenBy { it.id })
-        var start = nextChangeDate(snapshot)
-        return (plan.currentTray + 1..minOf(plan.totalTrays, plan.currentTray + limit)).map { tray
-            ->
+        var start = nextChangeDate(snapshot) ?: return emptyList()
+        return (plan.currentTray!! + 1..minOf(plan.totalTrays!!, plan.currentTray!! + limit)).map {
+            tray ->
             val row = tray to start
             val days =
                 snapshot.trayIntervals
                     .singleOrNull {
                         it.scheduleRevisionId == revision?.id && tray in it.firstTray..it.lastTray
                     }
-                    ?.daysPerTray ?: plan.daysPerTray
+                    ?.daysPerTray ?: plan.daysPerTray!!
             start = start.plusDays(days.toLong())
             row
         }
     }
 
-    fun nextChangeDate(snapshot: TrackerSnapshot): LocalDate {
-        val plan = checkNotNull(snapshot.plan) { "Set up a treatment first." }
+    fun nextChangeDate(snapshot: TrackerSnapshot): LocalDate? {
+        val plan = snapshot.plan ?: return null
+        if (nextChangeDate(plan) == null) return null
         val openTray = snapshot.trayHistory.singleOrNull { it.endedOn == null }
         val activePhase = snapshot.phases.singleOrNull { it.active }
         val revision =
@@ -49,25 +54,31 @@ object WearMath {
                 ?.let { current ->
                     snapshot.trayIntervals.singleOrNull {
                         it.scheduleRevisionId == current.id &&
-                            plan.currentTray in it.firstTray..it.lastTray
+                            plan.currentTray!! in it.firstTray..it.lastTray
                     }
                 }
                 ?.daysPerTray ?: plan.daysPerTray
         return LocalDate.parse(openTray?.startedOn ?: plan.currentTrayStartedOn)
-            .plusDays(currentDays.toLong())
+            .plusDays(currentDays!!.toLong())
     }
 
-    fun targetForDate(snapshot: TrackerSnapshot, date: LocalDate): Int {
-        val plan = snapshot.plan ?: return 0
-        return snapshot.targetHistory
-            .asSequence()
-            .filter { LocalDate.parse(it.effectiveFrom) <= date }
-            .maxByOrNull { it.effectiveFrom }
-            ?.goalMinutes ?: plan.dailyGoalMinutes
+    fun targetForDate(snapshot: TrackerSnapshot, date: LocalDate): Int? {
+        val plan = snapshot.plan ?: return null
+        val target =
+            snapshot.targetHistory
+                .filter { LocalDate.parse(it.effectiveFrom) <= date }
+                .maxByOrNull { it.effectiveFrom }
+        // Legacy in-memory snapshots retain their original complete-plan semantics.
+        if (snapshot.targetHistory.isEmpty()) return plan.dailyGoalMinutes
+        target ?: return null
+        val midnight = date.atStartOfDay(ZoneId.of(plan.zoneId)).toInstant().toEpochMilli()
+        // A newly prescribed target is not an all-day prescription for earlier hours.
+        if (target.effectiveAt != null && target.effectiveAt > midnight) return null
+        return target.goalMinutes
     }
 
     fun summarize(snapshot: TrackerSnapshot, date: LocalDate, now: Instant): DaySummary {
-        val plan = snapshot.plan ?: return DaySummary(date.toString(), 0, 0, 0, 0)
+        val plan = snapshot.plan ?: return DaySummary(date.toString(), 0, 0, 0, null)
         val zone = ZoneId.of(plan.zoneId)
         val start = date.atStartOfDay(zone).toInstant().toEpochMilli()
         val end =

@@ -5,17 +5,24 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TreatmentPlan(
     val id: Long = 1,
-    val startDate: String,
-    val totalTrays: Int,
-    val currentTray: Int,
-    val daysPerTray: Int,
-    val currentTrayStartedOn: String,
-    val dailyGoalMinutes: Int,
+    val startDate: String? = null,
+    val totalTrays: Int? = null,
+    val currentTray: Int? = null,
+    val daysPerTray: Int? = null,
+    val currentTrayStartedOn: String? = null,
+    val dailyGoalMinutes: Int? = null,
     val zoneId: String,
     val trackingStartedAt: Long,
     val completed: Boolean = false,
     val completedAt: Long? = null,
-)
+) {
+    val hasSchedule: Boolean
+        get() =
+            currentTray != null &&
+                totalTrays != null &&
+                daysPerTray != null &&
+                currentTrayStartedOn != null
+}
 
 @Serializable data class WearEvent(val id: Long = 0, val at: Long, val wearing: Boolean)
 
@@ -64,7 +71,7 @@ data class TreatmentPhase(
     val ordinal: Int,
     val name: String,
     val totalTrays: Int,
-    val startedOn: String,
+    val startedOn: String?,
     val completedOn: String? = null,
     val active: Boolean = true,
 )
@@ -104,7 +111,12 @@ data class TrayHistoryEntry(
 )
 
 @Serializable
-data class TargetHistoryEntry(val id: Long = 0, val effectiveFrom: String, val goalMinutes: Int)
+data class TargetHistoryEntry(
+    val id: Long = 0,
+    val effectiveFrom: String,
+    val goalMinutes: Int,
+    val effectiveAt: Long? = null,
+)
 
 @Serializable
 data class TreatmentNote(
@@ -190,5 +202,5 @@ data class DaySummary(
     val wornMillis: Long,
     val removedMillis: Long,
     val trackedMillis: Long,
-    val goalMinutes: Int,
+    val goalMinutes: Int?,
 )

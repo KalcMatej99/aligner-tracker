@@ -63,54 +63,175 @@ class TrackerRepository(
             require(!plan.completed) { "A new treatment cannot already be completed." }
             dao.insertPlan(PlanEntity.from(plan))
             dao.insertEvent(EventEntity(at = plan.trackingStartedAt, wearing = wearing))
-            val phaseId =
-                dao.insertPhase(
-                    PhaseEntity.from(
-                        TreatmentPhase(
-                            0,
-                            TreatmentPhaseKind.ALIGNER,
-                            1,
-                            "Initial treatment",
-                            plan.totalTrays,
-                            plan.startDate,
-                        )
-                    )
-                )
-            val revisionId =
-                dao.insertScheduleRevision(
-                    ScheduleRevisionEntity.from(
-                        ScheduleRevision(
-                            0,
-                            phaseId,
-                            plan.trackingStartedAt,
-                            "Initial prescribed schedule",
-                        )
-                    )
-                )
-            dao.insertTrayInterval(
-                TrayIntervalEntity(0, revisionId, 1, plan.totalTrays, plan.daysPerTray)
-            )
-            dao.insertTrayHistory(
-                TrayHistoryEntity(
-                    0,
-                    phaseId,
-                    plan.currentTray,
-                    plan.currentTrayStartedOn,
-                    null,
-                    revisionId,
-                    plan.daysPerTray,
-                    plan.trackingStartedAt,
-                    null,
-                )
-            )
-            val targetDate =
-                Instant.ofEpochMilli(plan.trackingStartedAt)
-                    .atZone(ZoneId.of(plan.zoneId))
-                    .toLocalDate()
-                    .toString()
-            dao.insertTarget(TargetHistoryEntity(0, targetDate, plan.dailyGoalMinutes))
+            if (plan.hasSchedule) attachSchedule(plan, plan.trackingStartedAt)
+            plan.dailyGoalMinutes?.let { minutes ->
+                val date =
+                    Instant.ofEpochMilli(plan.trackingStartedAt)
+                        .atZone(ZoneId.of(plan.zoneId))
+                        .toLocalDate()
+                        .toString()
+                dao.insertTarget(TargetHistoryEntity(0, date, minutes))
+            }
             dao.putState(StateEntity(generation = UUID.randomUUID().toString(), revision = 1))
         }
+    }
+
+    /** The successful transaction, not screen creation, defines the first recorded instant. */
+    suspend fun startTracking(wearing: Boolean, zoneId: String = ZoneId.systemDefault().id) {
+        database.withTransaction {
+            start(TreatmentPlan(zoneId = zoneId, trackingStartedAt = clock.millis()), wearing)
+        }
+    }
+
+    suspend fun updateTreatmentDetails(
+        startDate: String?,
+        totalTrays: Int?,
+        currentTray: Int?,
+        daysPerTray: Int?,
+        currentTrayStartedOn: String?,
+    ) {
+        database.withTransaction {
+            val old = activePlan()
+            val updated =
+                old.copy(
+                    startDate = startDate,
+                    totalTrays = totalTrays,
+                    currentTray = currentTray,
+                    daysPerTray = daysPerTray,
+                    currentTrayStartedOn = currentTrayStartedOn,
+                )
+            TrackerValidation.plan(updated, clock.instant())
+            if (dao.phases().isNotEmpty()) {
+                require(updated.hasSchedule) {
+                    "Recorded schedules need current tray, total, interval and tray start. Use corrections instead of removing recorded details."
+                }
+                require(
+                    totalTrays!! >=
+                        (dao.trayHistory()
+                            .filter {
+                                it.phaseId == dao.phases().single { phase -> phase.active }.id
+                            }
+                            .maxOfOrNull { it.trayNumber } ?: 1)
+                ) {
+                    "Total trays cannot be below an already recorded tray number."
+                }
+                val changed =
+                    old.totalTrays != totalTrays ||
+                        old.currentTray != currentTray ||
+                        old.daysPerTray != daysPerTray ||
+                        old.currentTrayStartedOn != currentTrayStartedOn
+                if (changed) {
+                    val now = clock.millis()
+                    check(now >= dao.events().last().at) {
+                        "The clock precedes existing treatment history. Correct it before changing details."
+                    }
+                    val phase = dao.phases().single { it.active }
+                    val previous = dao.trayHistory().single { it.endedOn == null }
+                    check(now >= (previous.startedAt ?: old.trackingStartedAt)) {
+                        "The clock precedes existing treatment history. Correct it before changing details."
+                    }
+                    dao.updatePhase(phase.copy(totalTrays = totalTrays))
+                    val revision =
+                        dao.insertScheduleRevision(
+                            ScheduleRevisionEntity(
+                                0,
+                                phase.id,
+                                now,
+                                "Explicit correction of current tray details",
+                            )
+                        )
+                    // Preserve any variable intervals unless the prescribed interval itself
+                    // changed.
+                    val priorRevision =
+                        dao.scheduleRevisions()
+                            .filter { it.phaseId == phase.id && it.id != revision }
+                            .last()
+                    val priorIntervals =
+                        dao.trayIntervals().filter { it.scheduleRevisionId == priorRevision.id }
+                    val prescribed =
+                        (1..totalTrays).map { tray ->
+                            if (tray == currentTray) daysPerTray!!
+                            else
+                                priorIntervals
+                                    .singleOrNull { tray in it.firstTray..it.lastTray }
+                                    ?.daysPerTray ?: daysPerTray!!
+                        }
+                    var first = 1
+                    for (tray in 1..totalTrays) {
+                        if (tray == totalTrays || prescribed[tray] != prescribed[first - 1]) {
+                            dao.insertTrayInterval(
+                                TrayIntervalEntity(0, revision, first, tray, prescribed[first - 1])
+                            )
+                            first = tray + 1
+                        }
+                    }
+                    if (
+                        old.currentTray != currentTray ||
+                            old.currentTrayStartedOn != currentTrayStartedOn
+                    ) {
+                        val today =
+                            Instant.ofEpochMilli(now)
+                                .atZone(ZoneId.of(old.zoneId))
+                                .toLocalDate()
+                                .toString()
+                        dao.updateTrayHistory(previous.copy(endedOn = today, endedAt = now))
+                        dao.insertTrayHistory(
+                            TrayHistoryEntity(
+                                0,
+                                phase.id,
+                                currentTray!!,
+                                currentTrayStartedOn!!,
+                                null,
+                                revision,
+                                daysPerTray!!,
+                                now,
+                                null,
+                            )
+                        )
+                    }
+                }
+            } else if (updated.hasSchedule) attachSchedule(updated, clock.millis())
+            dao.updatePlan(PlanEntity.from(updated))
+            bumpState()
+        }
+    }
+
+    private suspend fun attachSchedule(plan: TreatmentPlan, recordedAt: Long) {
+        val phaseId =
+            dao.insertPhase(
+                PhaseEntity.from(
+                    TreatmentPhase(
+                        0,
+                        TreatmentPhaseKind.ALIGNER,
+                        1,
+                        "Initial treatment",
+                        plan.totalTrays!!,
+                        plan.startDate,
+                    )
+                )
+            )
+        val revisionId =
+            dao.insertScheduleRevision(
+                ScheduleRevisionEntity.from(
+                    ScheduleRevision(0, phaseId, recordedAt, "Initial prescribed schedule")
+                )
+            )
+        dao.insertTrayInterval(
+            TrayIntervalEntity(0, revisionId, 1, plan.totalTrays!!, plan.daysPerTray!!)
+        )
+        dao.insertTrayHistory(
+            TrayHistoryEntity(
+                0,
+                phaseId,
+                plan.currentTray!!,
+                plan.currentTrayStartedOn!!,
+                null,
+                revisionId,
+                plan.daysPerTray!!,
+                recordedAt,
+                null,
+            )
+        )
     }
 
     suspend fun setWearing(wearing: Boolean) {
@@ -208,8 +329,9 @@ class TrackerRepository(
     suspend fun advanceTray() {
         database.withTransaction {
             val plan = activePlan()
+            check(plan.hasSchedule) { "Add your tray schedule first." }
             val phase = dao.phases().single { it.active }
-            check(plan.currentTray < phase.totalTrays) {
+            check(plan.currentTray!! < phase.totalTrays) {
                 "This is the last tray. Complete or begin a new phase explicitly when appropriate."
             }
             val today = LocalDate.now(clock.withZone(ZoneId.of(plan.zoneId)))
@@ -227,7 +349,7 @@ class TrackerRepository(
                     )
                 }
             val revision = dao.scheduleRevisions().last { it.phaseId == phase.id }
-            val nextTray = plan.currentTray + 1
+            val nextTray = plan.currentTray!! + 1
             val days =
                 dao.trayIntervals()
                     .single {
@@ -287,7 +409,7 @@ class TrackerRepository(
                 }
             val plan = requirePlan()
             val currentDays =
-                intervals.single { plan.currentTray in it.firstTray..it.lastTray }.daysPerTray
+                intervals.single { plan.currentTray!! in it.firstTray..it.lastTray }.daysPerTray
             dao.updatePlan(PlanEntity.from(plan.copy(daysPerTray = currentDays)))
             bumpState()
             revisionId
@@ -335,7 +457,7 @@ class TrackerRepository(
                         )
                     )
                 }
-            } else {
+            } else if (dao.phases().isNotEmpty()) {
                 val oldPhase = dao.phases().single { it.active }
                 dao.updatePhase(oldPhase.copy(active = false, completedOn = today))
                 dao.trayHistory()
@@ -378,6 +500,7 @@ class TrackerRepository(
             check(now >= dao.events().last().at) {
                 "The clock precedes the last switch. Correct it before completing treatment."
             }
+            check(plan.hasSchedule) { "Add your tray schedule first." }
             val completed = plan.copy(completed = true, completedAt = now)
             TrackerValidation.plan(completed, Instant.ofEpochMilli(now))
             val today =
@@ -398,12 +521,22 @@ class TrackerRepository(
         database.withTransaction {
             val plan = activePlan()
             val today = LocalDate.now(clock.withZone(ZoneId.of(plan.zoneId)))
-            val effective = effectiveFrom?.let(TrackerValidation::date) ?: today.plusDays(1)
+            val first = dao.targetHistory().isEmpty()
+            val effective =
+                effectiveFrom?.let(TrackerValidation::date)
+                    ?: if (first) today else today.plusDays(1)
             require(effective >= today) { "A target change cannot rewrite past target history." }
             val existing =
                 dao.targetHistory().singleOrNull { it.effectiveFrom == effective.toString() }
             if (existing == null)
-                dao.insertTarget(TargetHistoryEntity(0, effective.toString(), minutes))
+                dao.insertTarget(
+                    TargetHistoryEntity(
+                        0,
+                        effective.toString(),
+                        minutes,
+                        if (first && effective == today) clock.millis() else null,
+                    )
+                )
             else dao.updateTarget(existing.copy(goalMinutes = minutes))
             dao.updatePlan(PlanEntity.from(plan.copy(dailyGoalMinutes = minutes)))
             bumpState()

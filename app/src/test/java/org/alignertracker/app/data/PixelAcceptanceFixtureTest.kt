@@ -31,7 +31,7 @@ class PixelAcceptanceFixtureTest {
             assertEquals(row.getValue("wornMillis").jsonPrimitive.long, day.wornMillis)
             assertEquals(row.getValue("removedMillis").jsonPrimitive.long, day.removedMillis)
             assertEquals(row.getValue("trackedMillis").jsonPrimitive.long, day.trackedMillis)
-            assertEquals(row.getValue("goalMinutes").jsonPrimitive.long, day.goalMinutes.toLong())
+            assertEquals(row.getValue("goalMinutes").jsonPrimitive.long, day.goalMinutes!!.toLong())
         }
         assertEquals(2, ReportMath.streak(snapshot, now))
         assertEquals(listOf(7, 10), snapshot.trayHistory.map { it.prescribedDays })

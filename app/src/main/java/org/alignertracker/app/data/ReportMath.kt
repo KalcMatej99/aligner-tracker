@@ -34,7 +34,8 @@ object ReportMath {
         while (date >= first) {
             val summary = WearMath.summarize(snapshot, date, now)
             if (
-                summary.trackedMillis != dayMillis(date, zone) ||
+                summary.goalMinutes == null ||
+                    summary.trackedMillis != dayMillis(date, zone) ||
                     summary.wornMillis < summary.goalMinutes * 60_000L
             )
                 break

@@ -11,6 +11,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.ViewModelStore
 import androidx.test.platform.app.InstrumentationRegistry
@@ -146,22 +148,12 @@ class TalkBackSemanticsTest {
     }
 
     @Test
-    fun onboardingErrorsIdentifyInvalidNumericFields() {
+    fun onboardingMakesRequiredStateExplicit() {
         compose.setContent { AlignerTheme { OnboardingScreen(false, { _, _ -> }, {}) } }
-        compose.onNodeWithText("Start tracking").performScrollTo().performClick()
-        compose
-            .onNodeWithText("Total trays")
-            .performScrollTo()
-            .assert(
-                SemanticsMatcher.expectValue(
-                    SemanticsProperties.Error,
-                    "Enter a whole number from 1 to 1000.",
-                )
-            )
-        compose.onNodeWithText("Total trays").performTextReplacement("20")
-        compose
-            .onNodeWithText("Total trays")
-            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Error))
+        compose.onNodeWithText("Choose IN or OUT to start.").assertExists()
+        compose.onNodeWithText("Start tracking").performScrollTo().assertIsNotEnabled()
+        compose.onNodeWithText("Aligners in").performScrollTo().performClick()
+        compose.onNodeWithText("Start tracking").performScrollTo().assertIsEnabled()
     }
 
     @Test

@@ -13,24 +13,38 @@ object TrackerValidation {
 
     fun plan(plan: TreatmentPlan, now: Instant) {
         require(plan.id == 1L) { "A backup must contain one treatment with ID 1." }
-        require(plan.totalTrays in 1..1000) { "Total trays must be between 1 and 1000." }
-        require(plan.currentTray in 1..plan.totalTrays) {
+        require(plan.totalTrays == null || plan.totalTrays in 1..1000) {
+            "Total trays must be between 1 and 1000."
+        }
+        require(plan.currentTray == null || plan.currentTray in 1..1000) {
+            "Current tray must be between 1 and 1000."
+        }
+        require(
+            plan.currentTray == null ||
+                plan.totalTrays == null ||
+                plan.currentTray <= plan.totalTrays
+        ) {
             "Current tray must be within the treatment."
         }
-        require(plan.daysPerTray in 1..365) { "Days per tray must be between 1 and 365." }
-        require(plan.dailyGoalMinutes in 1..1440) { "Prescribed target must be 1 to 1440 minutes." }
+        require(plan.daysPerTray == null || plan.daysPerTray in 1..365) {
+            "Days per tray must be between 1 and 365."
+        }
+        require(plan.dailyGoalMinutes == null || plan.dailyGoalMinutes in 1..1440) {
+            "Prescribed target must be 1 to 1440 minutes."
+        }
         val zone = zone(plan.zoneId)
-        val start = date(plan.startDate)
-        val current = date(plan.currentTrayStartedOn)
+        val start = plan.startDate?.let(::date)
+        val current = plan.currentTrayStartedOn?.let(::date)
         val today = now.atZone(zone).toLocalDate()
-        require(start <= current && current <= today) {
+        require(
+            (start == null || start <= today) &&
+                (current == null || current <= today) &&
+                (start == null || current == null || start <= current)
+        ) {
             "Tray start must be between treatment start and today."
         }
         require(plan.trackingStartedAt in 0..now.toEpochMilli()) {
             "Tracking start cannot be in the future."
-        }
-        require(start <= Instant.ofEpochMilli(plan.trackingStartedAt).atZone(zone).toLocalDate()) {
-            "Treatment cannot start after tracking begins."
         }
         require(plan.completed == (plan.completedAt != null)) {
             "Completed treatment needs a completion timestamp."
@@ -39,13 +53,15 @@ object TrackerValidation {
             require(it in plan.trackingStartedAt..now.toEpochMilli()) {
                 "Completion must be within recorded treatment time."
             }
-            require(current <= Instant.ofEpochMilli(it).atZone(zone).toLocalDate()) {
+            require(
+                current == null || current <= Instant.ofEpochMilli(it).atZone(zone).toLocalDate()
+            ) {
                 "Completion cannot precede the current tray."
             }
         }
     }
 
-    fun snapshot(snapshot: TrackerSnapshot, now: Instant) {
+    fun snapshot(snapshot: TrackerSnapshot, now: Instant, expanded: Boolean = false) {
         require(snapshot.events.size <= MAX_EVENTS) {
             "A backup can contain at most 50,000 events."
         }
@@ -58,13 +74,18 @@ object TrackerValidation {
         }
         plan(plan, now)
         validateEvents(snapshot.events, plan, now)
-        if (hasExpandedRecords(snapshot)) validateExpanded(snapshot, now)
+        if (expanded || hasExpandedRecords(snapshot)) validateExpanded(snapshot, now)
     }
 
     /** Converts schema-1/legacy in-memory state without inventing earlier tray transitions. */
     fun expandLegacy(snapshot: TrackerSnapshot): TrackerSnapshot {
         val plan = snapshot.plan ?: return snapshot
-        if (hasExpandedTreatmentRecords(snapshot)) return snapshot
+        if (
+            hasExpandedTreatmentRecords(snapshot) ||
+                !plan.hasSchedule ||
+                plan.dailyGoalMinutes == null
+        )
+            return snapshot
         val zone = zone(plan.zoneId)
         val completedOn =
             plan.completedAt?.let { Instant.ofEpochMilli(it).atZone(zone).toLocalDate().toString() }
@@ -76,7 +97,7 @@ object TrackerValidation {
                         kind = TreatmentPhaseKind.ALIGNER,
                         ordinal = 1,
                         name = "Initial treatment",
-                        totalTrays = plan.totalTrays,
+                        totalTrays = plan.totalTrays!!,
                         startedOn = plan.startDate,
                         completedOn = completedOn,
                         active = !plan.completed,
@@ -84,17 +105,17 @@ object TrackerValidation {
                 ),
             scheduleRevisions =
                 listOf(ScheduleRevision(1, 1, plan.trackingStartedAt, "Imported fixed schedule")),
-            trayIntervals = listOf(TrayInterval(1, 1, 1, plan.totalTrays, plan.daysPerTray)),
+            trayIntervals = listOf(TrayInterval(1, 1, 1, plan.totalTrays!!, plan.daysPerTray!!)),
             trayHistory =
                 listOf(
                     TrayHistoryEntry(
                         id = 1,
                         phaseId = 1,
-                        trayNumber = plan.currentTray,
-                        startedOn = plan.currentTrayStartedOn,
+                        trayNumber = plan.currentTray!!,
+                        startedOn = plan.currentTrayStartedOn!!,
                         endedOn = completedOn,
                         scheduleRevisionId = 1,
-                        prescribedDays = plan.daysPerTray,
+                        prescribedDays = plan.daysPerTray!!,
                         startedAt = plan.trackingStartedAt,
                         endedAt = plan.completedAt,
                     )
@@ -214,10 +235,13 @@ object TrackerValidation {
 
     private fun validateExpanded(snapshot: TrackerSnapshot, now: Instant) {
         val plan = checkNotNull(snapshot.plan)
-        require(snapshot.phases.isNotEmpty()) { "Expanded treatment needs a phase." }
+
+        require(plan.hasSchedule == snapshot.phases.isNotEmpty()) {
+            "Schedule metadata and recorded schedule must agree."
+        }
         val phaseIds = positiveUnique(snapshot.phases.map { it.id }, "phase")
         val active = snapshot.phases.filter { it.active }
-        require(active.size == if (plan.completed) 0 else 1) {
+        require(active.size == if (plan.completed || snapshot.phases.isEmpty()) 0 else 1) {
             "Treatment must have exactly one active phase."
         }
         var expectedOrdinal = 1
@@ -229,9 +253,11 @@ object TrackerValidation {
                     "Phase name is invalid."
                 }
                 require(phase.totalTrays in 1..1000) { "Phase tray count is invalid." }
-                val started = date(phase.startedOn)
+                val started = phase.startedOn?.let(::date)
                 phase.completedOn?.let {
-                    require(date(it) >= started) { "Phase completion precedes its start." }
+                    require(started == null || date(it) >= started) {
+                        "Phase completion precedes its start."
+                    }
                 }
             }
         active.singleOrNull()?.let {
@@ -253,7 +279,11 @@ object TrackerValidation {
             val phase = snapshot.phases.single { phase -> phase.id == it.phaseId }
             intervals(
                 rows.map { row -> TrayIntervalDraft(row.firstTray, row.lastTray, row.daysPerTray) },
-                phase.totalTrays,
+                rows
+                    .maxOfOrNull { row -> row.lastTray }
+                    ?.also { last ->
+                        require(last in 1..1000) { "Schedule tray count is invalid." }
+                    } ?: phase.totalTrays,
             )
         }
         positiveUnique(snapshot.trayIntervals.map { it.id }, "tray interval")
@@ -262,7 +292,10 @@ object TrackerValidation {
         }
 
         positiveUnique(snapshot.trayHistory.map { it.id }, "tray history")
-        require(snapshot.trayHistory.count { it.endedOn == null } == if (plan.completed) 0 else 1) {
+        require(
+            snapshot.trayHistory.count { it.endedOn == null } ==
+                if (plan.completed || snapshot.phases.isEmpty()) 0 else 1
+        ) {
             "Treatment must have exactly one open tray history record."
         }
         snapshot.trayHistory.forEach { tray ->
@@ -293,7 +326,9 @@ object TrackerValidation {
         }
 
         positiveUnique(snapshot.targetHistory.map { it.id }, "target history")
-        require(snapshot.targetHistory.isNotEmpty()) { "Expanded treatment needs target history." }
+        require((plan.dailyGoalMinutes == null) == snapshot.targetHistory.isEmpty()) {
+            "Known targets require target history."
+        }
         var priorTargetDate: LocalDate? = null
         snapshot.targetHistory
             .sortedBy { it.effectiveFrom }
@@ -303,6 +338,15 @@ object TrackerValidation {
                     "Target dates must increase without duplicates."
                 }
                 require(it.goalMinutes in 1..1440) { "Historical target is invalid." }
+                it.effectiveAt?.let { at ->
+                    require(
+                        at >= plan.trackingStartedAt &&
+                            Instant.ofEpochMilli(at).atZone(zone(plan.zoneId)).toLocalDate() ==
+                                effective
+                    ) {
+                        "Target effective time is invalid."
+                    }
+                }
                 priorTargetDate = effective
             }
 

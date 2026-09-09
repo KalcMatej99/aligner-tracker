@@ -45,11 +45,9 @@ fun SettingsScreen(
     onEncryptedExport: () -> Unit = {},
     onEncryptedImport: () -> Unit = {},
     appointmentChannelAllowed: Boolean = true,
+    onDetails: () -> Unit = {},
 ) {
-    var goal by
-        rememberSaveable(plan?.dailyGoalMinutes) {
-            mutableStateOf(plan?.dailyGoalMinutes?.toString().orEmpty())
-        }
+    var goal by rememberSaveable(plan?.dailyGoalMinutes) { mutableStateOf("") }
     var goalError by rememberSaveable { mutableStateOf(false) }
     var enabled by rememberSaveable(preferences.enabled) { mutableStateOf(preferences.enabled) }
     var trayEnabled by
@@ -63,24 +61,36 @@ fun SettingsScreen(
     ScreenColumn {
         Heading(R.string.settings_heading)
         if (plan != null)
+            TextButton(onClick = onDetails) {
+                Text(stringResource(R.string.edit_treatment_details))
+            }
+        if (plan != null)
             Section(R.string.target_heading) {
+                plan.dailyGoalMinutes?.let {
+                    Text(stringResource(R.string.goal_value, durationLabel(it * 60_000L)))
+                }
                 Entry(
                     goal,
                     {
                         goal = it
                         goalError = false
                     },
-                    R.string.goal_minutes,
+                    R.string.optional_goal_hours,
                     numeric = true,
                     error = goalError,
-                    errorMessage = if (goalError) R.string.goal_invalid else null,
+                    errorMessage = if (goalError) R.string.goal_hours_invalid else null,
                     enabled = !busy && !plan.completed,
                 )
-                Text(stringResource(R.string.target_help))
+                Text(
+                    stringResource(
+                        if (plan.dailyGoalMinutes == null) R.string.initial_target_help
+                        else R.string.target_help
+                    )
+                )
                 Text(stringResource(R.string.watch_privacy))
                 Button(
                     onClick = {
-                        val value = parseUserInteger(goal)
+                        val value = parseUserHours(goal)
                         goalError = value == null || value !in 1..1440
                         if (!goalError) onGoal(value!!)
                     },

@@ -8,11 +8,11 @@ People using removable orthodontic aligners repeatedly remove them for meals and
 
 ## Outcomes and acceptance
 
-A first-time user sets up prescribed tray count, current tray, interval and daily wear target without an account. From Today, one tap records IN or OUT, visible immediately and recoverable after process death. An opted-in reminder helps end a break. A user can correct a forgotten switch, inspect covered wear history, explicitly advance/complete treatment and export/restore their data. This is the integrated MVP finish condition, alongside passing local automated checks and recorded emulator evidence. Physical notification reliability and release signing remain explicit Beta/v1 gates.
+A first-time user deliberately selects IN or OUT and starts tracking without typing or an account. Prescribed target and treatment/tray details are optional and editable later; unknown values remain absent. From Today, one tap records IN or OUT, visible immediately and recoverable after process death. An opted-in reminder helps end a break. A user can correct a forgotten switch, inspect covered wear history, explicitly advance/complete treatment and export/restore their data. This is the integrated MVP finish condition, alongside passing local automated checks and recorded emulator evidence. Physical notification reliability and release signing remain explicit Beta/v1 gates.
 
 ## Journeys
 
-1. Read privacy/local-storage introduction → enter prescribed plan and current state → Today.
+1. Read the short local-storage explanation → select current IN/OUT → Start tracking → Today. Optional target and tray details can wait.
 2. Before a meal tap Take out → see break duration → receive optional reminder → tap Put in.
 3. Missed a tap → History → edit transition time with adjacent events visible → validated correction recalculates totals.
 4. Tray due → Schedule → review date estimate → explicitly Change tray. No automatic changes. Last tray → explicit completion → retained read-only history.
@@ -21,7 +21,7 @@ A first-time user sets up prescribed tray count, current tray, interval and dail
 
 ## MVP
 
-Onboarding/setup, current-state timer, persisted events, configurable prescribed goal, partial-day totals, correction timestamps, current tray/projection/manual change, completion, break/tray reminders with permission status, history/date browsing, basic statistics, dark/system theme, accessible touch targets and text scaling, local JSON backup/validated restore, CSV report, delete data, automated test/build/lint and emulator smoke. One plan and fixed per-tray interval; treatment-zone daily accounting. No predefined medical target presented as advice: input is labeled prescribed target, default merely editable example.
+Onboarding/setup, current-state timer, persisted events, configurable prescribed goal, partial-day totals, correction timestamps, current tray/projection/manual change, completion, break/tray reminders with permission status, history/date browsing, basic statistics, dark/system theme, accessible touch targets and text scaling, local JSON backup/validated restore, CSV report, delete data, automated test/build/lint and emulator smoke. One plan and fixed per-tray interval; treatment-zone daily accounting. No predefined medical target presented as advice: input is labeled prescribed target, with no default.
 
 ## Expanded v1.0 scope
 

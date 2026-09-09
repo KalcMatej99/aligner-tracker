@@ -3,6 +3,7 @@ package org.alignertracker.app.integration
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -34,15 +35,7 @@ class TrackerJourneyTest {
     @Test
     fun setupTrackRestartAdvanceCompleteAndDelete() {
         compose.waitUntil(10_000) { runBlocking { container.repository.snapshot().plan == null } }
-        compose.onNodeWithText("Total trays").performScrollTo().performTextReplacement("2")
-        compose
-            .onNodeWithText("Prescribed days per tray")
-            .performScrollTo()
-            .performTextReplacement("7")
-        compose
-            .onNodeWithText("Prescribed daily hours (for example 22)")
-            .performScrollTo()
-            .performTextReplacement("21.5")
+        compose.onNodeWithText("Aligners in").performScrollTo().performClick()
         compose.onNodeWithText("Start tracking").performScrollTo().performClick()
         compose.waitUntil(10_000) { runBlocking { container.repository.snapshot().plan != null } }
         compose.waitUntil(10_000) {
@@ -62,6 +55,30 @@ class TrackerJourneyTest {
         compose.waitUntil(10_000) {
             runBlocking { container.repository.snapshot().events.size == 3 }
         }
+        val original = runBlocking { container.repository.snapshot().events }
+        compose.onNodeWithText("More").performClick()
+        compose.onNodeWithText("Treatment details").performClick()
+        compose
+            .onNodeWithText("Current tray (optional)")
+            .performScrollTo()
+            .performTextReplacement("1")
+        compose
+            .onNodeWithText("Total trays (optional)")
+            .performScrollTo()
+            .performTextReplacement("2")
+        compose
+            .onNodeWithText("Prescribed days per tray (optional)")
+            .performScrollTo()
+            .performTextReplacement("7")
+        compose
+            .onNodeWithContentDescription("Use today for Current tray start (optional)")
+            .performScrollTo()
+            .performClick()
+        compose.onNodeWithText("Save treatment details").performScrollTo().performClick()
+        compose.waitUntil(10_000) {
+            runBlocking { container.repository.snapshot().plan?.hasSchedule == true }
+        }
+        assertEquals(original, runBlocking { container.repository.snapshot().events })
         compose.onNodeWithText("Schedule").performClick()
         compose.onNodeWithText("Record next tray").performScrollTo().performClick()
         compose.onNodeWithText("I changed trays").performClick()

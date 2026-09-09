@@ -49,6 +49,31 @@ class WearSyncClientTest {
     }
 
     @Test
+    fun versionOneStatusWithUnknownTraySupportsTrackingAndRejectsFutureProtocol() = runTest {
+        val partial = phoneStatus(revision = 10, wearing = false).copy(tray = null)
+        val json = Json { explicitNulls = false }
+        val decoded =
+            json.decodeFromString<WearBridgeResponse>(
+                json.encodeToString(WearBridgeResponse(status = partial))
+            )
+        repository.applyStatus(decoded)
+        assertNull(repository.currentView().acknowledged!!.tray)
+        assertTrue(repository.enqueue(true) is EnqueueResult.Enqueued)
+        assertTrue(
+            runCatching {
+                    repository.applyStatus(
+                        WearBridgeResponse(
+                            protocolVersion = 99,
+                            status = partial.copy(revision = 100),
+                        )
+                    )
+                }
+                .isFailure
+        )
+        assertEquals(10L, repository.currentView().acknowledged!!.revision)
+    }
+
+    @Test
     fun offlineCommandRemainsPendingAndRetriesWhenPhoneReconnects() = runTest {
         repository.applyStatus(
             WearBridgeResponse(status = phoneStatus(revision = 10, wearing = false))

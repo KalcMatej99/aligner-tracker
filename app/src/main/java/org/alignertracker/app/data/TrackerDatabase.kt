@@ -35,12 +35,12 @@ import org.alignertracker.app.domain.WearEvent
 @Entity(tableName = "treatment")
 data class PlanEntity(
     @PrimaryKey val id: Long,
-    val startDate: String,
-    val totalTrays: Int,
-    val currentTray: Int,
-    val daysPerTray: Int,
-    val currentTrayStartedOn: String,
-    val dailyGoalMinutes: Int,
+    val startDate: String?,
+    val totalTrays: Int?,
+    val currentTray: Int?,
+    val daysPerTray: Int?,
+    val currentTrayStartedOn: String?,
+    val dailyGoalMinutes: Int?,
     val zoneId: String,
     val trackingStartedAt: Long,
     val completed: Boolean,
@@ -110,7 +110,7 @@ data class PhaseEntity(
     val ordinal: Int,
     val name: String,
     val totalTrays: Int,
-    val startedOn: String,
+    val startedOn: String?,
     val completedOn: String?,
     val active: Boolean,
 ) {
@@ -224,12 +224,13 @@ data class TargetHistoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val effectiveFrom: String,
     val goalMinutes: Int,
+    val effectiveAt: Long? = null,
 ) {
-    fun model() = TargetHistoryEntry(id, effectiveFrom, goalMinutes)
+    fun model() = TargetHistoryEntry(id, effectiveFrom, goalMinutes, effectiveAt)
 
     companion object {
         fun from(value: TargetHistoryEntry) =
-            TargetHistoryEntity(value.id, value.effectiveFrom, value.goalMinutes)
+            TargetHistoryEntity(value.id, value.effectiveFrom, value.goalMinutes, value.effectiveAt)
     }
 }
 
@@ -534,7 +535,7 @@ interface TrackerDao {
             StateEntity::class,
             CommandOutcomeEntity::class,
         ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class TrackerDatabase : RoomDatabase() {
@@ -599,13 +600,32 @@ abstract class TrackerDatabase : RoomDatabase() {
                 }
             }
 
+        val MIGRATION_2_3 =
+            object : Migration(2, 3) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "CREATE TABLE treatment_new (id INTEGER NOT NULL PRIMARY KEY, startDate TEXT, totalTrays INTEGER, currentTray INTEGER, daysPerTray INTEGER, currentTrayStartedOn TEXT, dailyGoalMinutes INTEGER, zoneId TEXT NOT NULL, trackingStartedAt INTEGER NOT NULL, completed INTEGER NOT NULL, completedAt INTEGER)"
+                    )
+                    db.execSQL("INSERT INTO treatment_new SELECT * FROM treatment")
+                    db.execSQL("DROP TABLE treatment")
+                    db.execSQL("ALTER TABLE treatment_new RENAME TO treatment")
+                    db.execSQL(
+                        "CREATE TABLE phases_new (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, kind TEXT NOT NULL, ordinal INTEGER NOT NULL, name TEXT NOT NULL, totalTrays INTEGER NOT NULL, startedOn TEXT, completedOn TEXT, active INTEGER NOT NULL)"
+                    )
+                    db.execSQL("INSERT INTO phases_new SELECT * FROM treatment_phases")
+                    db.execSQL("DROP TABLE treatment_phases")
+                    db.execSQL("ALTER TABLE phases_new RENAME TO treatment_phases")
+                    db.execSQL("ALTER TABLE target_history ADD COLUMN effectiveAt INTEGER")
+                }
+            }
+
         fun create(context: Context): TrackerDatabase =
             Room.databaseBuilder(
                     context.applicationContext,
                     TrackerDatabase::class.java,
                     "aligner-tracker.db",
                 )
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
     }
 }

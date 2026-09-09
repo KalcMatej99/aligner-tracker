@@ -30,6 +30,7 @@ object ReminderRules {
         if (
             !plan.completed &&
                 preferences.trayEnabled &&
+                org.alignertracker.app.domain.WearMath.nextChangeDate(snapshot) != null &&
                 snapshot.phases.firstOrNull { it.active }?.kind !=
                     org.alignertracker.app.domain.TreatmentPhaseKind.RETENTION
         ) {
@@ -38,7 +39,8 @@ object ReminderRules {
                 ReminderCandidate(
                     "tray",
                     "tray:${plan.trackingStartedAt}:${plan.currentTray}:${plan.currentTrayStartedOn}:${plan.daysPerTray}:${snapshot.scheduleRevisions.lastOrNull()?.id ?: 0}",
-                    due.atTime(LocalTime.of(9, 0))
+                    due!!
+                        .atTime(LocalTime.of(9, 0))
                         .atZone(ZoneId.of(plan.zoneId))
                         .toInstant()
                         .toEpochMilli(),

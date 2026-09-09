@@ -35,3 +35,7 @@ The owner's Garmin does not provide Wear OS acceptance. #20 paired/physical Wear
 ## Multilingual implementation planning — 2026-09-09
 
 [Localization plan](localization-plan.md), tracked in [#31](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/issues/31), covers phone language selection, translated resources, watch surfaces, background text, formatting and presentation exports. Owner scope is major languages plus English, explicitly excluding Slovene. The plan proposes Spanish, French, German, Italian, Brazilian Portuguese, Russian, Simplified Chinese, Japanese, Korean, Arabic and Hindi alongside English fallback. This is researched planning, not implementation or publication acceptance. Existing physical #12/#18/#20 and distribution #21 gates remain separate.
+
+## Tracking-first onboarding — #32
+
+Quick start now requires only deliberate IN/OUT selection and Start tracking. Optional prescription and tray details use [schema3](schema-v3.md), with non-destructive migration and old backup import. Software/emulator and private version3 deployment evidence are tracked in [issue32 validation](validation-32.md). Owner completion time/comprehension and physical acceptance remain open under #18/#32; #31 full translation delivery is separate.

@@ -15,16 +15,23 @@ import org.alignertracker.app.R
 import org.alignertracker.app.domain.*
 
 @Composable
-fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boolean) {
+fun TreatmentDetailsScreen(
+    snapshot: TrackerSnapshot,
+    model: TrackerViewModel,
+    busy: Boolean,
+    onDone: () -> Unit = {},
+) {
     val active = snapshot.phases.firstOrNull { it.active }
     var intervals by
         rememberSaveable(active?.id) {
-            mutableStateOf("1-${active?.totalTrays ?: 1}:${snapshot.plan?.daysPerTray ?: 7}")
+            mutableStateOf(
+                active?.let { "1-${it.totalTrays}:${snapshot.plan?.daysPerTray}" }.orEmpty()
+            )
         }
     var reason by rememberSaveable { mutableStateOf("") }
     var phaseName by rememberSaveable { mutableStateOf("") }
-    var count by rememberSaveable { mutableStateOf("1") }
-    var days by rememberSaveable { mutableStateOf("7") }
+    var count by rememberSaveable { mutableStateOf("") }
+    var days by rememberSaveable { mutableStateOf("") }
     var phaseWearing by rememberSaveable { mutableStateOf<Boolean?>(null) }
     var kind by rememberSaveable { mutableStateOf(TreatmentPhaseKind.REFINEMENT.name) }
     var confirm by remember { mutableStateOf<String?>(null) }
@@ -55,6 +62,8 @@ fun TreatmentDetailsScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, b
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.semantics { heading() },
         )
+        TextButton(onClick = onDone, enabled = !busy) { Text(stringResource(R.string.not_now)) }
+        OptionalTreatmentForm(snapshot, model, busy)
         Text(stringResource(R.string.schedule_instructions))
         if (active != null && snapshot.plan?.completed == false) {
             TrackerTextField(

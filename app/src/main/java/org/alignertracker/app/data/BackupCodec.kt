@@ -107,11 +107,11 @@ object BackupCodec {
     fun encode(snapshot: TrackerSnapshot): String {
         val expanded = TrackerValidation.expandLegacy(snapshot)
         val portable = expanded.copy(photos = expanded.photos.map { it.copy(ownedFileName = null) })
-        TrackerValidation.snapshot(portable, Instant.now())
+        TrackerValidation.snapshot(portable, Instant.now(), expanded = true)
         val encoded =
             codec.encodeToString(
                 BackupV2(
-                    2,
+                    3,
                     portable.plan,
                     portable.events,
                     portable.phases,
@@ -156,16 +156,17 @@ object BackupCodec {
             try {
                 when (version) {
                     1 -> decodeV1(root)
-                    2 -> decodeV2(root)
+                    2,
+                    3 -> decodeV2(root, version)
                     else ->
                         throw IllegalArgumentException(
-                            "Unsupported backup version. This app accepts schema 1 and 2."
+                            "Unsupported backup version. This app accepts schema 1, 2 and 3."
                         )
                 }
             } catch (_: SerializationException) {
                 throw IllegalArgumentException("Invalid backup JSON or unsupported fields.")
             }
-        TrackerValidation.snapshot(snapshot, Instant.now())
+        TrackerValidation.snapshot(snapshot, Instant.now(), expanded = true)
         return snapshot
     }
 
@@ -201,7 +202,10 @@ object BackupCodec {
                     .append(',')
                 append(summary.wornMillis).append(',').append(summary.removedMillis).append(',')
                 append(summary.trackedMillis).append(',').append(dayMillis).append(',')
-                append(summary.goalMinutes).append(',').append(coverage).append("\r\n")
+                append(summary.goalMinutes?.toString().orEmpty())
+                    .append(',')
+                    .append(coverage)
+                    .append("\r\n")
                 date = date.plusDays(1)
             }
         }
@@ -214,7 +218,7 @@ object BackupCodec {
         return TrackerValidation.expandLegacy(TrackerSnapshot(backup.plan, backup.events))
     }
 
-    private fun decodeV2(root: JsonObject): TrackerSnapshot {
+    private fun decodeV2(root: JsonObject, version: Int): TrackerSnapshot {
         val expected =
             setOf(
                 "schemaVersion",
@@ -237,15 +241,16 @@ object BackupCodec {
         require((root["events"] as JsonArray).size <= TrackerValidation.MAX_EVENTS) {
             "A backup can contain at most 50,000 events."
         }
-        requirePlanTypes(root.getValue("plan"))
+        requirePlanTypes(root.getValue("plan"), version == 3)
         requireObjects(root, "events", setOf("id", "at"), emptySet(), setOf("wearing"))
         requireObjects(
             root,
             "phases",
             setOf("id", "ordinal", "totalTrays"),
-            setOf("kind", "name", "startedOn"),
+            if (version == 3) setOf("kind", "name") else setOf("kind", "name", "startedOn"),
             setOf("active"),
-            nullableStrings = setOf("completedOn"),
+            nullableStrings =
+                if (version == 3) setOf("completedOn", "startedOn") else setOf("completedOn"),
         )
         requireObjects(
             root,
@@ -277,6 +282,7 @@ object BackupCodec {
             setOf("id", "goalMinutes"),
             setOf("effectiveFrom"),
             emptySet(),
+            nullableNumbers = if (version == 3) setOf("effectiveAt") else emptySet(),
         )
         requireObjects(
             root,
@@ -310,7 +316,7 @@ object BackupCodec {
             emptySet(),
         )
         val backup = codec.decodeFromJsonElement<BackupV2>(root)
-        require(backup.schemaVersion == 2)
+        require(backup.schemaVersion == version)
         return TrackerSnapshot(
             plan = backup.plan,
             events = backup.events,
@@ -345,7 +351,7 @@ object BackupCodec {
         }
     }
 
-    private fun requirePlanTypes(plan: JsonElement) {
+    private fun requirePlanTypes(plan: JsonElement, partial: Boolean = false) {
         if (plan != JsonNull) {
             require(plan is JsonObject) { "Invalid treatment object." }
             val numeric =
@@ -361,9 +367,15 @@ object BackupCodec {
             require(plan.keys == numeric + strings + setOf("completed", "completedAt")) {
                 "Invalid treatment fields."
             }
-            numeric.forEach { number(plan[it]) }
+            numeric.forEach {
+                if (!partial || it in setOf("id", "trackingStartedAt") || plan[it] != JsonNull)
+                    number(plan[it])
+            }
             strings.forEach {
-                require((plan[it] as? JsonPrimitive)?.isString == true) {
+                require(
+                    (partial && it != "zoneId" && plan[it] == JsonNull) ||
+                        (plan[it] as? JsonPrimitive)?.isString == true
+                ) {
                     "Invalid treatment text field."
                 }
             }

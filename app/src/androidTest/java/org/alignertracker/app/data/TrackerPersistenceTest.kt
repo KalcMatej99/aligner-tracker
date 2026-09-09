@@ -17,6 +17,42 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TrackerPersistenceTest {
     @Test
+    fun partialSessionAndEncryptedRestoreSurviveReopen() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val name = "partial-restart.db"
+        context.deleteDatabase(name)
+        var db = Room.databaseBuilder(context, TrackerDatabase::class.java, name).build()
+        try {
+            val repo = TrackerRepository(db)
+            repo.startTracking(false, "Pacific/Auckland")
+            val expected = repo.snapshot()
+            db.close()
+            db = Room.databaseBuilder(context, TrackerDatabase::class.java, name).build()
+            val reopened = TrackerRepository(db)
+            assertEquals(expected, reopened.snapshot())
+            val archive =
+                PortableArchive.encode(
+                    expected,
+                    org.alignertracker.app.photos.PhotoStore(context, reopened),
+                )
+            val password = "synthetic portable passphrase".toCharArray()
+            val encrypted = EncryptedBackup.encrypt(archive, password)
+            val restored =
+                PortableArchive.inspect(EncryptedBackup.decrypt(encrypted, password)).snapshot
+            reopened.replaceFromBackup(restored)
+            assertEquals(
+                expected.copy(stateVersion = org.alignertracker.app.domain.StateVersion()),
+                reopened
+                    .snapshot()
+                    .copy(stateVersion = org.alignertracker.app.domain.StateVersion()),
+            )
+        } finally {
+            db.close()
+            context.deleteDatabase(name)
+        }
+    }
+
+    @Test
     fun treatmentEventsCorrectionAndCompletionSurviveDatabaseReopen() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val name = "restart-verification.db"

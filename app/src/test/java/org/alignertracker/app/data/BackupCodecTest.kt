@@ -49,15 +49,15 @@ class BackupCodecTest {
         assertEquals(2, imported.trayHistory.single().trayNumber)
         assertEquals(start, imported.trayHistory.single().startedAt)
         assertEquals(1200, imported.targetHistory.single().goalMinutes)
-        assertTrue(BackupCodec.encode(imported).contains("\"schemaVersion\":2"))
+        assertTrue(BackupCodec.encode(imported).contains("\"schemaVersion\":3"))
     }
 
     @Test
     fun `unknown schema unknown fields duplicate fields and nested bombs reject`() {
         val encoded = BackupCodec.encode(state)
-        rejects(encoded.replace("\"schemaVersion\":2", "\"schemaVersion\":99"))
-        rejects(encoded.replace("\"schemaVersion\":2", "\"schemaVersion\":2,\"extra\":true"))
-        rejects(encoded.replace("\"schemaVersion\":2", "\"schemaVersion\":2,\"schemaVersion\":2"))
+        rejects(encoded.replace("\"schemaVersion\":3", "\"schemaVersion\":99"))
+        rejects(encoded.replace("\"schemaVersion\":3", "\"schemaVersion\":3,\"extra\":true"))
+        rejects(encoded.replace("\"schemaVersion\":3", "\"schemaVersion\":3,\"schemaVersion\":3"))
         rejects("[[[[[[]]]]]]")
         rejects("not JSON")
     }

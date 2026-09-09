@@ -133,6 +133,26 @@ class TrackerViewModel(
         viewModelScope.launch { reconcileSafely() }
     }
 
+    fun startTracking(wearing: Boolean, zoneId: String) = operate {
+        repository.startTracking(wearing, zoneId)
+    }
+
+    fun updateTreatmentDetails(
+        startDate: String?,
+        totalTrays: Int?,
+        currentTray: Int?,
+        daysPerTray: Int?,
+        currentTrayStartedOn: String?,
+    ) = operate {
+        repository.updateTreatmentDetails(
+            startDate,
+            totalTrays,
+            currentTray,
+            daysPerTray,
+            currentTrayStartedOn,
+        )
+    }
+
     fun start(plan: TreatmentPlan, wearing: Boolean) = operate { repository.start(plan, wearing) }
 
     fun setWearing(wearing: Boolean) =

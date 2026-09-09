@@ -171,12 +171,16 @@ class AccessibilityLocalizationTest {
             }
         }
 
-        compose.onNodeWithText("Prescribed daily target in minutes").performTextReplacement("0")
+        compose.onNodeWithText("Prescribed daily hours (optional)").performTextReplacement("0")
         compose.onNodeWithText("Update target").performScrollTo().performClick()
         compose
-            .onNodeWithText("Prescribed daily target in minutes")
+            .onNodeWithText("Prescribed daily hours (optional)")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
-        compose.onNodeWithText("Enter a whole number from 1 to 1440 minutes.").assertIsDisplayed()
+        compose
+            .onNodeWithText(
+                "Enter prescribed hours greater than 0 and no more than 24, in whole minutes."
+            )
+            .assertIsDisplayed()
     }
 
     @Test
