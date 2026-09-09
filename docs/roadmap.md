@@ -39,3 +39,11 @@ The owner's Garmin does not provide Wear OS acceptance. #20 paired/physical Wear
 ## Tracking-first onboarding — #32
 
 Quick start now requires only deliberate IN/OUT selection and Start tracking. Optional prescription and tray details use [schema3](schema-v3.md), with non-destructive migration and old backup import. Software/emulator and private version3 deployment evidence are tracked in [issue32 validation](validation-32.md). Owner completion time/comprehension and physical acceptance remain open under #18/#32; #31 full translation delivery is separate.
+
+## Phone redesign candidate — #33/#34
+
+The calm tracking design and supporting-screen hierarchy are implemented in the
+unpublished version4 candidate. [Redesign validation](validation-redesign.md) links
+before/after captures, adaptive/accessibility evidence, the observed Wear callback
+fix and signed3→4 preservation checks. Owner comprehension, physical acceptance,
+translations and publication remain separate open gates.

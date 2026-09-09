@@ -137,3 +137,12 @@ The phone and watch now build against the Apache-2.0 microG Wear client, with no
 F-Droid acceptance is unconfirmed. Its [inclusion policy](https://f-droid.org/en/docs/Inclusion_Policy/) requires freely licensed dependencies and an accepted source/build process; its [anti-feature definitions](https://f-droid.org/en/docs/Anti-Features/#Non-Free-Dependencies) distinguish dependencies on separately installed non-free software. A future submission must disclose the optional phone integration and the watch runtime requirement for maintainer assessment, including any applicable anti-feature labels. The earlier definite rejection claim based on embedded proprietary AARs no longer describes this build. No F-Droid build, submission or maintainer approval has occurred.
 
 A distribution bundle must include the signed APKs, SHA-256 manifest, signer fingerprint, exact tagged corresponding source, build instructions, GPL-3.0 text, third-party license inventory and required notices. Publication, store/developer accounts, signing and key custody all require separate explicit authorization. Passing local builds or emulator tests does not make the release ready while the physical and pilot gates in [external acceptance](external-acceptance.md) remain open.
+
+## Unpublished redesign candidate 4
+
+The redesign is prepared on `design/calm-tracking`, source tag
+`design-phone-candidate-4-final` (`506e52d`). Version4 retains the permanent signer;
+actual signed3→4 emulator upgrade preserves all tables and reminder datastore.
+See [redesign validation](validation-redesign.md) for screenshots, tests, hashes and
+candidate location. This work did not authorize a new private publication; version3
+remains the served update. Owner/device gates and publication approval remain open.
