@@ -1,5 +1,17 @@
 # Release preparation and artifact verification
 
+Current private phone update (issue #32): versionCode **3**, `1.0.0-dev`, source
+`91536654d68d3afb05e003d7f045f81422f9376a`, tag `pilot-phone-quick-start-3`.
+[Download](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_3.apk).
+APK SHA256 `4c013f25d66408c97d1e26522f3c8338a168cd086cb6a7623312a88b355549c8`;
+source archive SHA256 `c601f6710a0a14a81fc831939c1e58647ebce87472a91d6eb77e00f122a2fda3`.
+The permanent signer below is unchanged. Actual signed version2→3 emulator upgrade
+preserved synthetic records and reminder preferences. [Validation](validation-32.md)
+records tests, visual checks, exact served artifact verification and open owner gates.
+Bundle: `/home/matejkalc/.local/share/aligner-tracker/releases/quick-start-3/`.
+
+## First pilot publication (historical)
+
 Status: the owner authorized private phone pilot publication through Kalc Apps on 2026-09-09 and confirmed creating a permanent local app signing identity with encrypted backup. Version code 2 / `1.0.0-dev` remains a development pilot, not stable v1 acceptance. The preparation procedure below is retained for future stable candidates; physical/paired Wear and final signed upgrade acceptance remain open.
 
 Private pilot source: `82a11d0da1369db89e13d049eedc7cb913e8fea9`, annotated tag `pilot-phone-2026-09-09`. Phone APK SHA-256: `ac6c68c9227677deea713e05ff5953c6cd519b298bef50508a9090471497b4dc`. App signer SHA-256: `9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9`. Source archive SHA-256: `796926321b35d5ca2c744d4656941f98a545121eec25ccb8a42b09d1ac52d732`.

@@ -1,6 +1,15 @@
 # Changelog
 
-## 1.0.0-dev — unreleased
+## 1.0.0-dev / code3 — private phone update, 2026-09-09
+
+Start tracking with an explicit IN/OUT choice and no typing. Prescribed hours,
+tray details and treatment dates are optional and can be added or corrected later.
+Unknown information stays unknown in reports, reminders, widgets and watch status.
+Non-destructive schema3 upgrade and old backup imports preserve existing records.
+Same permanent signer as private code2; [validation](docs/validation-32.md).
+Owner Pixel usability and other physical acceptance remain open.
+
+## 1.0.0-dev — original development implementation
 
 Expanded v1.0 development implementation: variable schedules and preserved phase/target/tray history; missing-interval corrections and clock-gap coverage; safe widget/notification controls and reminder snooze; notes/appointments/calendar; historical-goal reports and optional streaks; complete encrypted portable archives and private photo comparison/offline HTML time-lapse; Wear OS companion with deterministic phone ownership; accessibility/localization and migration coverage.
 

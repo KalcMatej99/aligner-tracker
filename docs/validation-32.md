@@ -42,6 +42,41 @@ revisions/intervals, and closed tray attribution. No further speculative review.
 Local raw logs, screenshots and signed artifact evidence are retained under
 `/home/matejkalc/.local/share/aligner-tracker/releases/quick-start-3/`.
 
+## Signed pilot and visual acceptance
+
+- Tagged source `91536654d68d3afb05e003d7f045f81422f9376a`, tag
+  `pilot-phone-quick-start-3`; release rebuilt from the clean tagged checkout.
+- Existing permanent app signer retained. Clean-environment certificate and SHA-256
+  recomputation, zip alignment and package/minSDK checks passed.
+- Actual currently published signed version2 installed on disposable API36; its
+  schema2 fixture was restored through SAF preview/confirmation. Version3 installed
+  with `adb install -r` and all original table columns matched exactly: 13 events,
+  2 targets, 2 schedule revisions, 3 intervals, 2 tray rows, note, appointment and gap.
+- A second same-signer upgrade preserved explicitly enabled tray-reminder DataStore
+  preferences byte-for-byte (SHA256 `ae70c1e9f011a7c63b5cc05ea3a577512a22239f7f7785c279c3d712b91f4687`).
+- Signed fresh quick start, SAF schema3 complete export, data reset on the emulator,
+  preview/confirmed restore and force-stop/reopen preserved all six null fields,
+  exact session timestamp/zone and the sole original event. R8 serialization works.
+- 320dp / 200% font / dark: quick-start controls, partial Today, optional fields,
+  keyboard entry and inline invalid-goal feedback inspected as scrollable layouts.
+  RTL layouts inspected after emulator locale/config restart; focused quick-start
+  and saving-state tests passed at 320dp/200%. Normal-size signed light-theme quick
+  start and restore previews inspected. Captures include loading/saving state.
+- Both Android platform accessibility tests passed with the bundled real TalkBack
+  service enabled. This establishes native tree/focus/action evidence, not owner
+  traversal, speech comprehension or physical-device accessibility acceptance.
+
+Published privately at [Kalc Apps](https://apps.server.matejkalc.com/apps/org.alignertracker.app/).
+[Phone APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_3.apk),
+versionCode3 / `1.0.0-dev`, SHA256
+`4c013f25d66408c97d1e26522f3c8338a168cd086cb6a7623312a88b355549c8`.
+All 31 served snapshot files matched fresh HTTPS downloads, including the exact
+tested APK, source and notices. Downloaded signed repository indexes verified with
+unchanged fingerprint `7F72BE14125ABE9A79D5B291956D5BAA30E79E0BA8ED34441485D07C5B21BD32`.
+Version2 remains available for old cached indexes. No public store or Wear APK
+publication. Operator checks use the established loopback destination because the
+host's LAN DNS reaches the deliberate private-route 403; global DNS/ACLs unchanged.
+
 ## Remaining owner and device acceptance
 
 Owner must still try the revised onboarding on the Pixel and report comprehension,
