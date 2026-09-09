@@ -1,6 +1,13 @@
 # Release preparation and artifact verification
 
-Status: preparation only. The current configuration is version code 2 and version name `1.0.0-dev`; it is not a public release candidate. No user-owned release key has been created or used, and no release has been published. Debug APKs use the Android test certificate; hosted CI uploads test APKs, unsigned release intermediates and reports. Exact final-run verification is recorded in Forgejo #23.
+Status: the owner authorized private phone pilot publication through Kalc Apps on 2026-09-09 and confirmed creating a permanent local app signing identity with encrypted backup. Version code 2 / `1.0.0-dev` remains a development pilot, not stable v1 acceptance. The preparation procedure below is retained for future stable candidates; physical/paired Wear and final signed upgrade acceptance remain open.
+
+Private pilot source: `82a11d0da1369db89e13d049eedc7cb913e8fea9`, annotated tag `pilot-phone-2026-09-09`. Phone APK SHA-256: `ac6c68c9227677deea713e05ff5953c6cd519b298bef50508a9090471497b4dc`. App signer SHA-256: `9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9`. Source archive SHA-256: `796926321b35d5ca2c744d4656941f98a545121eec25ccb8a42b09d1ac52d732`.
+
+Operator identity is under `/home/matejkalc/.local/share/aligner-tracker/signing/` (0700; key/password files 0600), alias `aligner-release`. Password input is the restricted `password.txt` file; omit `--key-pass` for this PKCS12 identity so apksigner reuses the keystore password. The repository key is separate. Encrypted backup: `/home/matejkalc/backups/aligner-tracker/`; recovery key: `/home/matejkalc/.config/aligner-tracker/recovery.key`. Local recovery was read back and restored in isolation, and the restored key signed the verified APK. This is local recovery, not off-host redundancy. Preserve these files for update continuity; never regenerate or rotate them during a routine release.
+
+The release bundle, checks, immutable store manifest and custody evidence are under `/home/matejkalc/.local/share/aligner-tracker/releases/pilot-82a11d0da136/`. 55 phone JVM tests, formatting, release lint and release build passed. Store issue [#11](https://forgejo.server.matejkalc.com/matejkalc/kalc-app-store/issues/11) records publication verification. [Add the private repository](https://apps.server.matejkalc.com/add/) while connected to Tailscale. Only the phone APK is included. Existing debug-signed installations cannot update in place; protect their records with a verified encrypted portable backup before any owner-performed reinstall.
+
 
 ## Candidate inputs
 
