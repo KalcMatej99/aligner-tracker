@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -47,7 +49,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
@@ -56,7 +59,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.delay
 import org.alignertracker.app.R
 import org.alignertracker.app.reminders.ReminderScheduler
@@ -82,12 +84,38 @@ fun TrackerApp(model: TrackerViewModel) {
     val notice by model.notice.collectAsStateWithLifecycle()
     val pendingRestore by model.pendingRestore.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val compactControls =
+        androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp /
+            LocalDensity.current.fontScale < 300
+    val keyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     var now by androidx.compose.runtime.remember { mutableStateOf(Instant.now()) }
     var permissionEpoch by androidx.compose.runtime.remember { mutableIntStateOf(0) }
     var destinationName by rememberSaveable { mutableStateOf(Destination.TODAY.name) }
     val destination = Destination.valueOf(destinationName)
     val screenState = androidx.compose.runtime.saveable.rememberSaveableStateHolder()
+    var backStack by rememberSaveable { mutableStateOf(listOf<String>()) }
+    fun navigate(target: Destination) {
+        if (target != destination) {
+            backStack =
+                if (
+                    target in
+                        listOf(
+                            Destination.TODAY,
+                            Destination.SCHEDULE,
+                            Destination.HISTORY,
+                            Destination.PROGRESS,
+                        )
+                ) {
+                    if (target == Destination.TODAY) emptyList() else listOf(Destination.TODAY.name)
+                } else backStack + destinationName
+            destinationName = target.name
+        }
+    }
+    fun goBack() {
+        destinationName = backStack.lastOrNull() ?: Destination.TODAY.name
+        backStack = backStack.dropLast(1)
+    }
     var moreExpanded by androidx.compose.runtime.remember { mutableStateOf(false) }
     var confirmation by rememberSaveable { mutableStateOf<String?>(null) }
     var editId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -183,7 +211,7 @@ fun TrackerApp(model: TrackerViewModel) {
                 .getNotificationChannel(ReminderScheduler.TRAY_CHANNEL)
                 ?.importance != NotificationManager.IMPORTANCE_NONE
         }
-    BackHandler(destination != Destination.TODAY) { destinationName = Destination.TODAY.name }
+    BackHandler(backStack.isNotEmpty() || destination != Destination.TODAY) { goBack() }
     Scaffold(
         topBar = {
             AdaptiveTrackerTopBar(
@@ -192,14 +220,42 @@ fun TrackerApp(model: TrackerViewModel) {
                         if (destination == Destination.SETTINGS) R.string.settings
                         else R.string.app_name
                     ),
-                showBack = destination == Destination.SETTINGS,
-                onBack = { destinationName = Destination.TODAY.name },
+                showBack =
+                    destination in
+                        listOf(
+                            Destination.SETTINGS,
+                            Destination.DETAILS,
+                            Destination.JOURNAL,
+                            Destination.PHOTOS,
+                        ),
+                onBack = ::goBack,
                 actions = {
-                    if (snapshot?.plan != null)
+                    if (
+                        snapshot?.plan != null &&
+                            destination in
+                                listOf(
+                                    Destination.TODAY,
+                                    Destination.SCHEDULE,
+                                    Destination.HISTORY,
+                                    Destination.PROGRESS,
+                                )
+                    )
                         Box {
-                            TextButton(onClick = { moreExpanded = true }) {
-                                Text(stringResource(R.string.more_features))
-                            }
+                            if (compactControls)
+                                androidx.compose.material3.IconButton(
+                                    onClick = { moreExpanded = true },
+                                    modifier =
+                                        Modifier.semantics {
+                                            contentDescription =
+                                                context.getString(R.string.more_features)
+                                        },
+                                ) {
+                                    TrackerMoreIcon()
+                                }
+                            else
+                                TextButton(onClick = { moreExpanded = true }) {
+                                    Text(stringResource(R.string.more_features))
+                                }
                             androidx.compose.material3.DropdownMenu(
                                 expanded = moreExpanded,
                                 onDismissRequest = { moreExpanded = false },
@@ -213,21 +269,32 @@ fun TrackerApp(model: TrackerViewModel) {
                                     text = { Text(stringResource(target.title)) },
                                     onClick = {
                                         moreExpanded = false
-                                        destinationName = target.name
+                                        navigate(target)
                                     },
                                 )
                             }
                         }
                     if (snapshot != null && destination != Destination.SETTINGS)
-                        TextButton(onClick = { destinationName = Destination.SETTINGS.name }) {
-                            Text(stringResource(R.string.settings))
-                        }
+                        if (compactControls)
+                            androidx.compose.material3.IconButton(
+                                onClick = { navigate(Destination.SETTINGS) },
+                                modifier =
+                                    Modifier.semantics {
+                                        contentDescription = context.getString(R.string.settings)
+                                    },
+                            ) {
+                                TrackerNavIcon(Destination.SETTINGS)
+                            }
+                        else
+                            TextButton(onClick = { navigate(Destination.SETTINGS) }) {
+                                Text(stringResource(R.string.settings))
+                            }
                 },
             )
         },
         bottomBar = {
-            if (snapshot?.plan != null && destination != Destination.SETTINGS)
-                TrackerNavigation(destination) { destinationName = it.name }
+            if (snapshot?.plan != null && destination != Destination.SETTINGS && !keyboardVisible)
+                TrackerNavigation(destination) { navigate(it) }
         },
     ) { padding ->
         Column(
@@ -308,7 +375,7 @@ fun TrackerApp(model: TrackerViewModel) {
                                     )
                                     ?.importance != android.app.NotificationManager.IMPORTANCE_NONE,
                             onGoal = model::updateGoal,
-                            onDetails = { destinationName = Destination.DETAILS.name },
+                            onDetails = { navigate(Destination.DETAILS) },
                             onReminders = model::updateReminders,
                             onExport = { confirmation = if (it) "exportCsv" else "exportBackup" },
                             onImport = ::openImport,
@@ -339,8 +406,9 @@ fun TrackerApp(model: TrackerViewModel) {
                                     state,
                                     now,
                                     busy,
-                                    onDetails = { destinationName = Destination.DETAILS.name },
+                                    onDetails = { navigate(Destination.DETAILS) },
                                     onToggle = model::setWearing,
+                                    onCorrect = { navigate(Destination.HISTORY) },
                                 )
                             Destination.SCHEDULE ->
                                 ScheduleScreen(
@@ -348,24 +416,13 @@ fun TrackerApp(model: TrackerViewModel) {
                                     busy,
                                     { confirmation = "advance" },
                                     { confirmation = "complete" },
-                                    onDetails = { destinationName = Destination.DETAILS.name },
+                                    onDetails = { navigate(Destination.DETAILS) },
                                 )
-                            Destination.HISTORY ->
-                                HistoryScreen(state, now.truncatedTo(ChronoUnit.MINUTES), busy) {
-                                    editId = it
-                                }
-                            Destination.PROGRESS ->
-                                ReportsScreen(
-                                    state,
-                                    model,
-                                    now.truncatedTo(ChronoUnit.MINUTES),
-                                    preferences,
-                                )
+                            Destination.HISTORY -> HistoryScreen(state, now, busy) { editId = it }
+                            Destination.PROGRESS -> ReportsScreen(state, model, now, preferences)
                             Destination.PHOTOS -> PhotosScreen(state, model, busy)
                             Destination.DETAILS ->
-                                TreatmentDetailsScreen(state, model, busy) {
-                                    destinationName = Destination.TODAY.name
-                                }
+                                TreatmentDetailsScreen(state, model, busy) { goBack() }
                             Destination.JOURNAL -> JournalScreen(state, model, busy)
                             Destination.SETTINGS -> Unit
                         }
@@ -521,6 +578,7 @@ fun TrackerApp(model: TrackerViewModel) {
                     onClick = {
                         model.confirmImport()
                         destinationName = Destination.TODAY.name
+                        backStack = emptyList()
                     },
                     enabled = !busy,
                 ) {
@@ -572,6 +630,7 @@ fun TrackerApp(model: TrackerViewModel) {
                             "delete" -> {
                                 model.clearAll()
                                 destinationName = Destination.TODAY.name
+                                backStack = emptyList()
                             }
                             else ->
                                 runCatching {
@@ -666,7 +725,7 @@ internal fun TrackerNavigation(destination: Destination, onNavigate: (Destinatio
                     NavigationBarItem(
                         selected = destination == tab,
                         onClick = { onNavigate(tab) },
-                        icon = { Text(tab.glyph, modifier = Modifier.clearAndSetSemantics {}) },
+                        icon = { TrackerNavIcon(tab) },
                         label = { Text(stringResource(tab.title)) },
                     )
                 }

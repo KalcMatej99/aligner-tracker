@@ -56,7 +56,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             Instant.ofEpochMilli(it.occurredAt).atZone(zone).toLocalDate() == parsed
         }
     LazyColumn(
-        Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        Modifier.widthIn(max = 680.dp).fillMaxSize().padding(horizontal = 20.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {

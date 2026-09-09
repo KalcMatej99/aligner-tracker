@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
@@ -11,8 +13,10 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +53,8 @@ fun SettingsScreen(
 ) {
     var goal by rememberSaveable(plan?.dailyGoalMinutes) { mutableStateOf("") }
     var goalError by rememberSaveable { mutableStateOf(false) }
+    val goalFeedback = remember { BringIntoViewRequester() }
+    LaunchedEffect(goalError) { if (goalError) goalFeedback.bringIntoView() }
     var enabled by rememberSaveable(preferences.enabled) { mutableStateOf(preferences.enabled) }
     var trayEnabled by
         rememberSaveable(preferences.trayEnabled) { mutableStateOf(preferences.trayEnabled) }
@@ -80,6 +86,7 @@ fun SettingsScreen(
                     error = goalError,
                     errorMessage = if (goalError) R.string.goal_hours_invalid else null,
                     enabled = !busy && !plan.completed,
+                    modifier = Modifier.bringIntoViewRequester(goalFeedback),
                 )
                 Text(
                     stringResource(
@@ -242,7 +249,10 @@ fun SettingsScreen(
                     enabled = !busy,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                 ) {
-                    Text(stringResource(R.string.delete_data))
+                    Text(
+                        stringResource(R.string.delete_data),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.error,
+                    )
                 }
         }
         Text(stringResource(R.string.privacy_footer))

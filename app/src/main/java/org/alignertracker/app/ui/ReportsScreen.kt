@@ -11,7 +11,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -28,9 +27,16 @@ fun ReportsScreen(
     now: Instant,
     preferences: ReminderPreferences,
 ) {
+    if (snapshot.plan == null) {
+        ScreenColumn {
+            Heading(R.string.reports_title)
+            Text(stringResource(R.string.no_progress))
+        }
+        return
+    }
     var count by rememberSaveable { mutableStateOf(7) }
     var preview by remember { mutableStateOf(false) }
-    val zone = ZoneId.of(snapshot.plan?.zoneId ?: "UTC")
+    val zone = ZoneId.of(snapshot.plan.zoneId)
     val days =
         remember(snapshot, count, now.epochSecond / 60) {
             ReportMath.days(snapshot, if (count == 0) now.atZone(zone).dayOfMonth else count, now)
@@ -42,9 +48,9 @@ fun ReportsScreen(
             uri?.let { model.export(context.contentResolver, it, true) }
         }
     LazyColumn(
-        Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        Modifier.widthIn(max = 680.dp).fillMaxSize().padding(horizontal = 20.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         item {
             Text(
@@ -53,7 +59,7 @@ fun ReportsScreen(
                 modifier = Modifier.semantics { heading() },
             )
         }
-        item { Text(stringResource(R.string.reports_rules)) }
+
         item {
             Column {
                 for (row in listOf(1, 7, 30, 0).chunked(2)) FlowRow(
@@ -75,16 +81,116 @@ fun ReportsScreen(
         item {
             Text(
                 stringResource(
-                    R.string.report_totals,
-                    days.sumOf { it.wornMillis } / 60000,
-                    days.sumOf { it.removedMillis } / 60000,
-                    days.sumOf { it.trackedMillis } / 60000,
-                )
+                    R.string.report_range,
+                    readableDate(LocalDate.parse(days.first().date)),
+                    readableDate(LocalDate.parse(days.last().date)),
+                ),
+                style = MaterialTheme.typography.titleMedium,
             )
         }
         item {
-            if (snapshot.targetHistory.isEmpty()) Text(stringResource(R.string.streak_needs_goal))
-            else
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = MaterialTheme.shapes.large,
+            ) {
+                Column(
+                    Modifier.fillMaxWidth().padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        stringResource(R.string.report_recorded_total),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                    Text(
+                        if (days.any { it.trackedMillis > 0 })
+                            durationLabel(days.sumOf { it.wornMillis })
+                        else stringResource(R.string.report_no_record),
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                    if (days.any { it.trackedMillis > 0 }) {
+                        Text(
+                            stringResource(R.string.worn),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            stringResource(
+                                R.string.report_out_tracked,
+                                durationLabel(days.sumOf { it.removedMillis }),
+                                durationLabel(days.sumOf { it.trackedMillis }),
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                    Text(
+                        stringResource(
+                            R.string.report_coverage_count,
+                            days.count { it.trackedMillis > 0 },
+                            days.size,
+                        )
+                    )
+                }
+            }
+        }
+        items(days.asReversed(), key = { it.date }) { day ->
+            Column(
+                Modifier.fillMaxWidth().semantics(mergeDescendants = true) {},
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    readableDate(LocalDate.parse(day.date)),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                if (day.trackedMillis == 0L) {
+                    Text(
+                        stringResource(R.string.report_no_record),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    Text(
+                        stringResource(
+                            R.string.report_wear_out,
+                            durationLabel(day.wornMillis),
+                            durationLabel(day.removedMillis),
+                        )
+                    )
+                    Text(
+                        stringResource(
+                            R.string.report_tracked_duration,
+                            durationLabel(day.trackedMillis),
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    val total = ReportMath.dayMillis(LocalDate.parse(day.date), zone)
+                    Text(
+                        stringResource(
+                            if (day.trackedMillis == total) R.string.report_full
+                            else R.string.report_partial
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        day.goalMinutes?.let {
+                            stringResource(
+                                R.string.report_goal_duration,
+                                durationLabel(it * 60_000L),
+                            )
+                        } ?: stringResource(R.string.report_goal_unknown),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                HorizontalDivider(Modifier.padding(top = 8.dp))
+            }
+        }
+        item {
+            Section(R.string.report_reading_help) {
+                Text(
+                    stringResource(R.string.reports_rules),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        }
+        if (snapshot.targetHistory.isNotEmpty())
+            item {
                 FilterChip(
                     selected = preferences.streaksEnabled,
                     onClick = {
@@ -94,58 +200,11 @@ fun ReportsScreen(
                     },
                     label = { Text(stringResource(R.string.optional_streaks)) },
                 )
-        }
-        if (preferences.streaksEnabled && snapshot.targetHistory.isNotEmpty())
-            item {
-                Text(stringResource(R.string.streak_value, ReportMath.streak(snapshot, now)))
-                Text(stringResource(R.string.streak_rules))
-            }
-        items(days, key = { it.date }) { day ->
-            ElevatedCard(Modifier.fillMaxWidth()) {
-                Column(
-                    Modifier.padding(12.dp).semantics(mergeDescendants = true) {},
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        LocalDate.parse(day.date)
-                            .format(
-                                java.time.format.DateTimeFormatter.ofLocalizedDate(
-                                    java.time.format.FormatStyle.MEDIUM
-                                )
-                            )
-                    )
-                    Text(
-                        if (day.goalMinutes == null)
-                            stringResource(
-                                R.string.daily_report_no_goal,
-                                day.wornMillis / 60000,
-                                day.removedMillis / 60000,
-                                day.trackedMillis / 60000,
-                            )
-                        else
-                            stringResource(
-                                R.string.daily_report,
-                                day.wornMillis / 60000,
-                                day.removedMillis / 60000,
-                                day.trackedMillis / 60000,
-                                day.goalMinutes,
-                            )
-                    )
-                    val total = ReportMath.dayMillis(LocalDate.parse(day.date), zone)
-                    LinearProgressIndicator(
-                        progress = { (day.wornMillis.toFloat() / total).coerceIn(0f, 1f) },
-                        modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
-                    )
-                    Text(
-                        stringResource(
-                            if (day.trackedMillis == total) R.string.report_full
-                            else if (day.trackedMillis == 0L) R.string.report_untracked
-                            else R.string.report_partial
-                        )
-                    )
+                if (preferences.streaksEnabled) {
+                    Text(stringResource(R.string.streak_value, ReportMath.streak(snapshot, now)))
+                    Text(stringResource(R.string.streak_rules))
                 }
             }
-        }
         item {
             Text(
                 stringResource(R.string.per_tray_report),

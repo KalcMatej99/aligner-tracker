@@ -71,7 +71,6 @@ class TalkBackSemanticsTest {
         }
         compose
             .onNodeWithText("Put aligners in")
-            .performScrollTo()
             .assert(
                 SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Aligners out")
             )
@@ -166,9 +165,9 @@ class TalkBackSemanticsTest {
         compose.onNodeWithText("Days: 1").performClick()
         compose
             .onNode(hasScrollToIndexAction())
-            .performScrollToNode(hasText("prescribed goal", substring = true))
-        val daily = compose.onNode(hasText("prescribed goal", substring = true))
-        daily.performScrollTo().assertTextContains("Partial-day coverage")
+            .performScrollToNode(hasText("Partial-day coverage", substring = true))
+        val daily = compose.onNode(hasText("Partial-day coverage", substring = true))
+        daily.performScrollTo().assertTextContains("Prescribed", substring = true)
         assertTrue(daily.fetchSemanticsNode().config.isMergingSemanticsOfDescendants)
         compose
             .onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo))

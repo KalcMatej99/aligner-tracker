@@ -41,17 +41,13 @@ class TrackerJourneyTest {
         compose.waitUntil(10_000) {
             compose.onAllNodesWithText("Take aligners out").fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNodeWithText("Take aligners out").performScrollTo().performClick()
+        compose.onNodeWithText("Take aligners out").performClick()
         compose.waitUntil(10_000) {
             runBlocking { container.repository.snapshot().events.size == 2 }
         }
         assertFalse(runBlocking { container.repository.snapshot().events.last().wearing })
         compose.activityRule.scenario.recreate()
-        compose
-            .onNodeWithText("Put aligners in")
-            .performScrollTo()
-            .assertIsDisplayed()
-            .performClick()
+        compose.onNodeWithText("Put aligners in").assertIsDisplayed().performClick()
         compose.waitUntil(10_000) {
             runBlocking { container.repository.snapshot().events.size == 3 }
         }

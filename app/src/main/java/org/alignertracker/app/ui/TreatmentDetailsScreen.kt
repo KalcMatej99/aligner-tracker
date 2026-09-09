@@ -1,8 +1,6 @@
 package org.alignertracker.app.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -10,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import org.alignertracker.app.R
 import org.alignertracker.app.domain.*
 
@@ -53,10 +50,7 @@ fun TreatmentDetailsScreen(
                     .also { require(it.isNotEmpty()) }
             }
             .getOrNull()
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
+    ScreenColumn {
         Text(
             stringResource(R.string.treatment_details),
             style = MaterialTheme.typography.headlineMedium,

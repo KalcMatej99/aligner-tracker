@@ -69,7 +69,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
     val parsed = runCatching { LocalDate.parse(date) }.getOrNull()
     val validDate = parsed != null && parsed.year in 1970..2100 && parsed <= LocalDate.now(zone)
     LazyColumn(
-        Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        Modifier.widthIn(max = 680.dp).fillMaxSize().padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
     ) {

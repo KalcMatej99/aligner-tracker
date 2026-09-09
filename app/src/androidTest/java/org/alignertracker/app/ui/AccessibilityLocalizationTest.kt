@@ -141,7 +141,6 @@ class AccessibilityLocalizationTest {
 
         compose
             .onNodeWithText("Put aligners in")
-            .performScrollTo()
             .assertIsDisplayed()
             .assertHasClickAction()
             .assertHeightIsAtLeast(64.dp)
@@ -217,6 +216,10 @@ class AccessibilityLocalizationTest {
     @Test
     fun themeTextPairsMeetNormalTextContrast() {
         listOf(
+                LightColors.onSecondaryContainer to LightColors.secondaryContainer,
+                LightColors.onTertiaryContainer to LightColors.tertiaryContainer,
+                DarkColors.onSecondaryContainer to DarkColors.secondaryContainer,
+                DarkColors.onTertiaryContainer to DarkColors.tertiaryContainer,
                 LightColors.onPrimary to LightColors.primary,
                 LightColors.onPrimaryContainer to LightColors.primaryContainer,
                 LightColors.onSurface to LightColors.surface,

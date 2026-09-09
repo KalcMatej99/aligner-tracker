@@ -21,3 +21,7 @@ This describes implementation intent and lifecycle; current evidence and remaini
 Temporary camera captures are tracked privately while the external camera is open. Cancellation/import deletes the temporary original. To allow a camera result to survive process recreation, a still-active capture has a 24-hour recovery grace period; the next app start after that period removes it. Delete data removes all temporary captures immediately. This grace does not apply to normalized saved photos, which remain until explicitly deleted.
 
 Portable archives are bounded to 32 MiB, with a clear size error before replacement; keep the previous good backup if a larger collection needs reducing. Offline photo time-lapse output is bounded to 16 MiB and 100 frames; select fewer images if the size limit is reached.
+
+The phone remembers dismissal of the optional treatment-setup invitation in local
+presentation preferences. This UI choice is tied to the tracking session, is not
+included in portable treatment backups, and never changes treatment records.

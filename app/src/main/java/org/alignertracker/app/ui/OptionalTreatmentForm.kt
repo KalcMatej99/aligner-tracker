@@ -1,8 +1,12 @@
 package org.alignertracker.app.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,6 +44,8 @@ internal fun OptionalTreatmentForm(
         }
     var goal by rememberSaveable(plan.dailyGoalMinutes) { mutableStateOf("") }
     var goalError by rememberSaveable { mutableStateOf(false) }
+    val goalFeedback = remember { BringIntoViewRequester() }
+    LaunchedEffect(goalError) { if (goalError) goalFeedback.bringIntoView() }
     var attempted by rememberSaveable { mutableStateOf(false) }
     var confirmCorrection by rememberSaveable { mutableStateOf(false) }
     val established = snapshot.phases.isNotEmpty()
@@ -100,6 +106,7 @@ internal fun OptionalTreatmentForm(
             error = goalError,
             errorMessage = if (goalError) R.string.goal_hours_invalid else null,
             enabled = editable,
+            modifier = Modifier.bringIntoViewRequester(goalFeedback),
         )
         Text(
             stringResource(
