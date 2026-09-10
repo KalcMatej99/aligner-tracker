@@ -163,6 +163,7 @@ class TalkBackSemanticsTest {
             }
         }
         compose.onNodeWithText("Days: 1").performClick()
+        compose.onNodeWithText("Daily values and targets").performScrollTo().performClick()
         compose
             .onNode(hasScrollToIndexAction())
             .performScrollToNode(hasText("Partial-day coverage", substring = true))

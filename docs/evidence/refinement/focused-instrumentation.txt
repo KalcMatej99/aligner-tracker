@@ -1,0 +1,10 @@
+
+org.alignertracker.app.ui.PickerRefinementTest:....
+org.alignertracker.app.integration.DesignJourneyTest:......
+org.alignertracker.app.ui.TrackerScreensTest:.........
+
+Time: 37.656
+
+OK (19 tests)
+
+

@@ -1,0 +1,125 @@
+
+org.alignertracker.app.controls.TrackerControlsTest:.
+org.alignertracker.app.data.TrackerMigrationTest:..
+org.alignertracker.app.data.TrackerPersistenceTest:..
+org.alignertracker.app.integration.DesignJourneyTest:.....
+Error in appointmentTitleEditPreservesExactRepeatedInstant(org.alignertracker.app.integration.DesignJourneyTest):
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (ContentDescription contains 'Edit appointment' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.integration.DesignJourneyTest.appointmentTitleEditPreservesExactRepeatedInstant(DesignJourneyTest.kt:165)
+.
+org.alignertracker.app.integration.TrackerJourneyTest:.
+org.alignertracker.app.integration.WearConnectionLifecycleTest:.
+org.alignertracker.app.performance.LongHistoryTest:.
+org.alignertracker.app.photos.PhotoArchiveTest:.
+org.alignertracker.app.reminders.ReminderPlatformTest:
+Error in dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState(org.alignertracker.app.reminders.ReminderPlatformTest):
+java.lang.AssertionError: Emulator harness must grant POST_NOTIFICATIONS before instrumentation expected:<0> but was:<-1>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.alignertracker.app.reminders.ReminderPlatformTest$dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState$1.invokeSuspend(ReminderPlatformTest.kt:41)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at org.alignertracker.app.reminders.ReminderPlatformTest.dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState(ReminderPlatformTest.kt:30)
+
+org.alignertracker.app.ui.AccessibilityLocalizationTest:.......
+org.alignertracker.app.ui.AdaptiveNavigationTest:..
+org.alignertracker.app.ui.DialogAccessibilityTest:.
+org.alignertracker.app.ui.PickerRefinementTest:....
+Error in calendarSelectionCommitsOnlyOnSave(org.alignertracker.app.ui.PickerRefinementTest):
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains '9' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+	at org.alignertracker.app.ui.PickerRefinementTest.calendarSelectionCommitsOnlyOnSave(PickerRefinementTest.kt:40)
+
+org.alignertracker.app.ui.TalkBackSemanticsTest:.......
+Error in reportsKeepDateTotalsAndCoverageTogetherWithoutAnUnlabelledPercentage(org.alignertracker.app.ui.TalkBackSemanticsTest):
+java.lang.AssertionError: No node found that matches Text + InputText + EditableText contains 'Partial-day coverage' (ignoreCase: false) as substring in scrollable container
+Semantics of the node:
+Node #4733 at (l=53.0, t=0.0, r=1027.0, b=2400.0)px
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@7e9f3aa'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 19 children
+Selector used: (ScrollToIndex is defined)
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at org.alignertracker.app.ui.TalkBackSemanticsTest.reportsKeepDateTotalsAndCoverageTogetherWithoutAnUnlabelledPercentage(TalkBackSemanticsTest.kt:168)
+.
+org.alignertracker.app.ui.TextFieldAccessibilityTest:..
+org.alignertracker.app.ui.TrackerScreensTest:.........
+
+Time: 109.413
+There were 4 failures:
+1) appointmentTitleEditPreservesExactRepeatedInstant(org.alignertracker.app.integration.DesignJourneyTest)
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (ContentDescription contains 'Edit appointment' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.integration.DesignJourneyTest.appointmentTitleEditPreservesExactRepeatedInstant(DesignJourneyTest.kt:165)
+2) dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState(org.alignertracker.app.reminders.ReminderPlatformTest)
+java.lang.AssertionError: Emulator harness must grant POST_NOTIFICATIONS before instrumentation expected:<0> but was:<-1>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.alignertracker.app.reminders.ReminderPlatformTest$dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState$1.invokeSuspend(ReminderPlatformTest.kt:41)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at org.alignertracker.app.reminders.ReminderPlatformTest.dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState(ReminderPlatformTest.kt:30)
+3) calendarSelectionCommitsOnlyOnSave(org.alignertracker.app.ui.PickerRefinementTest)
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains '9' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+	at org.alignertracker.app.ui.PickerRefinementTest.calendarSelectionCommitsOnlyOnSave(PickerRefinementTest.kt:40)
+4) reportsKeepDateTotalsAndCoverageTogetherWithoutAnUnlabelledPercentage(org.alignertracker.app.ui.TalkBackSemanticsTest)
+java.lang.AssertionError: No node found that matches Text + InputText + EditableText contains 'Partial-day coverage' (ignoreCase: false) as substring in scrollable container
+Semantics of the node:
+Node #4733 at (l=53.0, t=0.0, r=1027.0, b=2400.0)px
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@7e9f3aa'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 19 children
+Selector used: (ScrollToIndex is defined)
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at org.alignertracker.app.ui.TalkBackSemanticsTest.reportsKeepDateTotalsAndCoverageTogetherWithoutAnUnlabelledPercentage(TalkBackSemanticsTest.kt:168)
+
+FAILURES!!!
+Tests run: 52,  Failures: 4
+
+

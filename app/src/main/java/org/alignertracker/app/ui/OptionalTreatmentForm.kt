@@ -247,52 +247,14 @@ private fun OptionalDate(
             Text(stringResource(R.string.not_sure))
         }
     }
-    if (choosing) {
-        val state =
-            rememberDatePickerState(
-                initialSelectedDateMillis =
-                    value
-                        .takeIf { it.isNotBlank() }
-                        ?.let {
-                            LocalDate.parse(it)
-                                .atStartOfDay(ZoneOffset.UTC)
-                                .toInstant()
-                                .toEpochMilli()
-                        },
-                yearRange = 1970..minOf(2100, today.year),
-                selectableDates =
-                    object : SelectableDates {
-                        override fun isSelectableDate(utcTimeMillis: Long): Boolean =
-                            Instant.ofEpochMilli(utcTimeMillis)
-                                .atZone(ZoneOffset.UTC)
-                                .toLocalDate() <= today
-                    },
-            )
-        DatePickerDialog(
-            onDismissRequest = { choosing = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        state.selectedDateMillis?.let {
-                            onChange(
-                                Instant.ofEpochMilli(it)
-                                    .atZone(ZoneOffset.UTC)
-                                    .toLocalDate()
-                                    .toString()
-                            )
-                        }
-                        choosing = false
-                    },
-                    enabled = state.selectedDateMillis != null,
-                ) {
-                    Text(stringResource(R.string.save))
-                }
+    if (choosing)
+        CalendarDialog(
+            value,
+            today,
+            {
+                onChange(it)
+                choosing = false
             },
-            dismissButton = {
-                TextButton(onClick = { choosing = false }) { Text(stringResource(R.string.cancel)) }
-            },
-        ) {
-            DatePicker(state)
-        }
-    }
+            { choosing = false },
+        )
 }

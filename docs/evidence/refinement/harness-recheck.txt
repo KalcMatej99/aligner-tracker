@@ -1,0 +1,80 @@
+
+org.alignertracker.app.ui.PickerRefinementTest:....
+Error in calendarSelectionCommitsOnlyOnSave(org.alignertracker.app.ui.PickerRefinementTest):
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (ContentDescription contains 'September 9, 2026' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+	at org.alignertracker.app.ui.PickerRefinementTest.calendarSelectionCommitsOnlyOnSave(PickerRefinementTest.kt:40)
+
+org.alignertracker.app.integration.DesignJourneyTest:.....
+Error in appointmentTitleEditPreservesExactRepeatedInstant(org.alignertracker.app.integration.DesignJourneyTest):
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Appointment title' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.integration.DesignJourneyTest.appointmentTitleEditPreservesExactRepeatedInstant(DesignJourneyTest.kt:172)
+.
+org.alignertracker.app.ui.TalkBackSemanticsTest:.........
+org.alignertracker.app.reminders.ReminderPlatformTest:INSTRUMENTATION_STATUS: reminder_delivery=AlarmManager
+INSTRUMENTATION_STATUS_CODE: 0
+.
+org.alignertracker.app.ui.PlatformAccessibilityTest:
+Error in invalidCorrectionExportsFieldErrorAndCancelClosesItsWindowWithoutSaving(org.alignertracker.app.ui.PlatformAccessibilityTest):
+java.lang.AssertionError: Enable the emulator's bundled TalkBack before running PlatformAccessibilityTest. Compose 1.9.5 suppresses virtual-node events when only UiAutomation is connected.
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.connectWithoutSuppressingScreenReaders(PlatformAccessibilityTest.kt:56)
+
+Error in todayExportsStateAndRespondsToPlatformFocusAndClick(org.alignertracker.app.ui.PlatformAccessibilityTest):
+java.lang.AssertionError: Enable the emulator's bundled TalkBack before running PlatformAccessibilityTest. Compose 1.9.5 suppresses virtual-node events when only UiAutomation is connected.
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.connectWithoutSuppressingScreenReaders(PlatformAccessibilityTest.kt:56)
+
+
+Time: 46.77
+There were 4 failures:
+1) calendarSelectionCommitsOnlyOnSave(org.alignertracker.app.ui.PickerRefinementTest)
+java.lang.AssertionError: Failed to inject touch input.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (ContentDescription contains 'September 9, 2026' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performTouchInput(Actions.kt:402)
+	at androidx.compose.ui.test.AndroidActions.performClickImpl(Actions.android.kt:23)
+	at androidx.compose.ui.test.ActionsKt.performClick(Actions.kt:60)
+	at org.alignertracker.app.ui.PickerRefinementTest.calendarSelectionCommitsOnlyOnSave(PickerRefinementTest.kt:40)
+2) appointmentTitleEditPreservesExactRepeatedInstant(org.alignertracker.app.integration.DesignJourneyTest)
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Appointment title' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.integration.DesignJourneyTest.appointmentTitleEditPreservesExactRepeatedInstant(DesignJourneyTest.kt:172)
+3) invalidCorrectionExportsFieldErrorAndCancelClosesItsWindowWithoutSaving(org.alignertracker.app.ui.PlatformAccessibilityTest)
+java.lang.AssertionError: Enable the emulator's bundled TalkBack before running PlatformAccessibilityTest. Compose 1.9.5 suppresses virtual-node events when only UiAutomation is connected.
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.connectWithoutSuppressingScreenReaders(PlatformAccessibilityTest.kt:56)
+4) todayExportsStateAndRespondsToPlatformFocusAndClick(org.alignertracker.app.ui.PlatformAccessibilityTest)
+java.lang.AssertionError: Enable the emulator's bundled TalkBack before running PlatformAccessibilityTest. Compose 1.9.5 suppresses virtual-node events when only UiAutomation is connected.
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.connectWithoutSuppressingScreenReaders(PlatformAccessibilityTest.kt:56)
+
+FAILURES!!!
+Tests run: 24,  Failures: 4
+
+

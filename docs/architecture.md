@@ -76,3 +76,7 @@ Phone features remain usable without Google Play services, while watch communica
 ## Tracking-first update — issue #32
 
 [Schema3 contract](schema-v3.md) supersedes required prescription fields and complete-plan-first startup above. Tracking requires only a fixed accounting zone and an explicit first state, captured atomically. All six prescription fields are nullable; historical targets and migrations retain their meanings.
+
+## Visual and picker refinement — #37
+
+The version 7 phone refinement supersedes earlier typed-ISO and repeated-offset UI guidance. Native calendar/clock dialogs, saved drafts and explicit repeated-time occurrence choices preserve exact stored instants. Timezone information and pre-start configuration live only in Settings. Accounting, serialization and widget/Wear contracts are unchanged. [Design and source rationale](visual-time-refinement.md); [validation](validation-refinement.md).

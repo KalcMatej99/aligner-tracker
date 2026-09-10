@@ -1,0 +1,24 @@
+<resources>
+    <string name="picker_date">Date</string>
+    <string name="choose_time">Choose time</string>
+    <string name="show_clock">Show clock</string>
+    <string name="use_keyboard">Use keyboard</string>
+    <string name="repeated_time">This time occurs twice. Choose which occurrence.</string>
+    <string name="first_occurrence">First occurrence</string>
+    <string name="second_occurrence">Second occurrence</string>
+    <string name="nonexistent_time">This clock time does not exist on this date. Choose another time.</string>
+    <string name="time_breakdown">Time breakdown</string>
+    <string name="time_details">About this breakdown</string>
+    <string name="time_details_body">Solid: recorded wear. Striped: recorded OUT. Dotted: elapsed time with no record. Empty: future time. Segment lengths show totals, not the order of events.</string>
+    <string name="future_time">Future</string>
+    <string name="short_duration">%1$d h %2$d min</string>
+    <string name="chart_hours">Hours from 0 to %1$d</string>
+    <string name="daily_data">Daily values and targets</string>
+    <string name="chart_target">Line: prescribed target for each date</string>
+    <string name="schedule_estimated">Estimated</string>
+    <string name="schedule_recorded">Recorded</string>
+    <string name="schedule_sequence">Tray sequence · spacing does not represent duration</string>
+    <string name="about_schedule">About this schedule</string>
+    <string name="estimated_change">Estimated change / finish: %1$s</string>
+    <string name="show_calendar">Show calendar</string>
+</resources>

@@ -1,0 +1,30 @@
+
+org.alignertracker.app.ui.PickerRefinementTest:.....
+org.alignertracker.app.integration.DesignJourneyTest:.....
+Error in appointmentTitleEditPreservesExactRepeatedInstant(org.alignertracker.app.integration.DesignJourneyTest):
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Save appointment' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.integration.DesignJourneyTest.appointmentTitleEditPreservesExactRepeatedInstant(DesignJourneyTest.kt:176)
+.
+
+Time: 24.866
+There was 1 failure:
+1) appointmentTitleEditPreservesExactRepeatedInstant(org.alignertracker.app.integration.DesignJourneyTest)
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Save appointment' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.integration.DesignJourneyTest.appointmentTitleEditPreservesExactRepeatedInstant(DesignJourneyTest.kt:176)
+
+FAILURES!!!
+Tests run: 12,  Failures: 1
+
+

@@ -24,7 +24,7 @@
     <string name="phase_name_required">Enter a phase name.</string>
     <string name="tray_count_invalid">Enter a whole number from 1 to 1000.</string>
     <string name="tray_days_invalid">Enter a whole number from 1 to 365 days.</string>
-    <string name="appointment_time_invalid">Enter a valid HH:mm time and date. Include a UTC offset for a repeated daylight-saving time.</string>
+    <string name="appointment_time_invalid">Choose a valid date and time. For a repeated time, choose an occurrence.</string>
     <string name="password_short">Use at least 12 characters for a new backup password.</string>
     <string name="password_mismatch">The repeated password must match the backup password.</string>
     <string name="current_tray_invalid">Enter your current tray number between 1 and the total number of trays.</string>

@@ -52,7 +52,11 @@ fun SettingsScreen(
     onEncryptedImport: () -> Unit = {},
     appointmentChannelAllowed: Boolean = true,
     onDetails: () -> Unit = {},
+    startupZone: String = java.time.ZoneId.systemDefault().id,
+    onStartupZone: (String) -> Unit = {},
 ) {
+    var choosingZone by rememberSaveable { mutableStateOf(false) }
+    var zoneQuery by rememberSaveable { mutableStateOf("") }
     var goal by rememberSaveable(plan?.dailyGoalMinutes) { mutableStateOf("") }
     var goalError by rememberSaveable { mutableStateOf(false) }
     val goalFeedback = remember { BringIntoViewRequester() }
@@ -108,8 +112,33 @@ fun SettingsScreen(
                 ) {
                     Text(stringResource(R.string.save_target))
                 }
-                Text(stringResource(R.string.zone_value, readableZone(plan.zoneId)))
             }
+        Section(R.string.treatment_zone) {
+            Text(stringResource(R.string.zone_value, readableZone(plan?.zoneId ?: startupZone)))
+            Text(stringResource(R.string.fixed_zone_help))
+            if (plan == null) {
+                TextButton(onClick = { choosingZone = !choosingZone }) {
+                    Text(stringResource(R.string.change_accounting_zone))
+                }
+                if (choosingZone) {
+                    Entry(zoneQuery, { zoneQuery = it }, R.string.search_zones)
+                    java.time.ZoneId.getAvailableZoneIds()
+                        .sorted()
+                        .filter { it.replace('_', ' ').contains(zoneQuery, ignoreCase = true) }
+                        .take(40)
+                        .forEach { id ->
+                            TextButton(
+                                onClick = {
+                                    onStartupZone(id)
+                                    choosingZone = false
+                                }
+                            ) {
+                                Text(readableZone(id))
+                            }
+                        }
+                }
+            }
+        }
         if (plan != null && !plan.completed)
             Section(R.string.reminder_heading) {
                 Text(stringResource(R.string.reminder_staged))
