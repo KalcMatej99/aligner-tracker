@@ -47,3 +47,12 @@ unpublished version4 candidate. [Redesign validation](validation-redesign.md) li
 before/after captures, adaptive/accessibility evidence, the observed Wear callback
 fix and signed3→4 preservation checks. Owner comprehension, physical acceptance,
 translations and publication remain separate open gates.
+
+## Owner-requested neutral redesign — 2026-09-10
+
+The version4 warm/pine composition was rejected by the owner. Candidate5 on
+`design/neutral-tracking` implements the replacement direction; see
+[design decisions](neutral-redesign.md) and [validation](validation-neutral.md).
+It retains PR35/#34's connection fix. PR integration, private publication, owner
+aesthetic acceptance and physical gates remain distinct. Publication of4 does
+not authorize publication of5.

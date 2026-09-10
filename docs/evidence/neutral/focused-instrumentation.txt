@@ -1,0 +1,10 @@
+
+org.alignertracker.app.integration.DesignJourneyTest:.....
+org.alignertracker.app.ui.TrackerScreensTest:.........
+org.alignertracker.app.ui.AdaptiveNavigationTest:..
+
+Time: 24.129
+
+OK (16 tests)
+
+

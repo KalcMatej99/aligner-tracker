@@ -1,0 +1,8 @@
+
+org.alignertracker.app.integration.WearConnectionLifecycleTest:.
+
+Time: 1.311
+
+OK (1 test)
+
+

@@ -147,11 +147,30 @@ F-Droid acceptance is unconfirmed. Its [inclusion policy](https://f-droid.org/en
 
 A distribution bundle must include the signed APKs, SHA-256 manifest, signer fingerprint, exact tagged corresponding source, build instructions, GPL-3.0 text, third-party license inventory and required notices. Publication, store/developer accounts, signing and key custody all require separate explicit authorization. Passing local builds or emulator tests does not make the release ready while the physical and pilot gates in [external acceptance](external-acceptance.md) remain open.
 
-## Unpublished redesign candidate 4
+## Historical redesign candidate 4
 
 The redesign is prepared on `design/calm-tracking`, source tag
 `design-phone-candidate-4-final` (`506e52d`). Version4 retains the permanent signer;
 actual signed3→4 emulator upgrade preserves all tables and reminder datastore.
 See [redesign validation](validation-redesign.md) for screenshots, tests, hashes and
-candidate location. This work did not authorize a new private publication; version3
-remains the served update. Owner/device gates and publication approval remain open.
+candidate location. The owner subsequently authorized version4 publication; it is the served update
+as reverified on2026-09-10. Owner/device gates remain open.
+
+
+## Neutral redesign candidate 5 (unpublished)
+
+Source tag: `neutral-phone-candidate-5-final`
+(`5e5ba6d3c5109513a2eb0a5670ada5b376186aac`). Phone and watch use versionCode 5,
+above the served version 4 reverified on 2026-09-10, with the unchanged owner signer.
+The tested local bundle is
+`/home/matejkalc/.local/share/aligner-tracker/releases/neutral-candidate-5/`.
+See [neutral validation](validation-neutral.md) for checksums, exact same-signer
+4→5 data comparison, restore evidence and remaining owner/device gates.
+
+For an owner-authorized installation, the phone APK is `aligner-tracker-phone.apk`
+in that directory. `adb -s PHONE_SERIAL install -r /path/to/aligner-tracker-phone.apk`
+performs an upgrade; select the intended device explicitly. No physical-phone
+installation or store publication was performed. Previous publication authorization
+is not authorization to publish this candidate. Do not use the superseded initial
+`neutral-phone-candidate-5` tag; the final tag above includes the accessibility
+regression assertion correction.

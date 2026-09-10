@@ -1,0 +1,12 @@
+
+org.alignertracker.app.ui.AccessibilityLocalizationTest:.......
+org.alignertracker.app.ui.TrackerScreensTest:.........
+org.alignertracker.app.reminders.ReminderPlatformTest:INSTRUMENTATION_STATUS: reminder_delivery=AlarmManager
+INSTRUMENTATION_STATUS_CODE: 0
+.
+
+Time: 32.248
+
+OK (17 tests)
+
+

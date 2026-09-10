@@ -1,0 +1,112 @@
+
+org.alignertracker.app.controls.TrackerControlsTest:.
+org.alignertracker.app.data.TrackerMigrationTest:..
+org.alignertracker.app.data.TrackerPersistenceTest:..
+org.alignertracker.app.integration.DesignJourneyTest:......
+org.alignertracker.app.integration.TrackerJourneyTest:.
+org.alignertracker.app.photos.PhotoArchiveTest:.
+org.alignertracker.app.reminders.ReminderPlatformTest:
+Error in dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState(org.alignertracker.app.reminders.ReminderPlatformTest):
+java.lang.AssertionError: Emulator harness must grant POST_NOTIFICATIONS before instrumentation expected:<0> but was:<-1>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.alignertracker.app.reminders.ReminderPlatformTest$dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState$1.invokeSuspend(ReminderPlatformTest.kt:41)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at org.alignertracker.app.reminders.ReminderPlatformTest.dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState(ReminderPlatformTest.kt:30)
+
+org.alignertracker.app.ui.AccessibilityLocalizationTest:.
+Error in rtlHistoryPlacesPreviousAtTheReadingStart(org.alignertracker.app.ui.AccessibilityLocalizationTest):
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Previous day' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.ui.AccessibilityLocalizationTest.rtlHistoryPlacesPreviousAtTheReadingStart(AccessibilityLocalizationTest.kt:198)
+.
+Error in shortLandscapeKeepsTodayActionReachableAtLargeText(org.alignertracker.app.ui.AccessibilityLocalizationTest):
+java.lang.AssertionError: Actual height is 56.0.dp, expected at least 64.0.dp (tolerance: 0.5.dp)
+	at androidx.compose.ui.test.BoundsAssertionsKt.assertIsAtLeast-cWfXhoU(BoundsAssertions.kt:342)
+	at androidx.compose.ui.test.BoundsAssertionsKt.assertIsAtLeast-cWfXhoU$default(BoundsAssertions.kt:339)
+	at androidx.compose.ui.test.BoundsAssertionsKt.assertHeightIsAtLeast_3ABfNKs$lambda$5(BoundsAssertions.kt:98)
+	at androidx.compose.ui.test.BoundsAssertionsKt.$r8$lambda$51MqXp3duqkrVxTLUqg8wZtWtzo(Unknown Source:0)
+	at androidx.compose.ui.test.BoundsAssertionsKt$$ExternalSyntheticLambda5.invoke(D8$$SyntheticClass:0)
+	at androidx.compose.ui.test.BoundsAssertionsKt.withUnclippedBoundsInRoot(BoundsAssertions.kt:266)
+	at androidx.compose.ui.test.BoundsAssertionsKt.assertHeightIsAtLeast-3ABfNKs(BoundsAssertions.kt:98)
+	at org.alignertracker.app.ui.AccessibilityLocalizationTest.shortLandscapeKeepsTodayActionReachableAtLargeText(AccessibilityLocalizationTest.kt:146)
+...
+org.alignertracker.app.ui.AdaptiveNavigationTest:..
+org.alignertracker.app.ui.DialogAccessibilityTest:.
+org.alignertracker.app.ui.TalkBackSemanticsTest:.........
+org.alignertracker.app.ui.TextFieldAccessibilityTest:..
+org.alignertracker.app.ui.TrackerScreensTest:..
+Error in historyDatePickerCancelKeepsSelectedDay(org.alignertracker.app.ui.TrackerScreensTest):
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Previous day' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.ui.TrackerScreensTest.historyDatePickerCancelKeepsSelectedDay(TrackerScreensTest.kt:191)
+......
+
+Time: 78.043
+There were 4 failures:
+1) dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState(org.alignertracker.app.reminders.ReminderPlatformTest)
+java.lang.AssertionError: Emulator harness must grant POST_NOTIFICATIONS before instrumentation expected:<0> but was:<-1>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.alignertracker.app.reminders.ReminderPlatformTest$dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState$1.invokeSuspend(ReminderPlatformTest.kt:41)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at org.alignertracker.app.reminders.ReminderPlatformTest.dueReminderIsPrivateAndActualSnoozeInAndOldActionsRespectPersistedState(ReminderPlatformTest.kt:30)
+2) rtlHistoryPlacesPreviousAtTheReadingStart(org.alignertracker.app.ui.AccessibilityLocalizationTest)
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Previous day' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.ui.AccessibilityLocalizationTest.rtlHistoryPlacesPreviousAtTheReadingStart(AccessibilityLocalizationTest.kt:198)
+3) shortLandscapeKeepsTodayActionReachableAtLargeText(org.alignertracker.app.ui.AccessibilityLocalizationTest)
+java.lang.AssertionError: Actual height is 56.0.dp, expected at least 64.0.dp (tolerance: 0.5.dp)
+	at androidx.compose.ui.test.BoundsAssertionsKt.assertIsAtLeast-cWfXhoU(BoundsAssertions.kt:342)
+	at androidx.compose.ui.test.BoundsAssertionsKt.assertIsAtLeast-cWfXhoU$default(BoundsAssertions.kt:339)
+	at androidx.compose.ui.test.BoundsAssertionsKt.assertHeightIsAtLeast_3ABfNKs$lambda$5(BoundsAssertions.kt:98)
+	at androidx.compose.ui.test.BoundsAssertionsKt.$r8$lambda$51MqXp3duqkrVxTLUqg8wZtWtzo(Unknown Source:0)
+	at androidx.compose.ui.test.BoundsAssertionsKt$$ExternalSyntheticLambda5.invoke(D8$$SyntheticClass:0)
+	at androidx.compose.ui.test.BoundsAssertionsKt.withUnclippedBoundsInRoot(BoundsAssertions.kt:266)
+	at androidx.compose.ui.test.BoundsAssertionsKt.assertHeightIsAtLeast-3ABfNKs(BoundsAssertions.kt:98)
+	at org.alignertracker.app.ui.AccessibilityLocalizationTest.shortLandscapeKeepsTodayActionReachableAtLargeText(AccessibilityLocalizationTest.kt:146)
+4) historyDatePickerCancelKeepsSelectedDay(org.alignertracker.app.ui.TrackerScreensTest)
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'Previous day' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at org.alignertracker.app.ui.TrackerScreensTest.historyDatePickerCancelKeepsSelectedDay(TrackerScreensTest.kt:191)
+
+FAILURES!!!
+Tests run: 44,  Failures: 4
+
+

@@ -1,0 +1,43 @@
+{
+  "before_version": 4,
+  "after_version": 5,
+  "table_equal": {
+    "android_metadata": true,
+    "appointments": true,
+    "command_outcomes": true,
+    "photo_metadata": true,
+    "room_master_table": true,
+    "schedule_revisions": true,
+    "sqlite_sequence": true,
+    "target_history": true,
+    "tracker_state": true,
+    "tracking_gaps": true,
+    "tray_history": true,
+    "tray_intervals": true,
+    "treatment": true,
+    "treatment_notes": true,
+    "treatment_phases": true,
+    "wear_events": true
+  },
+  "row_counts": {
+    "android_metadata": 1,
+    "appointments": 1,
+    "command_outcomes": 0,
+    "photo_metadata": 0,
+    "room_master_table": 1,
+    "schedule_revisions": 2,
+    "sqlite_sequence": 9,
+    "target_history": 2,
+    "tracker_state": 1,
+    "tracking_gaps": 1,
+    "tray_history": 2,
+    "tray_intervals": 3,
+    "treatment": 1,
+    "treatment_notes": 1,
+    "treatment_phases": 1,
+    "wear_events": 13
+  },
+  "reminder_preferences_identical": true,
+  "reminder_before_sha256": "2803b7a7f4ce1b36160503c90a2cd5b75c433c64fc3ac5f9408d111b27dac698",
+  "reminder_after_sha256": "2803b7a7f4ce1b36160503c90a2cd5b75c433c64fc3ac5f9408d111b27dac698"
+}

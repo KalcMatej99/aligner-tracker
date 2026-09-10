@@ -1,0 +1,13 @@
+    versionCode=4 minSdk=26 targetSdk=36
+    versionName=1.0.0-dev
+Performing Streamed Install
+Success
+Starting: Intent { cmp=org.alignertracker.app/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: org.alignertracker.app/.MainActivity
+TotalTime: 808
+WaitTime: 811
+Complete
+    versionCode=5 minSdk=26 targetSdk=36
+    versionName=1.0.0-dev
