@@ -1,0 +1,29 @@
+{
+  "from_version": 6,
+  "to_version": 7,
+  "method": "adb install -r; no uninstall between signed versions",
+  "all_database_tables_equal": true,
+  "changed_tables": [],
+  "reminder_preferences_equal": true,
+  "table_row_counts": {
+    "android_metadata": 1,
+    "appointments": 1,
+    "command_outcomes": 0,
+    "photo_metadata": 0,
+    "room_master_table": 1,
+    "schedule_revisions": 2,
+    "sqlite_sequence": 9,
+    "target_history": 2,
+    "tracker_state": 1,
+    "tracking_gaps": 1,
+    "tray_history": 2,
+    "tray_intervals": 3,
+    "treatment": 1,
+    "treatment_notes": 1,
+    "treatment_phases": 1,
+    "wear_events": 13
+  },
+  "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9",
+  "rendered_before_and_after": true,
+  "fixture_selinux_labels_corrected_before_final_run": true
+}

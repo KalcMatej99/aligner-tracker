@@ -21,4 +21,5 @@
     <string name="about_schedule">About this schedule</string>
     <string name="estimated_change">Estimated change / finish: %1$s</string>
     <string name="show_calendar">Show calendar</string>
+    <string name="range_wear">Recorded wear in this range</string>
 </resources>

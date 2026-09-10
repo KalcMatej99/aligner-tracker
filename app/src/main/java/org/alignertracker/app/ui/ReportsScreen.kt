@@ -83,7 +83,7 @@ fun ReportsScreen(
         }
         item {
             SummaryRow(
-                R.string.report_recorded_total,
+                R.string.range_wear,
                 if (days.any { it.trackedMillis > 0 }) compactDuration(days.sumOf { it.wornMillis })
                 else stringResource(R.string.report_no_record),
             )
@@ -128,6 +128,13 @@ fun ReportsScreen(
             )
             DetailsDisclosure(R.string.time_details) {
                 Text(stringResource(R.string.time_details_body))
+                Text(
+                    stringResource(
+                        R.string.report_out_tracked,
+                        durationLabel(days.sumOf { it.removedMillis }),
+                        durationLabel(days.sumOf { it.trackedMillis }),
+                    )
+                )
             }
         }
         item {

@@ -1,0 +1,20 @@
+{
+  "source_commit": "681ae2f1387e2014894427b030976057035c2914",
+  "source_tag": "visual-time-candidate-7",
+  "published": false,
+  "physical_installation": false,
+  "artifacts": {
+    "phone": {
+      "file": "aligner-tracker-phone.apk",
+      "sha256": "6fc1bb8fde25020b3903037a16a2064508460bca0ec765bdc043c65a9f2a6684",
+      "versionCode": 7,
+      "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9"
+    },
+    "wear": {
+      "file": "aligner-tracker-wear.apk",
+      "sha256": "b6dabc7f7cf797c7b36f2770c132854c99eafe8c0560910cd73f28d7343aed3f",
+      "versionCode": 7,
+      "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9"
+    }
+  }
+}
