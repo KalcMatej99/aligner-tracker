@@ -59,3 +59,7 @@ Screenshots and automated semantics do not establish human comprehension, TalkBa
 speech quality or owner aesthetic acceptance. English fallback and debug
 pseudolocales are tested; production translation delivery remains tracked separately.
 This follow-up does not bump a version or publish another build.
+
+The owner subsequently preferred the screenshot and authorized merge and deployment.
+[Version 9 publication](release.md) records the completed release and remaining
+physical-device boundaries; the earlier no-publication statement is historical.
