@@ -1,0 +1,69 @@
+{
+  "android_metadata": {
+    "rows": 1,
+    "identical": true
+  },
+  "appointments": {
+    "rows": 1,
+    "identical": true
+  },
+  "command_outcomes": {
+    "rows": 0,
+    "identical": true
+  },
+  "photo_metadata": {
+    "rows": 0,
+    "identical": true
+  },
+  "room_master_table": {
+    "rows": 1,
+    "identical": true
+  },
+  "schedule_revisions": {
+    "rows": 2,
+    "identical": true
+  },
+  "sqlite_sequence": {
+    "rows": 9,
+    "identical": true
+  },
+  "target_history": {
+    "rows": 2,
+    "identical": true
+  },
+  "tracker_state": {
+    "rows": 1,
+    "identical": true
+  },
+  "tracking_gaps": {
+    "rows": 1,
+    "identical": true
+  },
+  "tray_history": {
+    "rows": 2,
+    "identical": true
+  },
+  "tray_intervals": {
+    "rows": 3,
+    "identical": true
+  },
+  "treatment": {
+    "rows": 1,
+    "identical": true
+  },
+  "treatment_notes": {
+    "rows": 1,
+    "identical": true
+  },
+  "treatment_phases": {
+    "rows": 1,
+    "identical": true
+  },
+  "wear_events": {
+    "rows": 13,
+    "identical": true
+  },
+  "reminders.preferences_pb": {
+    "identical": true
+  }
+}

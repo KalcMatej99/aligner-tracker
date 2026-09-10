@@ -32,3 +32,23 @@ Encrypted export/import asks for a password after the system picker returns. Pas
 The home widget and reminder controls carry the state revision they display. Duplicate actions are idempotent; stale actions refresh without changing history. The widget has no ticking duration and no periodic update. Notifications show opt-in status, channel/permission/timing limitations and a 10-minute snooze where meaningful. Clock gaps are labeled as unknown, not counted as wear.
 
 Watch behavior and its explicit pending/rejected/disconnected states are documented in [wear.md](wear.md). Acceptance evidence, including remaining manual checks, is in [validation.md](validation.md).
+
+## Phone redesign — issue #33
+
+[Calm tracking design and evidence](redesign.md) supersedes the original visual
+specification above. Warm paper/pine and intentional dark palettes, scalable
+system typography, original vector navigation and flat shared sections replace
+nested pale cards. Today separates session and daily totals with a reachable
+tracking action and correction route; constrained height prioritizes state.
+History uses bounded native date selection. Reports show newest days first with
+human-readable totals, explicit ranges/coverage and unknown-day text. Secondary
+Back returns to the origin and retains drafts. Tracking-first setup from #32,
+resource-backed copy for #31 and the adaptive navigation acceptance of #24 remain.
+
+## Neutral phone redesign — candidate 5
+
+[Neutral design decisions](neutral-redesign.md) supersede the warm/pine visual
+specification above following owner rejection of published version4. One screen
+header, white/charcoal surfaces, restrained blue, compact facts/date controls and
+neutral supporting records preserve the tracking-first behavior. Validation and
+remaining owner/device gates are in [candidate5 evidence](validation-neutral.md).

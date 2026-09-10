@@ -56,17 +56,11 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             Instant.ofEpochMilli(it.occurredAt).atZone(zone).toLocalDate() == parsed
         }
     LazyColumn(
-        Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        Modifier.widthIn(max = 680.dp).fillMaxSize().padding(horizontal = 20.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item {
-            Text(
-                stringResource(R.string.journal_title),
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.semantics { heading() },
-            )
-        }
+        item { Heading(R.string.journal_title) }
         item {
             TrackerTextField(
                 date,
@@ -187,24 +181,36 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                 stringResource(R.string.edit_record_accessibility, noteDescription)
             val deleteDescription =
                 stringResource(R.string.delete_record_accessibility, noteDescription)
-            ElevatedCard(Modifier.fillMaxWidth()) {
+            OutlinedCard(
+                Modifier.fillMaxWidth(),
+                colors =
+                    CardDefaults.outlinedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                border =
+                    androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant,
+                    ),
+                shape = MaterialTheme.shapes.small,
+            ) {
                 Column(Modifier.padding(12.dp)) {
                     Text(note.text)
-                    TextButton(
+                    IconButton(
                         onClick = {
                             noteId = note.id
                             noteText = note.text
                         },
                         modifier = Modifier.recordAction(editDescription),
                     ) {
-                        Text(stringResource(R.string.edit_record))
+                        TrackerUtilityIcon(UtilityIcon.EDIT)
                     }
-                    TextButton(
+                    IconButton(
                         onClick = { delete = "note" to note.id },
                         enabled = !busy,
                         modifier = Modifier.recordAction(deleteDescription),
                     ) {
-                        Text(stringResource(R.string.delete_record))
+                        TrackerUtilityIcon(UtilityIcon.DELETE)
                     }
                 }
             }
@@ -219,6 +225,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
         }
         item {
             Button(
+                shape = androidx.compose.material3.MaterialTheme.shapes.small,
                 onClick = {
                     val existing = snapshot.notes.firstOrNull { it.id == noteId }
                     model.saveNote(
@@ -277,7 +284,19 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                     if (appointment.completed) R.string.appointment_completed_state
                     else R.string.appointment_upcoming_state
                 )
-            ElevatedCard(Modifier.fillMaxWidth()) {
+            OutlinedCard(
+                Modifier.fillMaxWidth(),
+                colors =
+                    CardDefaults.outlinedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                border =
+                    androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant,
+                    ),
+                shape = MaterialTheme.shapes.small,
+            ) {
                 Column(Modifier.padding(12.dp)) {
                     Text(appointment.title, style = MaterialTheme.typography.titleMedium)
                     Text(
@@ -290,7 +309,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                             )
                     )
                     if (appointment.note.isNotBlank()) Text(appointment.note)
-                    TextButton(
+                    IconButton(
                         onClick = {
                             appointmentId = appointment.id
                             title = appointment.title
@@ -310,7 +329,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                         },
                         modifier = Modifier.recordAction(editDescription),
                     ) {
-                        Text(stringResource(R.string.edit_record))
+                        TrackerUtilityIcon(UtilityIcon.EDIT)
                     }
                     TextButton(
                         onClick = {
@@ -331,12 +350,12 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                             )
                         )
                     }
-                    TextButton(
+                    IconButton(
                         onClick = { delete = "appointment" to appointment.id },
                         modifier = Modifier.recordAction(deleteDescription),
                         enabled = !busy,
                     ) {
-                        Text(stringResource(R.string.delete_record))
+                        TrackerUtilityIcon(UtilityIcon.DELETE)
                     }
                 }
             }
@@ -408,6 +427,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             item { FormFeedback(R.string.appointment_form_invalid) }
         item {
             Button(
+                shape = androidx.compose.material3.MaterialTheme.shapes.small,
                 onClick = {
                     val existing = snapshot.appointments.firstOrNull { it.id == appointmentId }
                     model.saveAppointment(
@@ -506,6 +526,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             item { FormFeedback(R.string.correction_form_invalid) }
         item {
             Button(
+                shape = androidx.compose.material3.MaterialTheme.shapes.small,
                 onClick = { correctionConfirm = true },
                 enabled =
                     !busy &&

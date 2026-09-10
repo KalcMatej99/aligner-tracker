@@ -1,6 +1,16 @@
 # Release preparation and artifact verification
 
-Current private phone update (issue #32): versionCode **3**, `1.0.0-dev`, source
+Current private phone update: **versionCode 5**, published with explicit owner authorization
+on 2026-09-10. [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_5.apk).
+Source tag `neutral-phone-candidate-5-final`, commit `5e5ba6d3c5109513a2eb0a5670ada5b376186aac`.
+APK SHA256 `d8c4574c89d648f829ee12af69c744fdabde235c5c55f70248dc9307478844ac`.
+Live HTTPS APK and signed indexes match the verified private snapshot. Versions 2–4
+remain advertised and downloadable. App/repository signing identities are unchanged.
+Encrypted store backup was refreshed, read back and used to sign/verify in isolation.
+No physical phone was installed onto. Owner aesthetic/device acceptance remains open.
+[Publication evidence](evidence/neutral/store-live-verification.json).
+
+Previous private phone update (issue #32): versionCode **3**, `1.0.0-dev`, source
 `91536654d68d3afb05e003d7f045f81422f9376a`, tag `pilot-phone-quick-start-3`.
 [Download](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_3.apk).
 APK SHA256 `4c013f25d66408c97d1e26522f3c8338a168cd086cb6a7623312a88b355549c8`;
@@ -137,3 +147,36 @@ The phone and watch now build against the Apache-2.0 microG Wear client, with no
 F-Droid acceptance is unconfirmed. Its [inclusion policy](https://f-droid.org/en/docs/Inclusion_Policy/) requires freely licensed dependencies and an accepted source/build process; its [anti-feature definitions](https://f-droid.org/en/docs/Anti-Features/#Non-Free-Dependencies) distinguish dependencies on separately installed non-free software. A future submission must disclose the optional phone integration and the watch runtime requirement for maintainer assessment, including any applicable anti-feature labels. The earlier definite rejection claim based on embedded proprietary AARs no longer describes this build. No F-Droid build, submission or maintainer approval has occurred.
 
 A distribution bundle must include the signed APKs, SHA-256 manifest, signer fingerprint, exact tagged corresponding source, build instructions, GPL-3.0 text, third-party license inventory and required notices. Publication, store/developer accounts, signing and key custody all require separate explicit authorization. Passing local builds or emulator tests does not make the release ready while the physical and pilot gates in [external acceptance](external-acceptance.md) remain open.
+
+## Historical redesign candidate 4
+
+The redesign is prepared on `design/calm-tracking`, source tag
+`design-phone-candidate-4-final` (`506e52d`). Version4 retains the permanent signer;
+actual signed3→4 emulator upgrade preserves all tables and reminder datastore.
+See [redesign validation](validation-redesign.md) for screenshots, tests, hashes and
+candidate location. The owner subsequently authorized version4 publication; it is the served update
+as reverified on2026-09-10. Owner/device gates remain open.
+
+
+## Neutral redesign version 5 (published)
+
+Source tag: `neutral-phone-candidate-5-final`
+(`5e5ba6d3c5109513a2eb0a5670ada5b376186aac`). Phone and watch use versionCode 5,
+above the served version 4 reverified on 2026-09-10, with the unchanged owner signer.
+The tested local bundle is
+`/home/matejkalc/.local/share/aligner-tracker/releases/neutral-candidate-5/`.
+See [neutral validation](validation-neutral.md) for checksums, exact same-signer
+4→5 data comparison, restore evidence and remaining owner/device gates.
+
+For an owner-authorized installation, the phone APK is `aligner-tracker-phone.apk`
+in that directory. `adb -s PHONE_SERIAL install -r /path/to/aligner-tracker-phone.apk`
+performs an upgrade; select the intended device explicitly. No physical-phone
+installation or store publication was performed. Previous publication authorization
+is not authorization to publish this candidate. Do not use the superseded initial
+`neutral-phone-candidate-5` tag; the final tag above includes the accessibility
+regression assertion correction.
+
+The owner subsequently requested “Deploy latest version”; version 5 was published
+to the existing Tailscale-only phone store on 2026-09-10. The earlier candidate-only
+statements record preparation status before that authorization. Wear remains a local
+companion artifact and was not added to the phone catalogue.

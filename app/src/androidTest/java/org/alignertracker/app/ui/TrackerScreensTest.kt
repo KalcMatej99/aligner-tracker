@@ -4,10 +4,10 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performTextReplacement
 import java.time.Instant
 import org.alignertracker.app.domain.TrackerSnapshot
 import org.alignertracker.app.domain.TreatmentPlan
@@ -18,6 +18,16 @@ import org.junit.Test
 
 class TrackerScreensTest {
     @get:Rule val compose = createComposeRule()
+
+    @org.junit.Before
+    fun resetSyntheticPresentationPreferences() {
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+            .targetContext
+            .getSharedPreferences("presentation", android.content.Context.MODE_PRIVATE)
+            .edit()
+            .clear()
+            .commit()
+    }
 
     @Test
     fun quickStartRequiresExplicitStateAndNoTypedFields() {
@@ -99,7 +109,7 @@ class TrackerScreensTest {
         compose.setContent {
             AlignerTheme { TodayScreen(partial, Instant.parse("2026-09-08T12:00:00Z"), false, {}) }
         }
-        compose.onNodeWithText("Tray not recorded").assertExists()
+        compose.onNodeWithText("Tray 1", substring = true).assertDoesNotExist()
         compose.onNodeWithText("Prescribed goal not set").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Add your treatment details").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Not now").performScrollTo().performClick()
@@ -117,7 +127,7 @@ class TrackerScreensTest {
                 }
             }
         }
-        compose.onNodeWithText("Put aligners in").performScrollTo().performClick()
+        compose.onNodeWithText("Put aligners in").performClick()
         compose.runOnIdle { assertEquals(true, nextState) }
         compose.onNodeWithText("Untracked elapsed time").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("9 hours, 0 minutes").assertIsDisplayed()
@@ -172,21 +182,21 @@ class TrackerScreensTest {
     }
 
     @Test
-    fun historyRejectsAnExtremeDateWithoutCalculatingIt() {
+    fun historyDatePickerCancelKeepsSelectedDay() {
         compose.setContent {
             AlignerTheme {
                 HistoryScreen(example(), Instant.parse("2026-09-08T12:00:00Z"), false, {})
             }
         }
-        compose
-            .onNodeWithText("Date (YYYY-MM-DD)")
-            .performScrollTo()
-            .performTextReplacement("-999999999-01-01")
-        compose.onNodeWithText("Go to date").performScrollTo().performClick()
-        compose
-            .onNodeWithText("Enter a valid date from 1970-01-01 through today.")
-            .performScrollTo()
-            .assertIsDisplayed()
+        compose.onNodeWithText("Date (YYYY-MM-DD)").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Previous day").performScrollTo().performClick()
+        compose.onNodeWithText("Sep 7, 2026").assertExists()
+        compose.onNodeWithText("Choose date").performClick()
+        val automation =
+            androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().uiAutomation
+        automation.executeShellCommand("input keyevent 4").close()
+        compose.waitForIdle()
+        compose.onNodeWithText("Sep 7, 2026").assertExists()
     }
 
     private fun example(): TrackerSnapshot {

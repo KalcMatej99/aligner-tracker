@@ -1,0 +1,21 @@
+{
+  "status": "unpublished private candidate; owner and device gates open",
+  "source_tag": "design-phone-candidate-4-final",
+  "source_commit": "506e52d5b3f6bca12a380f8c91701d6a513f2766",
+  "versionCode": 4,
+  "versionName": "1.0.0-dev",
+  "applicationId": "org.alignertracker.app",
+  "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9",
+  "sha256": {
+    "aligner-tracker-phone.apk": "b9dd73216cb615f24a472f9ea3c1f138f7ece9d711f7617ca86b11b51a6447b8",
+    "aligner-tracker-wear.apk": "f67d455fb5baba70b342a5303d36a733fbb3d1adac68c46825477f583ad050f0",
+    "source.tar.gz": "1d0da80177f8779a0237ee4e149ca311641a61f02b3a8e01c2265c1f99e0a2ec"
+  },
+  "publication_authorized": false,
+  "toolchain": {
+    "jdk": "21",
+    "sdk": "36",
+    "build_tools": "35.0.0"
+  },
+  "tests": "61 phone JVM, 9 watch JVM, 44 unique phone UI cases across full run and focused fixture recheck, 2 native accessibility, 4 watch, 1 connection stress regression"
+}

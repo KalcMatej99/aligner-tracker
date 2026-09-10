@@ -14,7 +14,7 @@
     <string name="edit_treatment_details">Edit treatment details</string>
     <string name="not_now">Not now</string>
     <string name="tray_date_unknown">Current tray start not recorded</string>
-    <string name="schedule_missing_details">A next-change estimate needs your current tray, prescribed interval and its start date. Add a total to enable tray advancement and whole-plan estimates.</string>
+    <string name="schedule_missing_details">Add your current tray, prescribed interval and tray start for a date estimate. A total also enables tray changes.</string>
     <string name="restore_partial_plan">%1$s · %2$s</string>
     <string name="optional_goal_hours">Prescribed daily hours (optional)</string>
     <string name="initial_target_help">A first goal starts when you save it. Earlier time has no target. Target comparisons begin with the next complete day.</string>

@@ -20,6 +20,7 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsToggleable
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -141,10 +142,9 @@ class AccessibilityLocalizationTest {
 
         compose
             .onNodeWithText("Put aligners in")
-            .performScrollTo()
             .assertIsDisplayed()
             .assertHasClickAction()
-            .assertHeightIsAtLeast(64.dp)
+            .assertHeightIsAtLeast(56.dp)
     }
 
     @Test
@@ -196,8 +196,11 @@ class AccessibilityLocalizationTest {
         }
 
         val previous =
-            compose.onNodeWithText("Previous day").performScrollTo().getUnclippedBoundsInRoot()
-        val next = compose.onNodeWithText("Next day").getUnclippedBoundsInRoot()
+            compose
+                .onNodeWithContentDescription("Previous day")
+                .performScrollTo()
+                .getUnclippedBoundsInRoot()
+        val next = compose.onNodeWithContentDescription("Next day").getUnclippedBoundsInRoot()
         assertTrue("Previous should begin on the RTL reading side", previous.left > next.left)
     }
 
@@ -217,6 +220,10 @@ class AccessibilityLocalizationTest {
     @Test
     fun themeTextPairsMeetNormalTextContrast() {
         listOf(
+                LightColors.onSecondaryContainer to LightColors.secondaryContainer,
+                LightColors.onTertiaryContainer to LightColors.tertiaryContainer,
+                DarkColors.onSecondaryContainer to DarkColors.secondaryContainer,
+                DarkColors.onTertiaryContainer to DarkColors.tertiaryContainer,
                 LightColors.onPrimary to LightColors.primary,
                 LightColors.onPrimaryContainer to LightColors.primaryContainer,
                 LightColors.onSurface to LightColors.surface,

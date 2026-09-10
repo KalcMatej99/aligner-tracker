@@ -1,0 +1,16 @@
+<resources>
+    <string name="current_wear_session">This wear session</string>
+    <string name="current_break_session">This break</string>
+    <string name="correct_missed_transition">Forgot a switch? Correct it</string>
+    <string name="report_range">%1$s – %2$s</string>
+    <string name="report_coverage_count">%1$d of %2$d days have recorded time</string>
+    <string name="report_recorded_total">Recorded in this range</string>
+    <string name="report_reading_help">How to read this report</string>
+    <string name="report_no_record">No recorded time. Wear is unknown.</string>
+    <string name="report_wear_out">%1$s worn · %2$s out</string>
+    <string name="report_tracked_duration">%1$s tracked</string>
+    <string name="report_goal_duration">Prescribed target: %1$s</string>
+    <string name="report_out_tracked">%1$s out · %2$s tracked</string>
+    <string name="report_goal_unknown">Prescribed target unavailable for this day</string>
+    <string name="watch_information">Wear OS companion</string>
+</resources>

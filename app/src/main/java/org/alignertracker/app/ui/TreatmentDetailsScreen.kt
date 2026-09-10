@@ -1,8 +1,6 @@
 package org.alignertracker.app.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -10,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import org.alignertracker.app.R
 import org.alignertracker.app.domain.*
 
@@ -53,15 +50,8 @@ fun TreatmentDetailsScreen(
                     .also { require(it.isNotEmpty()) }
             }
             .getOrNull()
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(
-            stringResource(R.string.treatment_details),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.semantics { heading() },
-        )
+    ScreenColumn {
+        Heading(R.string.treatment_details)
         TextButton(onClick = onDone, enabled = !busy) { Text(stringResource(R.string.not_now)) }
         OptionalTreatmentForm(snapshot, model, busy)
         Text(stringResource(R.string.schedule_instructions))
@@ -84,6 +74,7 @@ fun TreatmentDetailsScreen(
                 label = { Text(stringResource(R.string.adjustment_reason)) },
             )
             Button(
+                shape = androidx.compose.material3.MaterialTheme.shapes.small,
                 onClick = { confirm = "schedule" },
                 enabled = !busy && parsed != null,
                 modifier = Modifier.fillMaxWidth(),
@@ -146,6 +137,7 @@ fun TreatmentDetailsScreen(
         if (phaseName.isBlank() || count.toIntOrNull() !in 1..1000 || days.toIntOrNull() !in 1..365)
             FormFeedback(R.string.phase_form_invalid)
         Button(
+            shape = androidx.compose.material3.MaterialTheme.shapes.small,
             onClick = { confirm = "phase" },
             enabled =
                 !busy &&

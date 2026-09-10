@@ -1,6 +1,7 @@
 package org.alignertracker.app.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -10,12 +11,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -26,10 +28,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.isTraversalGroup
@@ -70,8 +75,11 @@ internal fun ScreenColumn(content: @Composable ColumnScope.() -> Unit) {
     )
 }
 
+internal val LocalScreenHeadingVisible = androidx.compose.runtime.staticCompositionLocalOf { true }
+
 @Composable
 internal fun Heading(@StringRes title: Int) {
+    if (!LocalScreenHeadingVisible.current) return
     Text(
         stringResource(title),
         style = MaterialTheme.typography.headlineMedium,
@@ -81,19 +89,13 @@ internal fun Heading(@StringRes title: Int) {
 
 @Composable
 internal fun Section(@StringRes title: Int, content: @Composable ColumnScope.() -> Unit) {
-    Card(
-        Modifier.fillMaxWidth(),
-        colors =
-            CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-    ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Text(
-                stringResource(title),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() },
-            )
-            content()
-        }
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            stringResource(title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.semantics { heading() },
+        )
+        content()
     }
 }
 
@@ -106,12 +108,13 @@ internal fun Entry(
     error: Boolean = false,
     @StringRes errorMessage: Int? = null,
     enabled: Boolean = true,
+    modifier: Modifier = Modifier,
 ) {
     val message = errorMessage?.let { stringResource(it) }
     TrackerTextField(
         value,
         onChange,
-        Modifier.fillMaxWidth().semantics { if (error && message != null) this.error(message) },
+        modifier.fillMaxWidth().semantics { if (error && message != null) this.error(message) },
         label = { Text(stringResource(label)) },
         supportingText = message?.let { { Text(it) } },
         singleLine = true,
@@ -242,29 +245,78 @@ fun OnboardingScreen(busy: Boolean, onStart: (Boolean, String) -> Unit, onImport
         Heading(R.string.quick_start_title)
         Text(stringResource(R.string.quick_start_body))
         Section(R.string.setup_state) {
-            for (state in listOf(true, false)) FilterChip(
-                selected = wearing == state,
-                onClick = { wearing = state },
-                enabled = !busy,
-                label = {
-                    Text(stringResource(if (state) R.string.state_in else R.string.state_out))
-                },
+            Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (state in listOf(true, false)) {
+                    val selected = wearing == state
+                    Surface(
+                        color =
+                            if (selected) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surface,
+                        shape = MaterialTheme.shapes.small,
+                        border =
+                            androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                if (selected) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.outlineVariant,
+                            ),
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth()
+                                .selectable(
+                                    selected,
+                                    enabled = !busy,
+                                    role = Role.RadioButton,
+                                    onClick = { wearing = state },
+                                )
+                                .heightIn(min = 64.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            RadioButton(selected = selected, onClick = null, enabled = !busy)
+                            Text(
+                                stringResource(
+                                    if (state) R.string.state_in else R.string.state_out
+                                ),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        }
+                    }
+                }
+            }
+            if (wearing == null)
+                Text(
+                    stringResource(R.string.choose_tracking_state),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            Text(
+                stringResource(R.string.setup_coverage),
+                style = MaterialTheme.typography.bodyMedium,
             )
-            if (wearing == null) Text(stringResource(R.string.choose_tracking_state))
-            Text(stringResource(R.string.setup_coverage))
             Button(
                 onClick = { wearing?.let { onStart(it, zone) } },
                 enabled = !busy && wearing != null,
+                shape = MaterialTheme.shapes.small,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
             ) {
                 Text(stringResource(if (busy) R.string.saving else R.string.setup_start))
             }
         }
-        Text(stringResource(R.string.zone_value, readableZone(zone)))
+        HorizontalDivider()
+        Text(
+            stringResource(R.string.zone_value, readableZone(zone)),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         TextButton(onClick = { chooseZone = true }, enabled = !busy) {
             Text(stringResource(R.string.change_accounting_zone))
         }
-        OutlinedButton(onClick = onImport, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            shape = MaterialTheme.shapes.small,
+            onClick = onImport,
+            enabled = !busy,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+        ) {
             Text(stringResource(R.string.setup_import))
         }
     }
@@ -325,12 +377,79 @@ internal fun Totals(
             )
             .toMillis()
             .coerceAtLeast(0)
-    Metric(R.string.worn, durationLabel(summary.wornMillis))
-    Metric(R.string.removed, durationLabel(summary.removedMillis))
-    Metric(R.string.covered, durationLabel(summary.trackedMillis))
-    Metric(R.string.untracked, durationLabel((elapsed - summary.trackedMillis).coerceAtLeast(0)))
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        SummaryRow(R.string.worn, durationLabel(summary.wornMillis), prominent = true)
+        SummaryRow(R.string.removed, durationLabel(summary.removedMillis))
+        HorizontalDivider(Modifier.padding(vertical = 2.dp))
+        SummaryRow(R.string.covered, durationLabel(summary.trackedMillis))
+        SummaryRow(
+            R.string.untracked,
+            durationLabel((elapsed - summary.trackedMillis).coerceAtLeast(0)),
+        )
+    }
     if (showCurrentNote)
         Text(stringResource(R.string.coverage_note), style = MaterialTheme.typography.bodySmall)
+}
+
+/** Compact facts retain complete units and stack when scaled text needs more room. */
+@Composable
+internal fun SummaryRow(@StringRes label: Int, value: String, prominent: Boolean = false) {
+    BoxWithConstraints(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}) {
+        val valueStyle =
+            if (prominent) MaterialTheme.typography.titleMedium
+            else MaterialTheme.typography.bodyMedium
+        if (maxWidth / LocalDensity.current.fontScale < 280.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    stringResource(label),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(value, style = valueStyle)
+            }
+        } else {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringResource(label),
+                    Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    value,
+                    Modifier.weight(1.15f),
+                    style = valueStyle,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun MetricPair(
+    @StringRes first: Int,
+    firstValue: String,
+    @StringRes second: Int,
+    secondValue: String,
+) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        if (maxWidth / LocalDensity.current.fontScale < 280.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Metric(first, firstValue)
+                Metric(second, secondValue)
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(Modifier.weight(1f)) { Metric(first, firstValue) }
+                Column(Modifier.weight(1f)) { Metric(second, secondValue) }
+            }
+        }
+    }
 }
 
 @Composable
@@ -351,7 +470,7 @@ fun TodayScreen(
     now: Instant,
     busy: Boolean,
     onToggle: (Boolean) -> Unit,
-) = TodayScreen(snapshot, now, busy, {}, onToggle)
+) = TodayScreen(snapshot, now, busy, {}, onToggle, {})
 
 @Composable
 fun TodayScreen(
@@ -360,89 +479,166 @@ fun TodayScreen(
     busy: Boolean,
     onDetails: () -> Unit,
     onToggle: (Boolean) -> Unit,
+    onCorrect: () -> Unit = {},
 ) {
     val plan = snapshot.plan ?: return
     val zone = ZoneId.of(plan.zoneId)
     val wearing = WearMath.isWearing(snapshot)
     val currentState = stringResource(if (wearing) R.string.state_in else R.string.state_out)
     val summary = WearMath.summarize(snapshot, now.atZone(zone).toLocalDate(), now)
-    var detailsDismissed by rememberSaveable(plan.trackingStartedAt) { mutableStateOf(false) }
-    ScreenColumn {
-        Heading(R.string.wear_heading)
-        Text(trayLabel(plan), style = MaterialTheme.typography.titleMedium)
-        Section(
-            if (plan.completed) R.string.completed_title
-            else if (wearing) R.string.state_in else R.string.state_out
-        ) {
-            if (plan.completed) Text(stringResource(R.string.completed_body))
-            else {
-                snapshot.events.lastOrNull()?.let { event ->
-                    Text(
-                        if (snapshot.trackingGaps.any { it.endAt > event.at })
-                            stringResource(R.string.clock_duration_uncertain)
-                        else
+    val uiPreferences =
+        androidx.compose.ui.platform.LocalContext.current.getSharedPreferences(
+            "presentation",
+            android.content.Context.MODE_PRIVATE,
+        )
+    var detailsDismissed by
+        rememberSaveable(plan.trackingStartedAt) {
+            mutableStateOf(
+                uiPreferences.getLong("detailsDismissedFor", -1L) == plan.trackingStartedAt
+            )
+        }
+    BoxWithConstraints(Modifier.widthIn(max = 680.dp).fillMaxSize()) {
+        val compact = maxHeight / LocalDensity.current.fontScale < 250.dp
+        Column(Modifier.fillMaxSize()) {
+            Column(
+                Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+            ) {
+                if (!compact)
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            readableDate(now.atZone(zone).toLocalDate()),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surface,
+                ) {
+                    Column(
+                        Modifier.padding(vertical = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
                             stringResource(
-                                R.string.current_duration,
-                                durationLabel(now.toEpochMilli() - event.at),
+                                if (plan.completed) R.string.completed_title
+                                else if (wearing) R.string.state_in else R.string.state_out
                             ),
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
+                            style = MaterialTheme.typography.headlineLarge,
+                            color =
+                                if (plan.completed) MaterialTheme.colorScheme.onSurface
+                                else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.semantics { heading() },
+                        )
+                        if (plan.completed) Text(stringResource(R.string.completed_body))
+                        else
+                            snapshot.events.lastOrNull()?.let { event ->
+                                Text(
+                                    stringResource(
+                                        if (wearing) R.string.current_wear_session
+                                        else R.string.current_break_session
+                                    ),
+                                    style = MaterialTheme.typography.labelLarge,
+                                )
+                                Text(
+                                    if (snapshot.trackingGaps.any { it.endAt > event.at })
+                                        stringResource(R.string.clock_duration_uncertain)
+                                    else durationLabel(now.toEpochMilli() - event.at),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                )
+                                Text(
+                                    stringResource(
+                                        R.string.state_since,
+                                        readableTime(event.at, zone),
+                                    ),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
+                    }
+                }
+                if (compact && !plan.completed)
+                    TextButton(onClick = onCorrect, enabled = !busy) {
+                        Text(stringResource(R.string.correct_missed_transition))
+                    }
+                HorizontalDivider()
+                Section(R.string.today_summary) {
+                    Totals(summary, now, zone, !plan.completed)
                     Text(
-                        stringResource(R.string.state_since, readableTime(event.at, zone)),
+                        summary.goalMinutes?.let {
+                            stringResource(R.string.goal_value, durationLabel(it * 60_000L))
+                        }
+                            ?: stringResource(
+                                if (plan.dailyGoalMinutes == null) R.string.goal_unknown
+                                else R.string.goal_comparison_unavailable
+                            ),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
-                Button(
-                    onClick = { onToggle(!wearing) },
-                    enabled = !busy,
-                    modifier =
-                        Modifier.fillMaxWidth().heightIn(min = 64.dp).semantics {
-                            stateDescription = currentState
-                            liveRegion = LiveRegionMode.Polite
-                        },
+                if (plan.currentTray != null)
+                    Text(trayLabel(plan), style = MaterialTheme.typography.titleMedium)
+                if (
+                    !detailsDismissed &&
+                        !plan.completed &&
+                        (plan.dailyGoalMinutes == null || !plan.hasSchedule)
                 ) {
-                    Text(
-                        stringResource(
-                            if (busy) R.string.saving
-                            else if (wearing) R.string.take_out else R.string.put_in
+                    HorizontalDivider()
+                    Section(R.string.optional_details_invitation) {
+                        Text(
+                            stringResource(R.string.optional_details_help),
+                            style = MaterialTheme.typography.bodyMedium,
                         )
-                    )
+                        TextButton(onClick = onDetails) {
+                            Text(stringResource(R.string.add_treatment_details))
+                        }
+                        TextButton(
+                            onClick = {
+                                detailsDismissed = true
+                                uiPreferences
+                                    .edit()
+                                    .putLong("detailsDismissedFor", plan.trackingStartedAt)
+                                    .apply()
+                            }
+                        ) {
+                            Text(stringResource(R.string.not_now))
+                        }
+                    }
                 }
+                Text(
+                    stringResource(R.string.zone_value, readableZone(plan.zoneId)),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
-        }
-        Section(R.string.today_summary) {
-            Totals(summary, now, zone, !plan.completed)
-            HorizontalDivider()
-            Text(
-                summary.goalMinutes?.let {
-                    stringResource(R.string.goal_value, durationLabel(it * 60_000L))
+            if (!plan.completed)
+                Surface(color = MaterialTheme.colorScheme.surface) {
+                    Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
+                        Button(
+                            shape = MaterialTheme.shapes.small,
+                            onClick = { onToggle(!wearing) },
+                            enabled = !busy,
+                            modifier =
+                                Modifier.fillMaxWidth().heightIn(min = 56.dp).semantics {
+                                    stateDescription = currentState
+                                    liveRegion = LiveRegionMode.Polite
+                                },
+                        ) {
+                            Text(
+                                stringResource(
+                                    if (busy) R.string.saving
+                                    else if (wearing) R.string.take_out else R.string.put_in
+                                )
+                            )
+                        }
+                        if (!compact)
+                            TextButton(
+                                onClick = onCorrect,
+                                enabled = !busy,
+                                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                            ) {
+                                Text(stringResource(R.string.correct_missed_transition))
+                            }
+                    }
                 }
-                    ?: stringResource(
-                        if (plan.dailyGoalMinutes == null) R.string.goal_unknown
-                        else R.string.goal_comparison_unavailable
-                    )
-            )
         }
-        if (
-            !detailsDismissed &&
-                !plan.completed &&
-                (plan.dailyGoalMinutes == null || !plan.hasSchedule)
-        ) {
-            Section(R.string.optional_details_invitation) {
-                Text(stringResource(R.string.optional_details_help))
-                TextButton(onClick = onDetails) {
-                    Text(stringResource(R.string.add_treatment_details))
-                }
-                TextButton(onClick = { detailsDismissed = true }) {
-                    Text(stringResource(R.string.not_now))
-                }
-            }
-        }
-        Text(stringResource(R.string.edit_hint))
-        Text(
-            stringResource(R.string.zone_value, readableZone(plan.zoneId)),
-            style = MaterialTheme.typography.bodySmall,
-        )
     }
 }
 
@@ -458,7 +654,7 @@ fun ScheduleScreen(
     val due = WearMath.nextChangeDate(snapshot)
     ScreenColumn {
         Heading(R.string.plan_heading)
-        Section(R.string.schedule) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(trayLabel(plan), style = MaterialTheme.typography.headlineSmall)
             Text(
                 plan.currentTrayStartedOn?.let {
@@ -470,13 +666,19 @@ fun ScheduleScreen(
                 Text(
                     due?.let { stringResource(R.string.next_change, readableDate(it)) }
                         ?: stringResource(R.string.schedule_missing_details),
-                    style = MaterialTheme.typography.titleMedium,
+                    style =
+                        if (due != null) MaterialTheme.typography.titleLarge
+                        else MaterialTheme.typography.bodyLarge,
                 )
-                Text(stringResource(R.string.schedule_note))
+                Text(
+                    stringResource(R.string.schedule_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
                 if (plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
                     Button(
                         onClick = onAdvance,
                         enabled = !busy,
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
                     ) {
                         Text(stringResource(R.string.advance_tray))
@@ -485,6 +687,7 @@ fun ScheduleScreen(
                     Button(
                         onClick = onComplete,
                         enabled = !busy,
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
                     ) {
                         Text(stringResource(R.string.complete_action))
@@ -498,7 +701,12 @@ fun ScheduleScreen(
         if (!plan.completed && plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
             Section(R.string.future_schedule) {
                 WearMath.futureTrayStarts(snapshot).forEach { (tray, startDate) ->
-                    Text(stringResource(R.string.future_tray, tray, readableDate(startDate)))
+                    Text(
+                        stringResource(R.string.future_tray, tray, readableDate(startDate)),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 8.dp),
+                    )
+                    HorizontalDivider()
                 }
                 if (plan.totalTrays!! > plan.currentTray!! + 12)
                     Text(stringResource(R.string.future_more))
@@ -516,57 +724,77 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
     val zone = ZoneId.of(plan.zoneId)
     val today = now.atZone(zone).toLocalDate()
     var selected by rememberSaveable(plan.trackingStartedAt) { mutableStateOf(today.toString()) }
-    var draft by rememberSaveable(plan.trackingStartedAt) { mutableStateOf(today.toString()) }
-    var dateError by rememberSaveable { mutableStateOf(false) }
+    var dateEntry by rememberSaveable { mutableStateOf(false) }
+    var dateDraft by rememberSaveable { mutableStateOf("") }
+    var dateInvalid by rememberSaveable { mutableStateOf(false) }
+    val compactDate =
+        LocalConfiguration.current.screenWidthDp / LocalDensity.current.fontScale < 360
+    val dateContext = androidx.compose.ui.platform.LocalContext.current
     val date = LocalDate.parse(selected)
     val summary = WearMath.summarize(snapshot, date, now)
     val events =
         snapshot.events.filter { Instant.ofEpochMilli(it.at).atZone(zone).toLocalDate() == date }
     ScreenColumn {
         Heading(R.string.history_heading)
-        Section(R.string.history) {
-            Text(readableDate(date), style = MaterialTheme.typography.titleLarge)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                TextButton(
-                    modifier = Modifier.weight(1f),
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = { selected = date.minusDays(1).toString() },
                     enabled = date > LocalDate.of(1970, 1, 1),
-                    onClick = {
-                        selected = date.minusDays(1).toString()
-                        draft = selected
-                    },
                 ) {
-                    Text(stringResource(R.string.previous_day))
+                    TrackerChevron(
+                        forward = false,
+                        description = stringResource(R.string.previous_day),
+                    )
                 }
                 TextButton(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                     onClick = {
-                        selected = date.plusDays(1).toString()
-                        draft = selected
+                        if (compactDate) {
+                            dateDraft = selected
+                            dateInvalid = false
+                            dateEntry = true
+                        } else
+                            android.app
+                                .DatePickerDialog(
+                                    dateContext,
+                                    R.style.TrackerDatePicker,
+                                    { _, year, month, day ->
+                                        selected = LocalDate.of(year, month + 1, day).toString()
+                                    },
+                                    date.year,
+                                    date.monthValue - 1,
+                                    date.dayOfMonth,
+                                )
+                                .apply {
+                                    datePicker.maxDate =
+                                        today
+                                            .atStartOfDay(ZoneId.systemDefault())
+                                            .toInstant()
+                                            .toEpochMilli()
+                                    datePicker.minDate =
+                                        LocalDate.of(1970, 1, 1)
+                                            .atStartOfDay(ZoneId.systemDefault())
+                                            .toInstant()
+                                            .toEpochMilli()
+                                }
+                                .show()
                     },
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(readableDate(date), style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            stringResource(R.string.choose_date),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+                IconButton(
+                    onClick = { selected = date.plusDays(1).toString() },
                     enabled = date < today,
                 ) {
-                    Text(stringResource(R.string.next_day))
+                    TrackerChevron(forward = true, description = stringResource(R.string.next_day))
                 }
-            }
-            Entry(
-                draft,
-                {
-                    draft = it
-                    dateError = false
-                },
-                R.string.history_date,
-                error = dateError,
-                errorMessage = if (dateError) R.string.date_invalid else null,
-            )
-            OutlinedButton(
-                onClick = {
-                    val parsed = runCatching { LocalDate.parse(draft.trim()) }.getOrNull()
-                    dateError =
-                        parsed == null || parsed > today || parsed < LocalDate.of(1970, 1, 1)
-                    if (!dateError) selected = parsed.toString()
-                }
-            ) {
-                Text(stringResource(R.string.go_to_date))
             }
             if (summary.trackedMillis == 0L) Text(stringResource(R.string.no_tracking))
             Totals(summary, now, zone, date == today && !plan.completed)
@@ -582,27 +810,52 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                         ),
                         readableTime(event.at, zone),
                     )
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        stringResource(
-                            if (event.wearing) R.string.state_in else R.string.state_out
-                        ),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Text(readableTime(event.at, zone))
-                    if (event.id == snapshot.events.firstOrNull()?.id)
-                        Text(
-                            stringResource(R.string.initial_event),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    else if (!plan.completed)
-                        OutlinedButton(
-                            onClick = { onEdit(event.id) },
-                            enabled = !busy,
-                            modifier = Modifier.heightIn(min = 48.dp).recordAction(editDescription),
-                        ) {
-                            Text(stringResource(R.string.edit_time))
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                    val details: @Composable () -> Unit = {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                stringResource(
+                                    if (event.wearing) R.string.state_in else R.string.state_out
+                                ),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Text(readableTime(event.at, zone))
                         }
+                    }
+                    val action: @Composable () -> Unit = {
+                        if (event.id == snapshot.events.firstOrNull()?.id)
+                            Text(
+                                stringResource(R.string.initial_event),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        else if (!plan.completed)
+                            IconButton(
+                                onClick = { onEdit(event.id) },
+                                enabled = !busy,
+                                modifier =
+                                    Modifier.heightIn(min = 48.dp).recordAction(editDescription),
+                            ) {
+                                TrackerUtilityIcon(UtilityIcon.EDIT)
+                            }
+                    }
+                    if (
+                        maxWidth / LocalDensity.current.fontScale < 320.dp ||
+                            event.id == snapshot.events.firstOrNull()?.id
+                    ) {
+                        Column {
+                            details()
+                            action()
+                        }
+                    } else {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(Modifier.weight(1f)) { details() }
+                            action()
+                        }
+                    }
                 }
                 HorizontalDivider()
             }
@@ -612,6 +865,48 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
             style = MaterialTheme.typography.bodySmall,
         )
     }
+    if (dateEntry)
+        TrackerDialog(
+            onDismissRequest = { dateEntry = false },
+            title = { Text(stringResource(R.string.choose_date)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Entry(
+                        dateDraft,
+                        {
+                            dateDraft = it
+                            dateInvalid = false
+                        },
+                        R.string.history_date,
+                        error = dateInvalid,
+                        errorMessage = if (dateInvalid) R.string.date_invalid else null,
+                    )
+                    val preview = runCatching { LocalDate.parse(dateDraft.trim()) }.getOrNull()
+                    if (preview != null && preview >= LocalDate.of(1970, 1, 1) && preview <= today)
+                        Text(readableDate(preview))
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val parsed = runCatching { LocalDate.parse(dateDraft.trim()) }.getOrNull()
+                        dateInvalid =
+                            parsed == null || parsed < LocalDate.of(1970, 1, 1) || parsed > today
+                        if (!dateInvalid) {
+                            selected = parsed.toString()
+                            dateEntry = false
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.go_to_date))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { dateEntry = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
 }
 
 @Composable

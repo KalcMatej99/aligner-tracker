@@ -29,16 +29,18 @@ not claim a physical-device or human usability audit.
 
 ## Contrast audit
 
+Candidate5: [neutral redesign](neutral-redesign.md), [calculated pairs](evidence/neutral/contrast.json).
 The fixed light and dark palettes specify foreground colors explicitly. Relative-luminance checks
 for every normal-text pair used by these screens meet the 4.5:1 WCAG threshold:
 
 | Pair | Light | Dark |
 |---|---:|---:|
-| Primary button text / primary | 6.49:1 | 7.75:1 |
-| Primary-container text / primary container | 13.37:1 | 7.30:1 |
-| Main text / surface | 15.73:1 | 13.52:1 |
-| Secondary text / low surface container | 8.65:1 | 9.72:1 |
-| Error text / low surface container | 5.99:1 | 9.74:1 |
+| Primary button text / primary | 6.25:1 | 7.69:1 |
+| Primary / surface | 6.25:1 | 10.75:1 |
+| Main text / surface | 16.32:1 | 15.31:1 |
+| Secondary text / low surface container | 6.09:1 | 9.22:1 |
+| Main text / dialog container | 13.78:1 | 11.08:1 |
+| Error text / low surface container | 5.92:1 | 9.83:1 |
 
 The calculation uses the WCAG sRGB relative-luminance formula. It covers theme colors in code; a
 device screenshot audit is still needed to detect display, OEM, or system rendering differences.

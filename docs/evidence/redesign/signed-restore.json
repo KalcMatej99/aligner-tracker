@@ -1,0 +1,83 @@
+{
+  "android_metadata": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "identical": true
+  },
+  "appointments": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "identical": true
+  },
+  "command_outcomes": {
+    "before_rows": 0,
+    "after_rows": 0,
+    "identical": true
+  },
+  "photo_metadata": {
+    "before_rows": 0,
+    "after_rows": 0,
+    "identical": true
+  },
+  "room_master_table": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "identical": true
+  },
+  "schedule_revisions": {
+    "before_rows": 2,
+    "after_rows": 2,
+    "identical": true
+  },
+  "sqlite_sequence": {
+    "before_rows": 9,
+    "after_rows": 9,
+    "identical": true
+  },
+  "target_history": {
+    "before_rows": 2,
+    "after_rows": 2,
+    "identical": true
+  },
+  "tracker_state": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "identical": false,
+    "explanation": "Restore creates a fresh generation and resets revision to reject stale widget/watch actions. Treatment records remain identical."
+  },
+  "tracking_gaps": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "identical": true
+  },
+  "tray_history": {
+    "before_rows": 2,
+    "after_rows": 2,
+    "identical": true
+  },
+  "tray_intervals": {
+    "before_rows": 3,
+    "after_rows": 3,
+    "identical": true
+  },
+  "treatment": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "identical": true
+  },
+  "treatment_notes": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "identical": true
+  },
+  "treatment_phases": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "identical": true
+  },
+  "wear_events": {
+    "before_rows": 13,
+    "after_rows": 13,
+    "identical": true
+  }
+}
