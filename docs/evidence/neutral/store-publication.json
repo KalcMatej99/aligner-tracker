@@ -1,0 +1,10 @@
+{
+  "status": "published",
+  "fingerprint": "7F72BE14125ABE9A79D5B291956D5BAA30E79E0BA8ED34441485D07C5B21BD32",
+  "releases": 4,
+  "retained_releases": 4,
+  "withdrawals": 0,
+  "index_v2_sha256": "596d0a062a1993931413cb4718302b84848916cae7cb9d7f835d158173c7eab6",
+  "timestamp": 1789038919000,
+  "snapshot": "/home/matejkalc/projects/kalc-app-store/work/private-hosting/snapshots/1789038922497247932-5ae0d796ee65"
+}

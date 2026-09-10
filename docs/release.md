@@ -1,13 +1,14 @@
 # Release preparation and artifact verification
 
-Current private phone update: **versionCode 4**, published with owner authorization
-on 2026-09-10. [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_4.apk).
-Source tag `design-phone-candidate-4-final`, commit `506e52d5b3f6bca12a380f8c91701d6a513f2766`.
-APK SHA256 `b9dd73216cb615f24a472f9ea3c1f138f7ece9d711f7617ca86b11b51a6447b8`.
-Live HTTPS APK and signed indexes match the verified private snapshot. Existing
-app/repository identities and older downloads are preserved. Updated encrypted
-store backup was read back and used to sign/verify in isolation. Owner/device
-acceptance remains open; publication does not claim physical acceptance.
+Current private phone update: **versionCode 5**, published with explicit owner authorization
+on 2026-09-10. [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_5.apk).
+Source tag `neutral-phone-candidate-5-final`, commit `5e5ba6d3c5109513a2eb0a5670ada5b376186aac`.
+APK SHA256 `d8c4574c89d648f829ee12af69c744fdabde235c5c55f70248dc9307478844ac`.
+Live HTTPS APK and signed indexes match the verified private snapshot. Versions 2–4
+remain advertised and downloadable. App/repository signing identities are unchanged.
+Encrypted store backup was refreshed, read back and used to sign/verify in isolation.
+No physical phone was installed onto. Owner aesthetic/device acceptance remains open.
+[Publication evidence](evidence/neutral/store-live-verification.json).
 
 Previous private phone update (issue #32): versionCode **3**, `1.0.0-dev`, source
 `91536654d68d3afb05e003d7f045f81422f9376a`, tag `pilot-phone-quick-start-3`.
@@ -157,7 +158,7 @@ candidate location. The owner subsequently authorized version4 publication; it i
 as reverified on2026-09-10. Owner/device gates remain open.
 
 
-## Neutral redesign candidate 5 (unpublished)
+## Neutral redesign version 5 (published)
 
 Source tag: `neutral-phone-candidate-5-final`
 (`5e5ba6d3c5109513a2eb0a5670ada5b376186aac`). Phone and watch use versionCode 5,
@@ -174,3 +175,8 @@ installation or store publication was performed. Previous publication authorizat
 is not authorization to publish this candidate. Do not use the superseded initial
 `neutral-phone-candidate-5` tag; the final tag above includes the accessibility
 regression assertion correction.
+
+The owner subsequently requested “Deploy latest version”; version 5 was published
+to the existing Tailscale-only phone store on 2026-09-10. The earlier candidate-only
+statements record preparation status before that authorization. Wear remains a local
+companion artifact and was not added to the phone catalogue.

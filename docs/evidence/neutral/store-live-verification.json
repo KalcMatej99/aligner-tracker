@@ -1,0 +1,16 @@
+{
+  "live_versions": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "https_matches_verified_snapshot": true,
+  "sha256": {
+    "index-v2.json": "596d0a062a1993931413cb4718302b84848916cae7cb9d7f835d158173c7eab6",
+    "entry.jar": "49c206d2bf7bda14eb96a4ebb06f2efeda6e32d55eb963a9648a9b33de7d4b2a",
+    "index-v1.jar": "9605c4e920acb9684c367f0142fe9eafc1b8ff341ee7bd87ecc73eb8b62ebe81",
+    "org.alignertracker.app_5.apk": "d8c4574c89d648f829ee12af69c744fdabde235c5c55f70248dc9307478844ac",
+    "org.alignertracker.app_4.apk": "b9dd73216cb615f24a472f9ea3c1f138f7ece9d711f7617ca86b11b51a6447b8"
+  }
+}
