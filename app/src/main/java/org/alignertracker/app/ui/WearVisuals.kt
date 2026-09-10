@@ -155,3 +155,47 @@ internal fun TrayMilestone(label: String, date: String, estimated: Boolean) {
         }
     }
 }
+
+/**
+ * Today-only compact values; spoken description retains complete units and missing-target truth.
+ */
+@Composable
+internal fun TodayWearGoal(day: DaySummary) {
+    val recorded = day.trackedMillis > 0L
+    val worn =
+        if (recorded) todayDuration(day.wornMillis / 60_000L)
+        else stringResource(R.string.today_value_unknown)
+    val goal =
+        day.goalMinutes?.let { todayDuration(it.toLong()) }
+            ?: stringResource(R.string.today_value_unknown)
+    val description =
+        stringResource(
+            R.string.today_wear_goal_description,
+            if (recorded) durationLabel(day.wornMillis)
+            else stringResource(R.string.report_no_record),
+            day.goalMinutes?.let { durationLabel(it * 60_000L) }
+                ?: stringResource(R.string.report_goal_unknown),
+        )
+    Column(
+        Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = description },
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            stringResource(R.string.today_wear_goal_label),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+        Text(
+            stringResource(R.string.today_wear_goal_value, worn, goal),
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun todayDuration(minutes: Long): String =
+    if (minutes % 60L == 0L) stringResource(R.string.today_hours, minutes / 60L)
+    else stringResource(R.string.today_hours_minutes, minutes / 60L, minutes % 60L)

@@ -110,7 +110,13 @@ class TrackerScreensTest {
             AlignerTheme { TodayScreen(partial, Instant.parse("2026-09-08T12:00:00Z"), false, {}) }
         }
         compose.onNodeWithText("Tray 1", substring = true).assertDoesNotExist()
-        compose.onNodeWithText("Prescribed goal not set").performScrollTo().assertIsDisplayed()
+        compose
+            .onNodeWithContentDescription(
+                "Target: Prescribed target unavailable for this day",
+                substring = true,
+            )
+            .performScrollTo()
+            .assertIsDisplayed()
         compose.onNodeWithText("Add your treatment details").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Not now").performScrollTo().performClick()
         compose.onNodeWithText("Add your treatment details").assertDoesNotExist()

@@ -320,6 +320,7 @@ internal fun Totals(
     now: Instant,
     zone: ZoneId,
     showCurrentNote: Boolean = false,
+    wearGoalBelowBar: Boolean = false,
 ) {
     val date = LocalDate.parse(summary.date)
     val elapsed =
@@ -330,13 +331,16 @@ internal fun Totals(
             .toMillis()
             .coerceAtLeast(0)
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        SummaryRow(
-            R.string.worn,
-            if (summary.trackedMillis == 0L) stringResource(R.string.report_no_record)
-            else compactDuration(summary.wornMillis),
-            prominent = true,
-        )
+        if (!wearGoalBelowBar) {
+            SummaryRow(
+                R.string.worn,
+                if (summary.trackedMillis == 0L) stringResource(R.string.report_no_record)
+                else compactDuration(summary.wornMillis),
+                prominent = true,
+            )
+        }
         BreakdownBar(summary, now, zone)
+        if (wearGoalBelowBar) TodayWearGoal(summary)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
                 stringResource(R.string.removed) +
@@ -484,7 +488,8 @@ fun TodayScreen(
                     color = MaterialTheme.colorScheme.surface,
                 ) {
                     Column(
-                        Modifier.padding(vertical = 4.dp),
+                        Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         if (plan.completed || snapshot.events.isEmpty()) {
@@ -508,12 +513,14 @@ fun TodayScreen(
                                         else R.string.current_break_session
                                     ),
                                     style = MaterialTheme.typography.labelLarge,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 )
                                 Text(
                                     if (snapshot.trackingGaps.any { it.endAt > event.at })
                                         stringResource(R.string.clock_duration_uncertain)
                                     else durationLabel(now.toEpochMilli() - event.at),
-                                    style = MaterialTheme.typography.headlineMedium,
+                                    style = MaterialTheme.typography.displaySmall,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 )
                                 Text(
                                     stringResource(
@@ -521,6 +528,7 @@ fun TodayScreen(
                                         readableTime(event.at, zone),
                                     ),
                                     style = MaterialTheme.typography.bodyMedium,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 )
                             }
                     }
@@ -531,20 +539,8 @@ fun TodayScreen(
                     }
                 HorizontalDivider()
                 Section(R.string.today_summary) {
-                    Totals(summary, now, zone, !plan.completed)
-                    Text(
-                        summary.goalMinutes?.let {
-                            stringResource(R.string.goal_value, durationLabel(it * 60_000L))
-                        }
-                            ?: stringResource(
-                                if (plan.dailyGoalMinutes == null) R.string.goal_unknown
-                                else R.string.goal_comparison_unavailable
-                            ),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                    Totals(summary, now, zone, !plan.completed, wearGoalBelowBar = true)
                 }
-                if (plan.currentTray != null)
-                    Text(trayLabel(plan), style = MaterialTheme.typography.titleMedium)
                 if (
                     !detailsDismissed &&
                         !plan.completed &&
