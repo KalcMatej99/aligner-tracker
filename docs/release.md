@@ -1,6 +1,41 @@
 # Release preparation and artifact verification
 
-Current private phone update: **versionCode 8**, published with the owner's “Merge and deploy”
+Current private phone update: **versionCode 9**, published on 2026-09-10 after the
+owner preferred the updated Today screenshot and requested “Merge and deploy”.
+[PR #44](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/44) is merged.
+[Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_9.apk)
+while connected to Tailscale, or refresh Kalc Apps in F-Droid.
+
+Today centers a larger aligner illustration and session timer, places compact
+recorded wear / actual target below the bar, and removes the separate prescribed-time
+sentence and tray index. Source tag `phone-release-9` points to
+`0ec4b220e49d846aceec388d46b6cea315a457df`; merged main
+`073d9fa33afe3ac297088ff8970fe8b8fd175e41` has the same Git tree.
+Hosted [run 39](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/actions/runs/39)
+passed on the final candidate. Local release lint, formatting and both release builds
+passed; the preceding UI change passed 30 instrumentation tests and all repository
+checks (63 phone + 9 Wear JVM tests).
+
+Phone SHA256: `1ae78d68b8fa8f9f4c32af5319c657d6d3c6fb7349678f63d0e799c59b17013b`.
+The original app and repository signing identities are unchanged. Signed 8→9 API36
+emulator upgrade preserved every database table. No preference datastore was present
+before or after; this is not populated-reminder evidence.
+[Upgrade evidence](evidence/release9/upgrade-verification.json),
+[before](screenshots/release9/signed-before.png),
+[after](screenshots/release9/signed-after.png).
+
+Fresh HTTPS downloads matched every snapshot file, including the APK and signed
+indexes; non-Tailscale LAN access still returns403. The mobile store page lists9
+first with no overflow or page errors. Versions2–8 remain available. Wear9 is a local
+companion artifact, not a phone-store entry. No owner phone installation occurred.
+The owner's positive screenshot feedback is recorded; human comprehension, TalkBack
+speech and physical-device acceptance are not inferred from it.
+[Live verification](evidence/release9/store-live-verification.json),
+[browser evidence](evidence/release9/store-browser.json),
+[store capture](screenshots/release9/store-mobile.png),
+[release manifest](evidence/release9/release.json).
+
+Previous private phone update: **versionCode 8**, published with the owner's “Merge and deploy”
 authorization on 2026-09-10 after merging [PR #41](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/41).
 [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_8.apk) while connected to Tailscale,
 or refresh Kalc Apps in F-Droid. Original fitted/separated Today status illustrations
