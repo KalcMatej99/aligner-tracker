@@ -829,13 +829,13 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         else if (!plan.completed)
-                            TextButton(
+                            IconButton(
                                 onClick = { onEdit(event.id) },
                                 enabled = !busy,
                                 modifier =
                                     Modifier.heightIn(min = 48.dp).recordAction(editDescription),
                             ) {
-                                Text(stringResource(R.string.edit_time))
+                                TrackerUtilityIcon(UtilityIcon.EDIT)
                             }
                     }
                     if (

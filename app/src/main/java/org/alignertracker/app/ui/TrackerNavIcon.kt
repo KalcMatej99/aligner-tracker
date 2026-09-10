@@ -95,3 +95,55 @@ internal fun TrackerChevron(forward: Boolean, description: String) {
         drawLine(ink, Offset(tip * u, 12 * u), Offset(x * u, 18 * u), 1.8f * u, StrokeCap.Round)
     }
 }
+
+internal enum class UtilityIcon {
+    BACK,
+    EDIT,
+    DELETE,
+}
+
+/** Original utility vectors; the containing button supplies its accessible name. */
+@Composable
+internal fun TrackerUtilityIcon(icon: UtilityIcon) {
+    val ink = androidx.compose.material3.LocalContentColor.current
+    val rtl =
+        androidx.compose.ui.platform.LocalLayoutDirection.current ==
+            androidx.compose.ui.unit.LayoutDirection.Rtl
+    Canvas(Modifier.size(24.dp)) {
+        val u = size.width / 24f
+        fun line(x: Float, y: Float, xx: Float, yy: Float) =
+            drawLine(ink, Offset(x * u, y * u), Offset(xx * u, yy * u), 1.8f * u, StrokeCap.Round)
+        when (icon) {
+            UtilityIcon.BACK -> {
+                val tip = if (rtl) 19f else 5f
+                val tail = 24f - tip
+                val bend = 12f
+                line(tail, 12f, tip, 12f)
+                line(bend, 5f, tip, 12f)
+                line(tip, 12f, bend, 19f)
+            }
+            UtilityIcon.EDIT -> {
+                val path =
+                    androidx.compose.ui.graphics.Path().apply {
+                        moveTo(4 * u, 20 * u)
+                        lineTo(5 * u, 15 * u)
+                        lineTo(16 * u, 4 * u)
+                        lineTo(20 * u, 8 * u)
+                        lineTo(9 * u, 19 * u)
+                        close()
+                    }
+                drawPath(path, ink, style = Stroke(1.8f * u))
+                line(14f, 6f, 18f, 10f)
+            }
+            UtilityIcon.DELETE -> {
+                line(4f, 6f, 20f, 6f)
+                line(9f, 3f, 15f, 3f)
+                line(6f, 6f, 7f, 21f)
+                line(7f, 21f, 17f, 21f)
+                line(17f, 21f, 18f, 6f)
+                line(10f, 10f, 10f, 17f)
+                line(14f, 10f, 14f, 17f)
+            }
+        }
+    }
+}

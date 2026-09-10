@@ -196,21 +196,21 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             ) {
                 Column(Modifier.padding(12.dp)) {
                     Text(note.text)
-                    TextButton(
+                    IconButton(
                         onClick = {
                             noteId = note.id
                             noteText = note.text
                         },
                         modifier = Modifier.recordAction(editDescription),
                     ) {
-                        Text(stringResource(R.string.edit_record))
+                        TrackerUtilityIcon(UtilityIcon.EDIT)
                     }
-                    TextButton(
+                    IconButton(
                         onClick = { delete = "note" to note.id },
                         enabled = !busy,
                         modifier = Modifier.recordAction(deleteDescription),
                     ) {
-                        Text(stringResource(R.string.delete_record))
+                        TrackerUtilityIcon(UtilityIcon.DELETE)
                     }
                 }
             }
@@ -309,7 +309,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                             )
                     )
                     if (appointment.note.isNotBlank()) Text(appointment.note)
-                    TextButton(
+                    IconButton(
                         onClick = {
                             appointmentId = appointment.id
                             title = appointment.title
@@ -329,7 +329,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                         },
                         modifier = Modifier.recordAction(editDescription),
                     ) {
-                        Text(stringResource(R.string.edit_record))
+                        TrackerUtilityIcon(UtilityIcon.EDIT)
                     }
                     TextButton(
                         onClick = {
@@ -350,12 +350,12 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                             )
                         )
                     }
-                    TextButton(
+                    IconButton(
                         onClick = { delete = "appointment" to appointment.id },
                         modifier = Modifier.recordAction(deleteDescription),
                         enabled = !busy,
                     ) {
-                        Text(stringResource(R.string.delete_record))
+                        TrackerUtilityIcon(UtilityIcon.DELETE)
                     }
                 }
             }

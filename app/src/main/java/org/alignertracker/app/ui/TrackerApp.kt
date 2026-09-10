@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -789,7 +790,12 @@ fun AdaptiveTrackerTopBar(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (showBack)
-                            TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                            IconButton(
+                                onClick = onBack,
+                                modifier = Modifier.recordAction(stringResource(R.string.back)),
+                            ) {
+                                TrackerUtilityIcon(UtilityIcon.BACK)
+                            }
                         actions()
                     }
                 }
@@ -805,7 +811,12 @@ fun AdaptiveTrackerTopBar(
                 },
                 navigationIcon = {
                     if (showBack)
-                        TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                        IconButton(
+                            onClick = onBack,
+                            modifier = Modifier.recordAction(stringResource(R.string.back)),
+                        ) {
+                            TrackerUtilityIcon(UtilityIcon.BACK)
+                        }
                 },
                 actions = actions,
             )

@@ -1,0 +1,10 @@
+
+org.alignertracker.app.integration.DesignJourneyTest:......
+org.alignertracker.app.ui.AccessibilityLocalizationTest:.......
+org.alignertracker.app.ui.TalkBackSemanticsTest:.........
+
+Time: 37.676
+
+OK (22 tests)
+
+

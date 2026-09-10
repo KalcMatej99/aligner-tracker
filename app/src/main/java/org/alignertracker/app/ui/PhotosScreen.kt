@@ -200,12 +200,12 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
                         label = { Text(stringResource(R.string.photo_select)) },
                         modifier = Modifier.recordAction(selectDescription),
                     )
-                    TextButton(
+                    IconButton(
                         onClick = { deleteId = photo.id },
                         enabled = !busy,
                         modifier = Modifier.recordAction(deleteDescription),
                     ) {
-                        Text(stringResource(R.string.photo_delete))
+                        TrackerUtilityIcon(UtilityIcon.DELETE)
                     }
                 }
             }
