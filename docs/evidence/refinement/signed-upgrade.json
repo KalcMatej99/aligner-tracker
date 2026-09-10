@@ -25,5 +25,7 @@
   },
   "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9",
   "rendered_before_and_after": true,
-  "fixture_selinux_labels_corrected_before_final_run": true
+  "fixture_selinux_labels_corrected_before_final_run": true,
+  "final_source_commit": "3ec3246e2ea4f5317e874b5a24181c534aae3513",
+  "final_phone_sha256": "064d69842930871443aec6a90b273515d20225755aeee72301656e9c1cf7cb4e"
 }

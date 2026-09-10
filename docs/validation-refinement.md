@@ -46,3 +46,13 @@ These are sampled configurations and journeys, not exhaustive coverage of every 
 The first file-only comparison was superseded: copied fixture directories retained the previous debug UID SELinux category and prevented release reads. The emulator fixture labels were corrected to the installed package context. The repeated signed6→7 check verified rendered records on both versions and exact table/preference equality. This was a fixture setup error, not a persistence migration.
 
 Native [12-hour clock](screenshots/refinement/after/clock.png), [320dp/200% clock](screenshots/refinement/after/clock-small-dark.png) and [scrolled confirmation controls](screenshots/refinement/after/clock-small-dark-actions.png) were inspected. Clock values remain legible and Save/Cancel are reachable by scrolling.
+
+## Final candidate — authoritative artifact
+
+The final range label explicitly says **Recorded wear in this range**, with aggregate OUT/tracked durations retained under About this breakdown. This presentation-only follow-up passed focused release compilation/lint and final clean formatting/phone/watch release builds. It changes no picker or data behavior.
+
+**Use final source `3ec3246`, tag `visual-time-candidate-7-final`.** This supersedes the initial artifact hashes above. Final phone SHA256: `064d69842930871443aec6a90b273515d20225755aeee72301656e9c1cf7cb4e`; final watch SHA256: `2e76aa818c08a9e43d1603649173d41f11033e06f92313d8720b7449700b93b9`. [Manifest](evidence/refinement/release-candidate.json). The bundle path is unchanged; it now contains these final artifacts and corresponding source.
+
+The final APK was again installed directly over signed6, with rendered records verified on both versions and exact database/reminder equality. The [upgrade evidence](evidence/refinement/signed-upgrade.json) identifies this final checksum. [Visual comparison viewer](visual-comparison.html) provides before/after pairs. [Settings accounting zone](screenshots/refinement/after/settings-zone.png) is the sole phone timezone surface.
+
+Additional final captures: [24-hour clock](screenshots/refinement/after/clock-24h.png), [empty History](screenshots/refinement/after/empty.png). The native clock switched presentation with the emulator 12/24-hour setting; cancellation left the event unchanged. The settings screenshot and signed Reports capture use the final artifact.

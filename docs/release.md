@@ -186,4 +186,4 @@ companion artifact and was not added to the phone catalogue.
 
 ## Unpublished visual and picker candidate 7
 
-Owner-requested refinement #37 is prepared from `681ae2f`, tag `visual-time-candidate-7`, with versionCode7 and the existing app identity. [Validation and signed6→7 data-preservation evidence](validation-refinement.md). Local installable bundle: `/home/matejkalc/.local/share/aligner-tracker/releases/visual-time-candidate-7/`. This does not replace the published version6 or authorize installation onto the owner phone. Owner aesthetic and physical acceptance remain open.
+Owner-requested refinement #37 is prepared from `3ec3246`, tag `visual-time-candidate-7-final`, with versionCode7 and the existing app identity. [Validation and signed6→7 data-preservation evidence](validation-refinement.md). Local installable bundle: `/home/matejkalc/.local/share/aligner-tracker/releases/visual-time-candidate-7/`. This does not replace the published version6 or authorize installation onto the owner phone. Owner aesthetic and physical acceptance remain open.
