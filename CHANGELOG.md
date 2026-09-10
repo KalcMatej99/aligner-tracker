@@ -1,5 +1,10 @@
 # Changelog
 
+## Private development update 8
+
+- Today shows original fitted/separated aligner status illustrations with distinct accessible status and labelled opposite actions (#40).
+- Preserves recorded-state saving safeguards, session context and the version 7 layout.
+
 ## 1.0.0-dev / code3 — private phone update, 2026-09-09
 
 Start tracking with an explicit IN/OUT choice and no typing. Prescribed hours,
