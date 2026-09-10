@@ -57,7 +57,7 @@ class TalkBackSemanticsTest {
     }
 
     @Test
-    fun todayAnnouncesStateChangesButDoesNotMakeTheTimerALiveRegion() {
+    fun todaySeparatesRecordedStatusFromActionsWithoutTimerAnnouncements() {
         compose.setContent {
             var snapshot by remember { mutableStateOf(example()) }
             AlignerTheme {
@@ -69,24 +69,23 @@ class TalkBackSemanticsTest {
                 }
             }
         }
+        compose.onAllNodesWithContentDescription("Aligners out").assertCountEquals(1)
+        compose.onNodeWithContentDescription("Aligners out").assertHasNoClickAction()
         compose
             .onNodeWithText("Put aligners in")
-            .assert(
-                SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Aligners out")
-            )
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.StateDescription))
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
             .performClick()
+        compose.onAllNodesWithContentDescription("Aligners in").assertCountEquals(1)
+        compose.onNodeWithContentDescription("Aligners out").assertDoesNotExist()
         compose
             .onNodeWithText("Take aligners out")
-            .assert(
-                SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Aligners in")
-            )
-            .assert(
-                SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite)
-            )
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.StateDescription))
+            .performClick()
+        compose.onAllNodesWithContentDescription("Aligners out").assertCountEquals(1)
         compose
             .onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
-            .assertCountEquals(1)
+            .assertCountEquals(0)
     }
 
     @Test
