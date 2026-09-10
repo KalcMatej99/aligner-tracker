@@ -60,3 +60,10 @@ not authorize publication of5.
 ## Visual information and native pickers — #37
 
 Version7 refines the accepted version6 foundation: recorded-time bars, historical target markers, recorded/estimated tray sequence, Settings-only timezone presentation and native date/time interactions. [Design decisions and primary sources](visual-time-refinement.md); [tests, screenshots and signed upgrade](validation-refinement.md). Candidate is unpublished; PR review and owner/physical acceptance remain separate.
+
+## Today recorded-status illustration — #40
+
+A focused version7 refinement replaces the large IN/OUT heading with original
+fitted/separated aligner vectors, retaining session context and labelled opposite
+actions. [Design and authorship](today-status.md); [emulator evidence and checks](validation-status.md).
+PR review, human comprehension, owner aesthetics and publication remain separate.

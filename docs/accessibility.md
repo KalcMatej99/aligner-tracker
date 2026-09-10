@@ -109,3 +109,12 @@ recorded with the final candidate evidence in #12/#23. The sole-owner physical P
 ## Visual and picker refinement — #37
 
 The version 7 phone refinement supersedes earlier typed-ISO and repeated-offset UI guidance. Native calendar/clock dialogs, saved drafts and explicit repeated-time occurrence choices preserve exact stored instants. Timezone information and pre-start configuration live only in Settings. Accounting, serialization and widget/Wear contracts are unchanged. [Design and source rationale](visual-time-refinement.md); [validation](validation-refinement.md).
+
+## Today recorded-status illustration — #40
+
+[Today status design](today-status.md) supersedes the earlier requirement for a
+large written IN/OUT status on Today. The noninteractive vector has one localized
+status description; visible session context and labelled opposite actions remain.
+Completion and unavailable state retain text. Timer ticks are not live regions.
+[Validation](validation-status.md) separates emulator/semantic evidence from human
+comprehension and actual TalkBack speech/traversal acceptance.

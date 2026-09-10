@@ -1,0 +1,12 @@
+{
+  "light": {
+    "ink": "#555D69",
+    "surface": "#FFFFFF",
+    "contrast": 6.654
+  },
+  "dark": {
+    "ink": "#BAC1CD",
+    "surface": "#12151B",
+    "contrast": 10.095
+  }
+}
