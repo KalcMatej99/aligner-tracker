@@ -1,0 +1,23 @@
+{
+  "before": 5,
+  "after": 6,
+  "all_tables_and_reminder_bytes_equal": true,
+  "row_counts": {
+    "android_metadata": 1,
+    "appointments": 1,
+    "command_outcomes": 0,
+    "photo_metadata": 0,
+    "room_master_table": 1,
+    "schedule_revisions": 2,
+    "sqlite_sequence": 9,
+    "target_history": 2,
+    "tracker_state": 1,
+    "tracking_gaps": 1,
+    "tray_history": 2,
+    "tray_intervals": 3,
+    "treatment": 1,
+    "treatment_notes": 1,
+    "treatment_phases": 1,
+    "wear_events": 13
+  }
+}

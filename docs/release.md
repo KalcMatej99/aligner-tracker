@@ -1,14 +1,17 @@
 # Release preparation and artifact verification
 
-Current private phone update: **versionCode 5**, published with explicit owner authorization
-on 2026-09-10. [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_5.apk).
-Source tag `neutral-phone-candidate-5-final`, commit `5e5ba6d3c5109513a2eb0a5670ada5b376186aac`.
-APK SHA256 `d8c4574c89d648f829ee12af69c744fdabde235c5c55f70248dc9307478844ac`.
-Live HTTPS APK and signed indexes match the verified private snapshot. Versions 2–4
-remain advertised and downloadable. App/repository signing identities are unchanged.
-Encrypted store backup was refreshed, read back and used to sign/verify in isolation.
-No physical phone was installed onto. Owner aesthetic/device acceptance remains open.
-[Publication evidence](evidence/neutral/store-live-verification.json).
+Current private phone update: **versionCode 6**, published with explicit owner authorization
+on 2026-09-10. [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_6.apk).
+Source tag `phone-release-6`, merged main commit `690f321340132694a85a3514bab8d86ba996599a`.
+APK SHA256 `b3b0c97937aef80f12b12aee85e7a73b2f52278e94ff66e0f2593466f25b46da`.
+PRs #36 and #35 are merged. The main tree exactly matches the checked build tree.
+Repository formatting, JVM tests, debug/release lint and phone/watch builds passed.
+The signed 5→6 emulator upgrade preserved all database tables and reminder bytes.
+Live HTTPS APK and signed indexes match the verified snapshot; versions 2–5 remain
+available. App/repository signing identities are unchanged. Encrypted store backup
+was read back and the restored identity signed/verified in isolation.
+No owner phone was installed onto. Owner aesthetic/device acceptance remains open.
+[Deployment evidence](evidence/release6/store-live-verification.json).
 
 Previous private phone update (issue #32): versionCode **3**, `1.0.0-dev`, source
 `91536654d68d3afb05e003d7f045f81422f9376a`, tag `pilot-phone-quick-start-3`.
