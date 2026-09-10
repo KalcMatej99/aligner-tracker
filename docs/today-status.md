@@ -79,3 +79,6 @@ Consulted the four supplied sources on 2026-09-10:
 
 [Validation and review](validation-status.md) separates rendered/test evidence from
 human comprehension, physical-device and owner aesthetic acceptance.
+
+The subsequent owner-requested [Today focus refinement](today-focus.md) enlarges
+and centers this artwork and updates the timer and daily-value layout.

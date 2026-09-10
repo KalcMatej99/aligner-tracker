@@ -19,7 +19,7 @@ internal fun AlignerStatusIllustration(wearing: Boolean) {
             if (wearing) R.drawable.aligner_status_in else R.drawable.aligner_status_out
         ),
         contentDescription = stringResource(if (wearing) R.string.state_in else R.string.state_out),
-        modifier = Modifier.size(width = 88.dp, height = 66.dp),
+        modifier = Modifier.size(width = 176.dp, height = 132.dp),
         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
     )
 }

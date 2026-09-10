@@ -22,4 +22,10 @@
     <string name="estimated_change">Estimated change / finish: %1$s</string>
     <string name="show_calendar">Show calendar</string>
     <string name="range_wear">Recorded wear in this range</string>
+    <string name="today_hours">%1$dh</string>
+    <string name="today_hours_minutes">%1$dh%2$02d′</string>
+    <string name="today_wear_goal_value">%1$s / %2$s</string>
+    <string name="today_wear_goal_label">Recorded wear / target</string>
+    <string name="today_wear_goal_description">Recorded wear: %1$s. Target: %2$s</string>
+    <string name="today_value_unknown">—</string>
 </resources>
