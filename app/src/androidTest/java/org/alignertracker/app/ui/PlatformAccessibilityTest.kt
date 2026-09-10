@@ -88,11 +88,16 @@ class PlatformAccessibilityTest {
             }
         }
         val heading =
-            awaitNode("Today state heading") { it.isHeading && it.names(R.string.state_out) }
+            awaitNode("Today summary heading") { it.isHeading && it.names(R.string.today_summary) }
         assertTrue(heading.isVisibleToUser)
         heading.recycle()
         val action = awaitNode("Put in action") { it.isClickable && it.names(R.string.put_in) }
-        assertEquals(context.getString(R.string.state_out), action.stateDescription?.toString())
+        assertEquals(null, action.stateDescription)
+        awaitNode("recorded OUT illustration") {
+                it.contentDescription?.toString() == context.getString(R.string.state_out) &&
+                    !it.isClickable
+            }
+            .recycle()
         val event =
             automation.executeAndWaitForEvent(
                 {
@@ -116,7 +121,12 @@ class PlatformAccessibilityTest {
             awaitNode("Take out action after platform click") {
                 it.isClickable && it.names(R.string.take_out)
             }
-        assertEquals(context.getString(R.string.state_in), changed.stateDescription?.toString())
+        assertEquals(null, changed.stateDescription)
+        awaitNode("recorded IN illustration") {
+                it.contentDescription?.toString() == context.getString(R.string.state_in) &&
+                    !it.isClickable
+            }
+            .recycle()
         changed.recycle()
     }
 

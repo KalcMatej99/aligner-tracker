@@ -161,4 +161,5 @@
     <string name="tray_channel_allowed">Tray reminder channel is available.</string>
     <string name="tray_channel_blocked">Tray reminder channel is blocked. Enable it in notification settings.</string>
     <string name="reminder_staged">Changes take effect when you tap Save reminders.</string>
+    <string name="status_unavailable">Current status unavailable</string>
 </resources>

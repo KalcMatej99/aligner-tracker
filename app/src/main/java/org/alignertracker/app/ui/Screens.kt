@@ -40,7 +40,6 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.os.ConfigurationCompat
@@ -454,7 +453,6 @@ fun TodayScreen(
     val plan = snapshot.plan ?: return
     val zone = ZoneId.of(plan.zoneId)
     val wearing = WearMath.isWearing(snapshot)
-    val currentState = stringResource(if (wearing) R.string.state_in else R.string.state_out)
     val summary = WearMath.summarize(snapshot, now.atZone(zone).toLocalDate(), now)
     val uiPreferences =
         androidx.compose.ui.platform.LocalContext.current.getSharedPreferences(
@@ -489,17 +487,18 @@ fun TodayScreen(
                         Modifier.padding(vertical = 4.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Text(
-                            stringResource(
-                                if (plan.completed) R.string.completed_title
-                                else if (wearing) R.string.state_in else R.string.state_out
-                            ),
-                            style = MaterialTheme.typography.headlineLarge,
-                            color =
-                                if (plan.completed) MaterialTheme.colorScheme.onSurface
-                                else MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.semantics { heading() },
-                        )
+                        if (plan.completed || snapshot.events.isEmpty()) {
+                            Text(
+                                stringResource(
+                                    if (plan.completed) R.string.completed_title
+                                    else R.string.status_unavailable
+                                ),
+                                style = MaterialTheme.typography.headlineLarge,
+                                modifier = Modifier.semantics { heading() },
+                            )
+                        } else {
+                            AlignerStatusIllustration(wearing)
+                        }
                         if (plan.completed) Text(stringResource(R.string.completed_body))
                         else
                             snapshot.events.lastOrNull()?.let { event ->
@@ -581,11 +580,7 @@ fun TodayScreen(
                             shape = MaterialTheme.shapes.small,
                             onClick = { onToggle(!wearing) },
                             enabled = !busy,
-                            modifier =
-                                Modifier.fillMaxWidth().heightIn(min = 56.dp).semantics {
-                                    stateDescription = currentState
-                                    liveRegion = LiveRegionMode.Polite
-                                },
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
                         ) {
                             Text(
                                 stringResource(
