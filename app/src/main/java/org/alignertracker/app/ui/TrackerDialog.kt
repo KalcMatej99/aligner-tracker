@@ -30,8 +30,13 @@ internal fun TrackerDialog(
     text: @Composable () -> Unit,
     confirmButton: @Composable () -> Unit,
     dismissButton: (@Composable () -> Unit)? = null,
+    picker: Boolean = false,
 ) {
-    BasicAlertDialog(onDismissRequest = onDismissRequest) {
+    BasicAlertDialog(
+        onDismissRequest = onDismissRequest,
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = !picker),
+        modifier = if (picker) Modifier.padding(8.dp).then(Modifier.fillMaxWidth()) else Modifier,
+    ) {
         Surface(
             shape = MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -46,7 +51,7 @@ internal fun TrackerDialog(
                     )
                     .semantics { isTraversalGroup = true }
                     .verticalScroll(rememberScrollState())
-                    .padding(24.dp),
+                    .padding(if (picker) 12.dp else 24.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 Column(Modifier.semantics(mergeDescendants = true) { heading() }) {

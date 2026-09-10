@@ -4,7 +4,7 @@
     <string name="choose_tracking_state">Choose IN or OUT to start.</string>
     <string name="change_accounting_zone">Change time zone</string>
     <string name="search_zones">Search time zones</string>
-    <string name="fixed_zone_help">Day totals use this time zone. It stays fixed after tracking starts, including when you travel.</string>
+    <string name="fixed_zone_help">Day totals use this fixed accounting zone, including when you travel. Existing records keep their zone. Changing the device zone does not reinterpret your history.</string>
     <string name="tray_unknown">Tray not recorded</string>
     <string name="tray_number_only">Tray %1$d</string>
     <string name="goal_unknown">Prescribed goal not set</string>

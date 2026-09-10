@@ -40,3 +40,7 @@ Treatment timestamps and private photos can reveal health routines. Collect the 
 ## Release gates
 
 MVP internal testing: setup→track→correct→history→reminder→backup/restore functional, deterministic time/import tests pass, APK builds, emulator runs without crash. Beta: API/device matrix, TalkBack/large font, no unreconciled data loss or reminder blockers, battery measurements. v1: signing ownership, license/dependency audit, privacy statement/store declarations, tested upgrade migration/restore and distribution documentation. No medical effectiveness claim.
+
+## Visual and picker refinement — #37
+
+The version 7 phone refinement supersedes earlier typed-ISO and repeated-offset UI guidance. Native calendar/clock dialogs, saved drafts and explicit repeated-time occurrence choices preserve exact stored instants. Timezone information and pre-start configuration live only in Settings. Accounting, serialization and widget/Wear contracts are unchanged. [Design and source rationale](visual-time-refinement.md); [validation](validation-refinement.md).

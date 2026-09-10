@@ -2,7 +2,6 @@ package org.alignertracker.app.ui
 
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.UiAutomation
-import android.os.Bundle
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import android.view.accessibility.AccessibilityNodeInfo
@@ -122,7 +121,7 @@ class PlatformAccessibilityTest {
     }
 
     @Test
-    fun invalidCorrectionExportsFieldErrorAndCancelClosesItsWindowWithoutSaving() {
+    fun correctionExposesNativePickerAndCancellationWithoutSaving() {
         var saved = false
         compose.setContent {
             var open by remember { mutableStateOf(true) }
@@ -148,34 +147,19 @@ class PlatformAccessibilityTest {
             }
         val dialogWindow = heading.windowId
         heading.recycle()
-        val timestamp =
-            awaitNode("Timestamp editor") {
-                it.isEditable && it.text?.contains("2026-09-08 10:00:00") == true
+        val date =
+            awaitNode("Date picker control") { it.isClickable && it.names(R.string.picker_date) }
+        assertEquals(dialogWindow, date.windowId)
+        assertFalse(date.isEditable)
+        date.recycle()
+        click(R.string.choose_time)
+        val clock =
+            awaitNode("Native clock dialog heading") {
+                it.isHeading && it.names(R.string.choose_time) && it.windowId != dialogWindow
             }
-        assertEquals(dialogWindow, timestamp.windowId)
-        assertTrue(
-            timestamp.performAction(
-                AccessibilityNodeInfo.ACTION_SET_TEXT,
-                Bundle().apply {
-                    putCharSequence(
-                        AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
-                        "invalid",
-                    )
-                },
-            )
-        )
-        timestamp.recycle()
-        click(R.string.save)
-        val invalid =
-            awaitNode("Invalid timestamp with a specific exported error") {
-                it.isEditable &&
-                    it.isContentInvalid &&
-                    it.error?.toString() == context.getString(R.string.timestamp_invalid)
-            }
-        assertEquals("invalid", invalid.text?.toString())
-        assertEquals(dialogWindow, invalid.windowId)
-        invalid.recycle()
-        compose.runOnIdle { assertFalse("Invalid input must not invoke save", saved) }
+        clock.recycle()
+        click(R.string.cancel)
+        compose.runOnIdle { assertFalse("Picker cancellation must not save the event", saved) }
         click(R.string.cancel)
         val underlying =
             awaitNode("Underlying window after cancellation") {

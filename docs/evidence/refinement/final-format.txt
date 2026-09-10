@@ -1,0 +1,13 @@
+> Task :spotlessInternalRegisterDependencies UP-TO-DATE
+> Task :spotlessKotlin UP-TO-DATE
+> Task :spotlessKotlinCheck UP-TO-DATE
+> Task :spotlessCheck UP-TO-DATE
+> Task :app:spotlessKotlin
+> Task :app:spotlessKotlinCheck
+> Task :app:spotlessCheck
+> Task :wear:spotlessKotlin UP-TO-DATE
+> Task :wear:spotlessKotlinCheck UP-TO-DATE
+> Task :wear:spotlessCheck UP-TO-DATE
+
+BUILD SUCCESSFUL in 927ms
+7 actionable tasks: 2 executed, 5 up-to-date

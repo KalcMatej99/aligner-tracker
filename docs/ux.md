@@ -52,3 +52,7 @@ specification above following owner rejection of published version4. One screen
 header, white/charcoal surfaces, restrained blue, compact facts/date controls and
 neutral supporting records preserve the tracking-first behavior. Validation and
 remaining owner/device gates are in [candidate5 evidence](validation-neutral.md).
+
+## Visual and picker refinement — #37
+
+The version 7 phone refinement supersedes earlier typed-ISO and repeated-offset UI guidance. Native calendar/clock dialogs, saved drafts and explicit repeated-time occurrence choices preserve exact stored instants. Timezone information and pre-start configuration live only in Settings. Accounting, serialization and widget/Wear contracts are unchanged. [Design and source rationale](visual-time-refinement.md); [validation](validation-refinement.md).

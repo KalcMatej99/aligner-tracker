@@ -102,7 +102,7 @@
     <string name="previous_event">Previous: %1$s</string>
     <string name="following_event">Next: %1$s</string>
     <string name="no_following_event">Next: now (latest permitted time)</string>
-    <string name="timestamp_invalid">Use a valid time strictly between neighboring changes and no later than now. Ambiguous daylight-saving times require an explicit UTC offset, for example +02:00.</string>
+    <string name="timestamp_invalid">Choose a valid time between neighboring changes and no later than now. For a repeated time, choose an occurrence.</string>
     <string name="event_offset">UTC offset (optional, for example +02:00)</string>
     <string name="progress_heading">Understand your pattern.</string>
     <string name="progress_period">Recent days: %1$d</string>
@@ -110,12 +110,12 @@
     <string name="average_recorded">Average recorded wear</string>
     <string name="days_with_data">Days with tracked time: %1$d of %2$d</string>
     <string name="full_days">Complete days meeting their recorded target: %1$d; fully tracked days: %2$d</string>
-    <string name="progress_goal_policy">Comparisons use the target effective on each treatment-zone date. Partial days do not count as missed goals. This summary records self-reported time, not clinical treatment assessment.</string>
+    <string name="progress_goal_policy">Targets apply to their historical dates. Partial days do not count as missed goals.</string>
     <string name="no_progress">Keep recording to build your history. No data is counted before tracking began.</string>
     <string name="treatment_fraction">Trays reached: %1$d of %2$d</string>
     <string name="settings_heading">Make it work for you.</string>
     <string name="target_heading">Daily target</string>
-    <string name="target_help">Use the target prescribed to you. A change takes effect tomorrow in the treatment time zone. Earlier daily targets remain unchanged.</string>
+    <string name="target_help">Use your prescribed target. Changes apply tomorrow; earlier targets stay unchanged.</string>
     <string name="goal_invalid">Enter a whole number from 1 to 1440 minutes.</string>
     <string name="save_target">Update target</string>
     <string name="reminder_heading">Optional reminders</string>

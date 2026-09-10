@@ -56,3 +56,7 @@ The version4 warm/pine composition was rejected by the owner. Candidate5 on
 It retains PR35/#34's connection fix. PR integration, private publication, owner
 aesthetic acceptance and physical gates remain distinct. Publication of4 does
 not authorize publication of5.
+
+## Visual information and native pickers — #37
+
+Version7 refines the accepted version6 foundation: recorded-time bars, historical target markers, recorded/estimated tray sequence, Settings-only timezone presentation and native date/time interactions. [Design decisions and primary sources](visual-time-refinement.md); [tests, screenshots and signed upgrade](validation-refinement.md). Candidate is unpublished; PR review and owner/physical acceptance remain separate.

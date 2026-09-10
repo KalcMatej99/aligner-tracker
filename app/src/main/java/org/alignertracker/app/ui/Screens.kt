@@ -48,9 +48,7 @@ import androidx.core.text.BidiFormatter
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -180,17 +178,14 @@ internal fun readableDate(date: LocalDate): String {
 internal fun readableTime(at: Long, zone: ZoneId): String {
     val locale = currentLocale()
     val zoned = Instant.ofEpochMilli(at).atZone(zone)
-    val dateTime =
-        zoned.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale))
-    val offset =
-        if (zoned.offset == ZoneOffset.UTC) stringResource(R.string.utc_abbreviation)
-        else stringResource(R.string.utc_offset, zoned.offset.id)
-    val bidi = BidiFormatter.getInstance(locale)
-    return stringResource(
-        R.string.date_time_with_offset,
-        bidi.unicodeWrap(dateTime),
-        bidi.unicodeWrap(offset),
-    )
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val pattern =
+        android.text.format.DateFormat.getBestDateTimePattern(
+            locale,
+            if (android.text.format.DateFormat.is24HourFormat(context)) "yMMMdHms" else "yMMMdhms",
+        )
+    return BidiFormatter.getInstance(locale)
+        .unicodeWrap(zoned.format(DateTimeFormatter.ofPattern(pattern, locale)))
 }
 
 @Composable
@@ -239,8 +234,6 @@ internal fun parseUserHours(value: String): Int? {
 fun OnboardingScreen(busy: Boolean, onStart: (Boolean, String) -> Unit, onImport: () -> Unit) {
     var zone by rememberSaveable { mutableStateOf(ZoneId.systemDefault().id) }
     var wearing by rememberSaveable { mutableStateOf<Boolean?>(null) }
-    var chooseZone by rememberSaveable { mutableStateOf(false) }
-    var query by rememberSaveable { mutableStateOf("") }
     ScreenColumn {
         Heading(R.string.quick_start_title)
         Text(stringResource(R.string.quick_start_body))
@@ -303,14 +296,6 @@ fun OnboardingScreen(busy: Boolean, onStart: (Boolean, String) -> Unit, onImport
             }
         }
         HorizontalDivider()
-        Text(
-            stringResource(R.string.zone_value, readableZone(zone)),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        TextButton(onClick = { chooseZone = true }, enabled = !busy) {
-            Text(stringResource(R.string.change_accounting_zone))
-        }
         OutlinedButton(
             shape = MaterialTheme.shapes.small,
             onClick = onImport,
@@ -320,38 +305,6 @@ fun OnboardingScreen(busy: Boolean, onStart: (Boolean, String) -> Unit, onImport
             Text(stringResource(R.string.setup_import))
         }
     }
-    if (chooseZone)
-        TrackerDialog(
-            onDismissRequest = { chooseZone = false },
-            title = { Text(stringResource(R.string.treatment_zone)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.fixed_zone_help))
-                    Entry(query, { query = it }, R.string.search_zones)
-                    ZoneId.getAvailableZoneIds()
-                        .sorted()
-                        .filter { it.replace('_', ' ').contains(query.trim(), ignoreCase = true) }
-                        .take(40)
-                        .forEach { id ->
-                            TextButton(
-                                onClick = {
-                                    zone = id
-                                    chooseZone = false
-                                    query = ""
-                                }
-                            ) {
-                                Text(readableZone(id))
-                            }
-                        }
-                }
-            },
-            confirmButton = {},
-            dismissButton = {
-                TextButton(onClick = { chooseZone = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
-        )
 }
 
 @Composable
@@ -377,18 +330,35 @@ internal fun Totals(
             )
             .toMillis()
             .coerceAtLeast(0)
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        SummaryRow(R.string.worn, durationLabel(summary.wornMillis), prominent = true)
-        SummaryRow(R.string.removed, durationLabel(summary.removedMillis))
-        HorizontalDivider(Modifier.padding(vertical = 2.dp))
-        SummaryRow(R.string.covered, durationLabel(summary.trackedMillis))
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         SummaryRow(
-            R.string.untracked,
-            durationLabel((elapsed - summary.trackedMillis).coerceAtLeast(0)),
+            R.string.worn,
+            if (summary.trackedMillis == 0L) stringResource(R.string.report_no_record)
+            else compactDuration(summary.wornMillis),
+            prominent = true,
         )
+        BreakdownBar(summary, now, zone)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(
+                stringResource(R.string.removed) +
+                    ": " +
+                    if (summary.trackedMillis == 0L) stringResource(R.string.report_no_record)
+                    else compactDuration(summary.removedMillis),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Text(
+                stringResource(R.string.untracked) +
+                    ": " +
+                    compactDuration((elapsed - summary.trackedMillis).coerceAtLeast(0)),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        DetailsDisclosure(R.string.time_details) {
+            Text(stringResource(R.string.time_details_body))
+            SummaryRow(R.string.covered, durationLabel(summary.trackedMillis))
+            SummaryRow(R.string.future_time, durationLabel(dayParts(summary, now, zone).last()))
+        }
     }
-    if (showCurrentNote)
-        Text(stringResource(R.string.coverage_note), style = MaterialTheme.typography.bodySmall)
 }
 
 /** Compact facts retain complete units and stack when scaled text needs more room. */
@@ -603,10 +573,6 @@ fun TodayScreen(
                         }
                     }
                 }
-                Text(
-                    stringResource(R.string.zone_value, readableZone(plan.zoneId)),
-                    style = MaterialTheme.typography.bodySmall,
-                )
             }
             if (!plan.completed)
                 Surface(color = MaterialTheme.colorScheme.surface) {
@@ -664,16 +630,15 @@ fun ScheduleScreen(
             if (plan.completed) Text(stringResource(R.string.completed_body))
             else {
                 Text(
-                    due?.let { stringResource(R.string.next_change, readableDate(it)) }
+                    due?.let { stringResource(R.string.estimated_change, readableDate(it)) }
                         ?: stringResource(R.string.schedule_missing_details),
                     style =
                         if (due != null) MaterialTheme.typography.titleLarge
                         else MaterialTheme.typography.bodyLarge,
                 )
-                Text(
-                    stringResource(R.string.schedule_note),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                DetailsDisclosure(R.string.about_schedule) {
+                    Text(stringResource(R.string.schedule_note))
+                }
                 if (plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
                     Button(
                         onClick = onAdvance,
@@ -698,23 +663,32 @@ fun ScheduleScreen(
             TextButton(onClick = onDetails) {
                 Text(stringResource(R.string.edit_treatment_details))
             }
+        if (snapshot.trayHistory.isNotEmpty())
+            Section(R.string.actual_tray_history) {
+                snapshot.trayHistory.takeLast(4).forEach { entry ->
+                    TrayMilestone(
+                        stringResource(R.string.tray_number_only, entry.trayNumber),
+                        readableDate(LocalDate.parse(entry.startedOn)),
+                        false,
+                    )
+                }
+            }
         if (!plan.completed && plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
             Section(R.string.future_schedule) {
+                Text(
+                    stringResource(R.string.schedule_sequence),
+                    style = MaterialTheme.typography.bodySmall,
+                )
                 WearMath.futureTrayStarts(snapshot).forEach { (tray, startDate) ->
-                    Text(
-                        stringResource(R.string.future_tray, tray, readableDate(startDate)),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(vertical = 8.dp),
+                    TrayMilestone(
+                        stringResource(R.string.tray_number_only, tray),
+                        readableDate(startDate),
+                        true,
                     )
-                    HorizontalDivider()
                 }
                 if (plan.totalTrays!! > plan.currentTray!! + 12)
                     Text(stringResource(R.string.future_more))
             }
-        Text(
-            stringResource(R.string.zone_value, readableZone(plan.zoneId)),
-            style = MaterialTheme.typography.bodySmall,
-        )
     }
 }
 
@@ -749,37 +723,7 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                 }
                 TextButton(
                     modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                    onClick = {
-                        if (compactDate) {
-                            dateDraft = selected
-                            dateInvalid = false
-                            dateEntry = true
-                        } else
-                            android.app
-                                .DatePickerDialog(
-                                    dateContext,
-                                    R.style.TrackerDatePicker,
-                                    { _, year, month, day ->
-                                        selected = LocalDate.of(year, month + 1, day).toString()
-                                    },
-                                    date.year,
-                                    date.monthValue - 1,
-                                    date.dayOfMonth,
-                                )
-                                .apply {
-                                    datePicker.maxDate =
-                                        today
-                                            .atStartOfDay(ZoneId.systemDefault())
-                                            .toInstant()
-                                            .toEpochMilli()
-                                    datePicker.minDate =
-                                        LocalDate.of(1970, 1, 1)
-                                            .atStartOfDay(ZoneId.systemDefault())
-                                            .toInstant()
-                                            .toEpochMilli()
-                                }
-                                .show()
-                    },
+                    onClick = { dateEntry = true },
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(readableDate(date), style = MaterialTheme.typography.titleMedium)
@@ -860,52 +804,16 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                 HorizontalDivider()
             }
         }
-        Text(
-            stringResource(R.string.zone_value, readableZone(plan.zoneId)),
-            style = MaterialTheme.typography.bodySmall,
-        )
     }
     if (dateEntry)
-        TrackerDialog(
-            onDismissRequest = { dateEntry = false },
-            title = { Text(stringResource(R.string.choose_date)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Entry(
-                        dateDraft,
-                        {
-                            dateDraft = it
-                            dateInvalid = false
-                        },
-                        R.string.history_date,
-                        error = dateInvalid,
-                        errorMessage = if (dateInvalid) R.string.date_invalid else null,
-                    )
-                    val preview = runCatching { LocalDate.parse(dateDraft.trim()) }.getOrNull()
-                    if (preview != null && preview >= LocalDate.of(1970, 1, 1) && preview <= today)
-                        Text(readableDate(preview))
-                }
+        CalendarDialog(
+            selected,
+            today,
+            {
+                selected = it
+                dateEntry = false
             },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val parsed = runCatching { LocalDate.parse(dateDraft.trim()) }.getOrNull()
-                        dateInvalid =
-                            parsed == null || parsed < LocalDate.of(1970, 1, 1) || parsed > today
-                        if (!dateInvalid) {
-                            selected = parsed.toString()
-                            dateEntry = false
-                        }
-                    }
-                ) {
-                    Text(stringResource(R.string.go_to_date))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { dateEntry = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
+            { dateEntry = false },
         )
 }
 
@@ -968,10 +876,6 @@ fun ProgressScreen(snapshot: TrackerSnapshot, now: Instant) {
             }
         }
         Text(stringResource(R.string.progress_goal_policy))
-        Text(
-            stringResource(R.string.zone_value, readableZone(plan.zoneId)),
-            style = MaterialTheme.typography.bodySmall,
-        )
     }
 }
 
@@ -985,11 +889,7 @@ internal fun EditEventDialog(
 ) {
     val zone = ZoneId.of(snapshot.plan!!.zoneId)
     val original = Instant.ofEpochMilli(event.at).atZone(zone)
-    var value by
-        rememberSaveable(event.id) {
-            mutableStateOf(original.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-        }
-    var offset by rememberSaveable(event.id) { mutableStateOf(original.offset.id) }
+    var value by rememberSaveable(event.id) { mutableStateOf<Long?>(event.at) }
     var invalid by rememberSaveable(event.id) { mutableStateOf(false) }
     val index = snapshot.events.indexOfFirst { it.id == event.id }
     val previous = snapshot.events.getOrNull(index - 1)
@@ -999,7 +899,6 @@ internal fun EditEventDialog(
         title = { Text(stringResource(R.string.edit_event_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(stringResource(R.string.edit_event_body, readableZone(zone.id)))
                 previous?.let {
                     Text(stringResource(R.string.previous_event, readableTime(it.at, zone)))
                 }
@@ -1007,27 +906,16 @@ internal fun EditEventDialog(
                     if (following == null) stringResource(R.string.no_following_event)
                     else stringResource(R.string.following_event, readableTime(following.at, zone))
                 )
-                Entry(
-                    value,
+                MomentField(
+                    event.at,
                     {
                         value = it
                         invalid = false
                     },
-                    R.string.event_timestamp,
-                    error = invalid,
-                    errorMessage = if (invalid) R.string.timestamp_invalid else null,
-                    enabled = !busy,
+                    zone,
+                    !busy,
                 )
-                Entry(
-                    offset,
-                    {
-                        offset = it
-                        invalid = false
-                    },
-                    R.string.event_offset,
-                    error = invalid,
-                    enabled = !busy,
-                )
+                if (invalid) ErrorText(R.string.timestamp_invalid)
             }
         },
         confirmButton = {
@@ -1036,22 +924,7 @@ internal fun EditEventDialog(
                 onClick = {
                     val result =
                         runCatching {
-                                val local =
-                                    LocalDateTime.parse(
-                                        value.trim(),
-                                        DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss")
-                                            .withResolverStyle(
-                                                java.time.format.ResolverStyle.STRICT
-                                            ),
-                                    )
-                                val offsets = zone.rules.getValidOffsets(local)
-                                val chosen =
-                                    if (offset.isBlank()) {
-                                        require(offsets.size == 1)
-                                        offsets.single()
-                                    } else ZoneOffset.of(offset.trim())
-                                require(chosen in offsets)
-                                val instant = local.toInstant(chosen).toEpochMilli()
+                                val instant = requireNotNull(value)
                                 require(
                                     previous != null &&
                                         instant > previous.at &&

@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.core.app.ApplicationProvider
 import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.runBlocking
 import org.alignertracker.app.MainActivity
 import org.alignertracker.app.TrackerApplication
@@ -76,14 +75,12 @@ class DesignJourneyTest {
             .onNodeWithContentDescription("Edit time for", substring = true)
             .performScrollTo()
             .performClick()
-        val corrected = before.events.last().at - 300_000
-        val local = Instant.ofEpochMilli(corrected).atZone(ZoneId.of("UTC"))
-        compose
-            .onNodeWithText("Date and time (YYYY-MM-DD HH:MM:SS)")
-            .performScrollTo()
-            .performTextReplacement(
-                local.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-            )
+        compose.onNodeWithText("Choose time").performScrollTo().performClick()
+        compose.onNodeWithText("Use keyboard").performScrollTo().performClick()
+        val original = Instant.ofEpochMilli(before.events.last().at).atZone(ZoneId.of("UTC"))
+        val correctedMinute = if (original.minute > 5) original.minute - 5 else original.minute + 5
+        compose.onAllNodes(hasSetTextAction())[1].performTextReplacement(correctedMinute.toString())
+        compose.onAllNodesWithText("Save").onLast().performScrollTo().performClick()
         compose.onNodeWithText("Save").performScrollTo().performClick()
         compose.waitUntil(10_000) {
             runBlocking {
@@ -144,12 +141,67 @@ class DesignJourneyTest {
     }
 
     @Test
+    fun appointmentTitleEditPreservesExactRepeatedInstant() {
+        val base = seed()
+        val appointment =
+            org.alignertracker.app.domain.Appointment(
+                1,
+                Instant.parse("2026-10-25T01:30:17.123Z").toEpochMilli(),
+                30,
+                "Synthetic visit",
+            )
+        runBlocking {
+            container.repository.replaceFromBackup(
+                base.copy(
+                    plan = base.plan!!.copy(zoneId = "Europe/Rome"),
+                    appointments = listOf(appointment),
+                )
+            )
+        }
+        compose.onNodeWithContentDescription("More").performClick()
+        compose.onNodeWithText("Calendar and notes").performClick()
+        compose
+            .onNode(hasScrollToIndexAction())
+            .performScrollToNode(hasContentDescription("Edit Appointment", substring = true))
+        compose
+            .onNodeWithContentDescription("Edit Appointment", substring = true)
+            .performScrollTo()
+            .performClick()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Appointment title"))
+        compose
+            .onNodeWithText("Appointment title")
+            .performScrollTo()
+            .performTextReplacement("Edited visit")
+        compose.activityRule.scenario.onActivity { activity ->
+            activity
+                .getSystemService(android.view.inputmethod.InputMethodManager::class.java)
+                .hideSoftInputFromWindow(activity.window.decorView.windowToken, 0)
+        }
+        compose.waitForIdle()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Save appointment"))
+        compose.onNodeWithText("Save appointment").performScrollTo().performClick()
+        compose.waitUntil(10_000) {
+            runBlocking {
+                container.repository.snapshot().appointments.single().title == "Edited visit"
+            }
+        }
+        val after = runBlocking { container.repository.snapshot().appointments.single() }
+        assertEquals(appointment.startsAt, after.startsAt)
+        assertEquals(appointment.durationMinutes, after.durationMinutes)
+    }
+
+    @Test
     fun reportUnknownDayIsNotDisplayedAsZeroWear() {
         seed()
         compose.onNodeWithText("Progress").performClick()
         ready("Reports")
         compose.onAllNodesWithText("No recorded time. Wear is unknown.")[0].assertExists()
         compose.onNodeWithText("Worn 0 min", substring = true).assertDoesNotExist()
-        compose.onNodeWithText("Prescribed target unavailable for this day").assertExists()
+        compose
+            .onAllNodesWithContentDescription(
+                "Prescribed target unavailable for this day",
+                substring = true,
+            )[0]
+            .assertExists()
     }
 }

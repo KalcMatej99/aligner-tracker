@@ -34,6 +34,7 @@ fun ReportsScreen(
         }
         return
     }
+    var showData by rememberSaveable { mutableStateOf(false) }
     var count by rememberSaveable { mutableStateOf(7) }
     var preview by remember { mutableStateOf(false) }
     val zone = ZoneId.of(snapshot.plan.zoneId)
@@ -81,100 +82,119 @@ fun ReportsScreen(
             )
         }
         item {
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                shape = MaterialTheme.shapes.small,
-            ) {
-                Column(
-                    Modifier.fillMaxWidth().padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text(
-                        stringResource(R.string.report_recorded_total),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Text(
-                        if (days.any { it.trackedMillis > 0 })
-                            durationLabel(days.sumOf { it.wornMillis })
-                        else stringResource(R.string.report_no_record),
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                    if (days.any { it.trackedMillis > 0 }) {
-                        Text(
-                            stringResource(R.string.worn),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        Text(
-                            stringResource(
-                                R.string.report_out_tracked,
-                                durationLabel(days.sumOf { it.removedMillis }),
-                                durationLabel(days.sumOf { it.trackedMillis }),
-                            ),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                    Text(
-                        stringResource(
-                            R.string.report_coverage_count,
-                            days.count { it.trackedMillis > 0 },
-                            days.size,
-                        )
-                    )
-                }
-            }
-        }
-        items(days.asReversed(), key = { it.date }) { day ->
-            Column(
-                Modifier.fillMaxWidth().semantics(mergeDescendants = true) {},
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text(
-                    readableDate(LocalDate.parse(day.date)),
-                    style = MaterialTheme.typography.titleMedium,
+            SummaryRow(
+                R.string.range_wear,
+                if (days.any { it.trackedMillis > 0 }) compactDuration(days.sumOf { it.wornMillis })
+                else stringResource(R.string.report_no_record),
+            )
+            Text(
+                stringResource(
+                    R.string.report_coverage_count,
+                    days.count { it.trackedMillis > 0 },
+                    days.size,
                 )
-                if (day.trackedMillis == 0L) {
+            )
+            val scale =
+                days
+                    .maxOf { ReportMath.dayMillis(LocalDate.parse(it.date), zone) }
+                    .coerceAtLeast(24 * 3_600_000L)
+            Text(
+                stringResource(R.string.chart_hours, scale / 3_600_000),
+                style = MaterialTheme.typography.labelMedium,
+            )
+            days.forEach { day ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        stringResource(R.string.report_no_record),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                } else {
-                    Text(
-                        stringResource(
-                            R.string.report_wear_out,
-                            durationLabel(day.wornMillis),
-                            durationLabel(day.removedMillis),
-                        )
-                    )
-                    Text(
-                        stringResource(
-                            R.string.report_tracked_duration,
-                            durationLabel(day.trackedMillis),
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    val total = ReportMath.dayMillis(LocalDate.parse(day.date), zone)
-                    Text(
-                        stringResource(
-                            if (day.trackedMillis == total) R.string.report_full
-                            else R.string.report_partial
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
+                        readableDate(LocalDate.parse(day.date)),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.weight(1f),
                     )
                     Text(
-                        day.goalMinutes?.let {
-                            stringResource(
-                                R.string.report_goal_duration,
-                                durationLabel(it * 60_000L),
-                            )
-                        } ?: stringResource(R.string.report_goal_unknown),
-                        style = MaterialTheme.typography.bodyMedium,
+                        if (day.trackedMillis == 0L) stringResource(R.string.report_no_record)
+                        else compactDuration(day.wornMillis),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.weight(1f),
                     )
                 }
-                HorizontalDivider(Modifier.padding(top = 8.dp))
+                BreakdownBar(day, now, zone, scale, target = true)
+                Spacer(Modifier.height(8.dp))
+            }
+            Text(
+                stringResource(
+                    if (days.any { it.goalMinutes != null }) R.string.chart_target
+                    else R.string.report_goal_unknown
+                ),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            DetailsDisclosure(R.string.time_details) {
+                Text(stringResource(R.string.time_details_body))
+                Text(
+                    stringResource(
+                        R.string.report_out_tracked,
+                        durationLabel(days.sumOf { it.removedMillis }),
+                        durationLabel(days.sumOf { it.trackedMillis }),
+                    )
+                )
             }
         }
         item {
-            Section(R.string.report_reading_help) {
+            TextButton(onClick = { showData = !showData }) {
+                Text(stringResource(R.string.daily_data))
+            }
+        }
+        if (showData)
+            items(days.asReversed(), key = { it.date }) { day ->
+                Column(
+                    Modifier.fillMaxWidth().semantics(mergeDescendants = true) {},
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        readableDate(LocalDate.parse(day.date)),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    if (day.trackedMillis == 0L) {
+                        Text(
+                            stringResource(R.string.report_no_record),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        Text(
+                            stringResource(
+                                R.string.report_wear_out,
+                                durationLabel(day.wornMillis),
+                                durationLabel(day.removedMillis),
+                            )
+                        )
+                        Text(
+                            stringResource(
+                                R.string.report_tracked_duration,
+                                durationLabel(day.trackedMillis),
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        val total = ReportMath.dayMillis(LocalDate.parse(day.date), zone)
+                        Text(
+                            stringResource(
+                                if (day.trackedMillis == total) R.string.report_full
+                                else R.string.report_partial
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            day.goalMinutes?.let {
+                                stringResource(
+                                    R.string.report_goal_duration,
+                                    durationLabel(it * 60_000L),
+                                )
+                            } ?: stringResource(R.string.report_goal_unknown),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                    HorizontalDivider(Modifier.padding(top = 8.dp))
+                }
+            }
+        item {
+            DetailsDisclosure(R.string.report_reading_help) {
                 Text(
                     stringResource(R.string.reports_rules),
                     style = MaterialTheme.typography.bodyMedium,

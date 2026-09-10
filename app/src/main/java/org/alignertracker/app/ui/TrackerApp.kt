@@ -85,6 +85,7 @@ fun TrackerApp(model: TrackerViewModel) {
     val error by model.error.collectAsStateWithLifecycle()
     val notice by model.notice.collectAsStateWithLifecycle()
     val pendingRestore by model.pendingRestore.collectAsStateWithLifecycle()
+    var startupZone by rememberSaveable { mutableStateOf(java.time.ZoneId.systemDefault().id) }
     val context = LocalContext.current
     val keyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -338,6 +339,8 @@ fun TrackerApp(model: TrackerViewModel) {
                                 exactAllowed,
                                 breakChannelAllowed,
                                 trayChannelAllowed,
+                                startupZone = startupZone,
+                                onStartupZone = { startupZone = it },
                                 onRequestNotifications = {
                                     if (Build.VERSION.SDK_INT >= 33)
                                         notificationPermission.launch(
@@ -407,7 +410,11 @@ fun TrackerApp(model: TrackerViewModel) {
                                 },
                             )
                         } else if (state.plan == null) {
-                            OnboardingScreen(busy, model::startTracking, ::openImport)
+                            OnboardingScreen(
+                                busy,
+                                { wearing, _ -> model.startTracking(wearing, startupZone) },
+                                ::openImport,
+                            )
                         } else
                             when (destination) {
                                 Destination.TODAY ->
@@ -564,12 +571,7 @@ fun TrackerApp(model: TrackerViewModel) {
                     val plan = restored.plan
                     val description =
                         if (plan == null) stringResource(R.string.restore_empty)
-                        else
-                            stringResource(
-                                R.string.restore_partial_plan,
-                                trayLabel(plan),
-                                readableZone(plan.zoneId),
-                            )
+                        else trayLabel(plan)
                     Text(
                         stringResource(R.string.restore_summary, restored.events.size, description)
                     )

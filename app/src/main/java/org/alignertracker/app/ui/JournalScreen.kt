@@ -42,11 +42,11 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
     var correctionConfirm by remember { mutableStateOf(false) }
     val parsed =
         runCatching { LocalDate.parse(date).also { require(it.year in 1970..2100) } }.getOrNull()
-    fun at(time: String): Long? = parseTreatmentTime(parsed, time, zone)
+    fun at(time: String): Long? = parsePickerTime(parsed, time, zone)
     val appointmentAt = at(appointmentTime)
     val start = at(missingStart)
     val end =
-        parseTreatmentTime(
+        parsePickerTime(
             runCatching { LocalDate.parse(missingEndDate) }.getOrNull(),
             missingEnd,
             zone,
@@ -61,17 +61,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item { Heading(R.string.journal_title) }
-        item {
-            TrackerTextField(
-                date,
-                { date = it },
-                label = { Text(stringResource(R.string.journal_date)) },
-                isError = parsed == null,
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .fieldError(parsed == null, R.string.journal_date_invalid),
-            )
-        }
+        item { DateField(date, { date = it }, R.string.picker_date) }
         if (parsed == null) item { FormFeedback(R.string.journal_date_invalid) }
         item {
             FilterChip(
@@ -299,15 +289,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             ) {
                 Column(Modifier.padding(12.dp)) {
                     Text(appointment.title, style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        Instant.ofEpochMilli(appointment.startsAt)
-                            .atZone(zone)
-                            .format(
-                                java.time.format.DateTimeFormatter.ofLocalizedDateTime(
-                                    java.time.format.FormatStyle.MEDIUM
-                                )
-                            )
-                    )
+                    Text(readableTime(appointment.startsAt, zone))
                     if (appointment.note.isNotBlank()) Text(appointment.note)
                     IconButton(
                         onClick = {
@@ -321,7 +303,8 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                             appointmentTime =
                                 Instant.ofEpochMilli(appointment.startsAt)
                                     .atZone(zone)
-                                    .toLocalTime()
+                                    .toOffsetDateTime()
+                                    .toOffsetTime()
                                     .toString()
                             duration = appointment.durationMinutes.toString()
                             reminder = appointment.reminderMinutesBefore?.toString() ?: ""
@@ -371,15 +354,13 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             )
         }
         item {
-            TrackerTextField(
+            TimeField(
                 appointmentTime,
                 { appointmentTime = it },
-                label = { Text(stringResource(R.string.appointment_time)) },
-                supportingText = { Text(stringResource(R.string.local_time_hint, zone.id)) },
-                isError = appointmentAt == null,
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .fieldError(appointmentAt == null, R.string.appointment_time_invalid),
+                R.string.appointment_time,
+                parsed,
+                zone,
+                !busy,
             )
         }
         item {
@@ -470,43 +451,32 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
         }
         item { Text(stringResource(R.string.missing_interval_hint)) }
         item {
-            TrackerTextField(
+            TimeField(
                 missingStart,
                 { missingStart = it },
-                label = { Text(stringResource(R.string.interval_start)) },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .fieldError(start == null, R.string.correction_form_invalid),
-                isError = start == null,
+                R.string.interval_start,
+                parsed,
+                zone,
+                !busy,
             )
         }
         item {
-            TrackerTextField(
+            DateField(
                 missingEndDate,
                 { missingEndDate = it },
-                label = { Text(stringResource(R.string.interval_end_date)) },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .fieldError(end == null, R.string.correction_form_invalid),
-                isError = end == null,
+                R.string.interval_end_date,
+                LocalDate.now(zone),
+                !busy,
             )
         }
         item {
-            TrackerTextField(
+            TimeField(
                 missingEnd,
                 { missingEnd = it },
-                label = { Text(stringResource(R.string.interval_end)) },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .fieldError(
-                            end == null ||
-                                start == null ||
-                                start >= end ||
-                                end > System.currentTimeMillis(),
-                            R.string.correction_form_invalid,
-                        ),
-                isError =
-                    end == null || start == null || start >= end || end > System.currentTimeMillis(),
+                R.string.interval_end,
+                runCatching { LocalDate.parse(missingEndDate) }.getOrNull(),
+                zone,
+                !busy,
             )
         }
         item {
@@ -567,8 +537,10 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             title = { Text(stringResource(R.string.review_correction)) },
             text = {
                 Text(
-                    "$date $missingStart – $missingEndDate $missingEnd\n" +
-                        stringResource(R.string.missing_interval_hint)
+                    (start?.let { readableTime(it, zone) }.orEmpty() +
+                        " – " +
+                        end?.let { readableTime(it, zone) }.orEmpty() +
+                        "\n") + stringResource(R.string.missing_interval_hint)
                 )
             },
             confirmButton = {
