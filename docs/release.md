@@ -1,6 +1,39 @@
 # Release preparation and artifact verification
 
-Current private phone update: **versionCode 7**, published with owner authorization
+Current private phone update: **versionCode 8**, published with the owner's “Merge and deploy”
+authorization on 2026-09-10 after merging [PR #41](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/41).
+[Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_8.apk) while connected to Tailscale,
+or refresh Kalc Apps in F-Droid. Original fitted/separated Today status illustrations
+retain the session context and explicit opposite-action labels.
+
+Source tag `phone-release-8`, commit `18c837221773ecc76cf8ecf184b45481b3a3336c`.
+Merged main `5a3978c0ed32a908926d272a9cd659ef71c979f9` has exactly the same Git tree as
+the signed candidate. Hosted [run 34](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/actions/runs/34)
+passed for that candidate; local formatting, release lint and both release builds
+passed. Phone SHA256:
+`1618b6e0ebafb75589baf73588d269bfb383e0b2ec7634aa730b956b0688b85b`.
+
+The actual signed 7→8 API36 emulator upgrade preserved every database table. The
+fixture had no persisted reminder preferences before or after; this is not a
+populated-reminder acceptance claim. [Before](screenshots/release8/signed-before.png),
+[after](screenshots/release8/signed-after.png), [upgrade evidence](evidence/release8/upgrade-verification.json).
+No owner phone was installed onto. Human comprehension, TalkBack speech, aesthetics
+and physical acceptance remain open. Wear8 is a local signed companion artifact,
+not a phone-store entry.
+
+All HTTPS snapshot files were downloaded and matched, signed indexes and APK
+signatures verified, and the mobile page inspected for version8/no overflow/no page
+errors. App and repository identities are unchanged; versions2–7 remain available;
+non-Tailscale LAN requests still return403. [Live verification](evidence/release8/store-live-verification.json),
+[browser](evidence/release8/store-browser.json), [page capture](screenshots/release8/store-mobile.png),
+[release manifest](evidence/release8/release.json).
+The first promotion attempts found missing Java tools in the default and sudo PATH;
+no live pointer changed until the installed JDK21/SDK were supplied explicitly and
+snapshot verification passed. No system tool installation or shared configuration
+change was needed.
+
+
+Previous private phone update: **versionCode 7**, published with owner authorization
 on 2026-09-10 after merging [PR #38](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/38).
 [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_7.apk) while connected to Tailscale.
 Merged main `bf59c97`; application code matches tested source `3ec3246`, tag

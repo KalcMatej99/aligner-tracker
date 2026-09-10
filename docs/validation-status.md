@@ -129,3 +129,12 @@ acceptance is claimed from JVM tests and builds.
 Human recognition,
 TalkBack speech/traversal quality, owner aesthetic approval, physical accessibility
 and release acceptance remain unverified (#12/#18). No merge/publication is implied.
+
+## Subsequent owner-authorized publication
+
+The owner then requested “Merge and deploy”. Version8 adds only aligned phone/Wear
+versionCode metadata and changelog text to the tested implementation. PR41 merged
+after hosted CI passed; the matching signed phone candidate is published privately.
+[Release and upgrade evidence](release.md). Earlier no-publication statements above
+describe the refinement's original scope and preparation checkpoint. Physical and
+human acceptance remain unverified.

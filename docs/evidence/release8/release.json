@@ -1,0 +1,22 @@
+{
+  "source_commit": "18c837221773ecc76cf8ecf184b45481b3a3336c",
+  "source_tag": "phone-release-8",
+  "published": true,
+  "physical_installation": false,
+  "artifacts": {
+    "phone": {
+      "file": "aligner-tracker-phone.apk",
+      "sha256": "1618b6e0ebafb75589baf73588d269bfb383e0b2ec7634aa730b956b0688b85b",
+      "versionCode": 8,
+      "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9"
+    },
+    "wear": {
+      "file": "aligner-tracker-wear.apk",
+      "sha256": "b463b8d647d18664bb814f78802960c83fe6eb974ac5fcc77c961d649de580a3",
+      "versionCode": 8,
+      "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9"
+    }
+  },
+  "merged_commit": "5a3978c0ed32a908926d272a9cd659ef71c979f9",
+  "merged_tree_matches_candidate": true
+}

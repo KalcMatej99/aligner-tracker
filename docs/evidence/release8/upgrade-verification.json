@@ -1,0 +1,26 @@
+{
+  "from_version": 7,
+  "to_version": 8,
+  "database_tables_equal": true,
+  "table_counts": {
+    "android_metadata": 1,
+    "appointments": 0,
+    "command_outcomes": 0,
+    "photo_metadata": 0,
+    "room_master_table": 1,
+    "schedule_revisions": 0,
+    "sqlite_sequence": 1,
+    "target_history": 0,
+    "tracker_state": 1,
+    "tracking_gaps": 0,
+    "tray_history": 0,
+    "tray_intervals": 0,
+    "treatment": 1,
+    "treatment_notes": 0,
+    "treatment_phases": 0,
+    "wear_events": 3
+  },
+  "reminder_sha256": null,
+  "emulator": "API36 emulator-5554",
+  "physical_installation": false
+}
