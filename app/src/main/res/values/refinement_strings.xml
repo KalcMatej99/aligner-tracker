@@ -28,4 +28,9 @@
     <string name="today_wear_goal_label">Recorded wear / target</string>
     <string name="today_wear_goal_description">Recorded wear: %1$s. Target: %2$s</string>
     <string name="today_value_unknown">—</string>
+    <string name="history_legend_in">IN</string>
+    <string name="history_legend_out">OUT</string>
+    <string name="history_legend_unknown">Untracked</string>
+    <string name="history_legend_future">Future</string>
+    <string name="history_bar_note">Daily totals, not the order of changes.</string>
 </resources>

@@ -174,14 +174,15 @@ internal fun readableDate(date: LocalDate): String {
 }
 
 @Composable
-internal fun readableTime(at: Long, zone: ZoneId): String {
+internal fun readableTime(at: Long, zone: ZoneId, includeDate: Boolean = true): String {
     val locale = currentLocale()
     val zoned = Instant.ofEpochMilli(at).atZone(zone)
     val context = androidx.compose.ui.platform.LocalContext.current
     val pattern =
         android.text.format.DateFormat.getBestDateTimePattern(
             locale,
-            if (android.text.format.DateFormat.is24HourFormat(context)) "yMMMdHms" else "yMMMdhms",
+            (if (includeDate) "yMMMd" else "") +
+                if (android.text.format.DateFormat.is24HourFormat(context)) "Hms" else "hms",
         )
     return BidiFormatter.getInstance(locale)
         .unicodeWrap(zoned.format(DateTimeFormatter.ofPattern(pattern, locale)))
@@ -321,6 +322,7 @@ internal fun Totals(
     zone: ZoneId,
     showCurrentNote: Boolean = false,
     wearGoalBelowBar: Boolean = false,
+    historyLegend: Boolean = false,
 ) {
     val date = LocalDate.parse(summary.date)
     val elapsed =
@@ -356,11 +358,13 @@ internal fun Totals(
                 style = MaterialTheme.typography.bodySmall,
             )
         }
-        DetailsDisclosure(R.string.time_details) {
-            Text(stringResource(R.string.time_details_body))
-            SummaryRow(R.string.covered, durationLabel(summary.trackedMillis))
-            SummaryRow(R.string.future_time, durationLabel(dayParts(summary, now, zone).last()))
-        }
+        if (historyLegend) HistoryBarLegend()
+        else
+            DetailsDisclosure(R.string.time_details) {
+                Text(stringResource(R.string.time_details_body))
+                SummaryRow(R.string.covered, durationLabel(summary.trackedMillis))
+                SummaryRow(R.string.future_time, durationLabel(dayParts(summary, now, zone).last()))
+            }
     }
 }
 
@@ -732,67 +736,23 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                 }
             }
             if (summary.trackedMillis == 0L) Text(stringResource(R.string.no_tracking))
-            Totals(summary, now, zone, date == today && !plan.completed)
+            Totals(summary, now, zone, date == today && !plan.completed, historyLegend = true)
         }
         Section(R.string.events_heading) {
             if (events.isEmpty()) Text(stringResource(R.string.no_changes))
-            events.forEach { event ->
-                val editDescription =
-                    stringResource(
-                        R.string.edit_transition_accessibility,
-                        stringResource(
-                            if (event.wearing) R.string.state_in else R.string.state_out
-                        ),
-                        readableTime(event.at, zone),
+            Column {
+                events.forEachIndexed { index, event ->
+                    HistoryEventRow(
+                        event = event,
+                        zone = zone,
+                        first = index == 0,
+                        last = index == events.lastIndex,
+                        initial = event.id == snapshot.events.firstOrNull()?.id,
+                        completed = plan.completed,
+                        busy = busy,
+                        onEdit = { onEdit(event.id) },
                     )
-                BoxWithConstraints(Modifier.fillMaxWidth()) {
-                    val details: @Composable () -> Unit = {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                stringResource(
-                                    if (event.wearing) R.string.state_in else R.string.state_out
-                                ),
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                            Text(readableTime(event.at, zone))
-                        }
-                    }
-                    val action: @Composable () -> Unit = {
-                        if (event.id == snapshot.events.firstOrNull()?.id)
-                            Text(
-                                stringResource(R.string.initial_event),
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        else if (!plan.completed)
-                            IconButton(
-                                onClick = { onEdit(event.id) },
-                                enabled = !busy,
-                                modifier =
-                                    Modifier.heightIn(min = 48.dp).recordAction(editDescription),
-                            ) {
-                                TrackerUtilityIcon(UtilityIcon.EDIT)
-                            }
-                    }
-                    if (
-                        maxWidth / LocalDensity.current.fontScale < 320.dp ||
-                            event.id == snapshot.events.firstOrNull()?.id
-                    ) {
-                        Column {
-                            details()
-                            action()
-                        }
-                    } else {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Column(Modifier.weight(1f)) { details() }
-                            action()
-                        }
-                    }
                 }
-                HorizontalDivider()
             }
         }
     }
