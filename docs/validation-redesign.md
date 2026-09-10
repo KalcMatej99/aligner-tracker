@@ -1,5 +1,11 @@
 # Redesign evidence and candidate 4
 
+**Publication update, 2026-09-10:** owner authorized private-store deployment.
+Version4 is now [available to install](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_4.apk).
+Downloaded APK SHA256 matches the final candidate below; signed indexes and
+updated encrypted store recovery verified. Earlier unpublished statements below
+record the candidate preparation checkpoint. Physical acceptance remains open.
+
 Implementation: [design audit, principles and review](redesign.md), issues #33/#34.
 Branch `design/calm-tracking`; final source tag `design-phone-candidate-4-final`.
 This is an unpublished private candidate. Current private publication remains version 3.

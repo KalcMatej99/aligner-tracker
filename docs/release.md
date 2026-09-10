@@ -1,6 +1,15 @@
 # Release preparation and artifact verification
 
-Current private phone update (issue #32): versionCode **3**, `1.0.0-dev`, source
+Current private phone update: **versionCode 4**, published with owner authorization
+on 2026-09-10. [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_4.apk).
+Source tag `design-phone-candidate-4-final`, commit `506e52d5b3f6bca12a380f8c91701d6a513f2766`.
+APK SHA256 `b9dd73216cb615f24a472f9ea3c1f138f7ece9d711f7617ca86b11b51a6447b8`.
+Live HTTPS APK and signed indexes match the verified private snapshot. Existing
+app/repository identities and older downloads are preserved. Updated encrypted
+store backup was read back and used to sign/verify in isolation. Owner/device
+acceptance remains open; publication does not claim physical acceptance.
+
+Previous private phone update (issue #32): versionCode **3**, `1.0.0-dev`, source
 `91536654d68d3afb05e003d7f045f81422f9376a`, tag `pilot-phone-quick-start-3`.
 [Download](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_3.apk).
 APK SHA256 `4c013f25d66408c97d1e26522f3c8338a168cd086cb6a7623312a88b355549c8`;
