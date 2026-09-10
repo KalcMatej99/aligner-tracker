@@ -52,7 +52,7 @@ class TrackerJourneyTest {
             runBlocking { container.repository.snapshot().events.size == 3 }
         }
         val original = runBlocking { container.repository.snapshot().events }
-        compose.onNodeWithText("More").performClick()
+        compose.onNodeWithContentDescription("More").performClick()
         compose.onNodeWithText("Treatment details").performClick()
         compose
             .onNodeWithText("Current tray (optional)")
@@ -89,7 +89,7 @@ class TrackerJourneyTest {
         val completed = runBlocking { container.repository.snapshot() }
         assertTrue(completed.plan!!.completedAt != null)
         assertEquals(3, completed.events.size)
-        compose.onNodeWithText("Settings").performClick()
+        compose.onNodeWithContentDescription("Settings").performClick()
         compose.onNodeWithText("Delete all local data").performScrollTo().performClick()
         compose.onNodeWithText("Delete local records").performClick()
         compose.waitUntil(10_000) { runBlocking { container.repository.snapshot().plan == null } }

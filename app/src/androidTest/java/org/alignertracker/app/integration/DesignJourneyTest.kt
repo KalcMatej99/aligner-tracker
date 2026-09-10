@@ -72,7 +72,10 @@ class DesignJourneyTest {
     fun correctionRouteEditsRealTransitionWithoutChangingCoverageStart() {
         val before = seed()
         compose.onNodeWithText("Forgot a switch? Correct it").assertIsDisplayed().performClick()
-        compose.onNodeWithText("Edit time").performScrollTo().performClick()
+        compose
+            .onNodeWithContentDescription("Edit time for", substring = true)
+            .performScrollTo()
+            .performClick()
         val corrected = before.events.last().at - 300_000
         val local = Instant.ofEpochMilli(corrected).atZone(ZoneId.of("UTC"))
         compose
@@ -103,11 +106,23 @@ class DesignJourneyTest {
             .performScrollTo()
             .performTextReplacement("3")
         compose.activityRule.scenario.recreate()
-        compose.onNodeWithText("Back").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
         compose.onNodeWithText("Your schedule").assertExists()
         compose.onNodeWithText("Edit treatment details").performScrollTo().performClick()
         compose.onNodeWithText("Current tray (optional)").performScrollTo().assertTextContains("3")
         assertNull(runBlocking { container.repository.snapshot().plan!!.currentTray })
+    }
+
+    @Test
+    fun dateBrowsingPreservesRecordsAndBoundsNextDay() {
+        val before = seed()
+        compose.onNodeWithText("History").performClick()
+        compose.onNodeWithContentDescription("Next day").assertIsNotEnabled()
+        compose.onNodeWithContentDescription("Previous day").assertIsDisplayed().performClick()
+        compose.onNodeWithContentDescription("Next day").assertIsEnabled().performClick()
+        compose.onNodeWithContentDescription("Next day").assertIsNotEnabled()
+        compose.onNodeWithText("Choose date").assertHasClickAction()
+        assertEquals(before, runBlocking { container.repository.snapshot() })
     }
 
     @Test

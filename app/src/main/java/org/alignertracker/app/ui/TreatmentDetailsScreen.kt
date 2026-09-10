@@ -51,11 +51,7 @@ fun TreatmentDetailsScreen(
             }
             .getOrNull()
     ScreenColumn {
-        Text(
-            stringResource(R.string.treatment_details),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.semantics { heading() },
-        )
+        Heading(R.string.treatment_details)
         TextButton(onClick = onDone, enabled = !busy) { Text(stringResource(R.string.not_now)) }
         OptionalTreatmentForm(snapshot, model, busy)
         Text(stringResource(R.string.schedule_instructions))
@@ -78,6 +74,7 @@ fun TreatmentDetailsScreen(
                 label = { Text(stringResource(R.string.adjustment_reason)) },
             )
             Button(
+                shape = androidx.compose.material3.MaterialTheme.shapes.small,
                 onClick = { confirm = "schedule" },
                 enabled = !busy && parsed != null,
                 modifier = Modifier.fillMaxWidth(),
@@ -140,6 +137,7 @@ fun TreatmentDetailsScreen(
         if (phaseName.isBlank() || count.toIntOrNull() !in 1..1000 || days.toIntOrNull() !in 1..365)
             FormFeedback(R.string.phase_form_invalid)
         Button(
+            shape = androidx.compose.material3.MaterialTheme.shapes.small,
             onClick = { confirm = "phase" },
             enabled =
                 !busy &&

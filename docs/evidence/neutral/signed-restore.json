@@ -1,0 +1,24 @@
+{
+  "preview_cancel_preserved_all_tables_and_preferences": true,
+  "restored_tables_equal": {
+    "android_metadata": true,
+    "appointments": true,
+    "command_outcomes": true,
+    "photo_metadata": true,
+    "room_master_table": true,
+    "schedule_revisions": true,
+    "sqlite_sequence": true,
+    "target_history": true,
+    "tracker_state": false,
+    "tracking_gaps": true,
+    "tray_history": true,
+    "tray_intervals": true,
+    "treatment": true,
+    "treatment_notes": true,
+    "treatment_phases": true,
+    "wear_events": true
+  },
+  "reminder_preferences_preserved": true,
+  "cold_restart_completed": true,
+  "tracker_generation_refreshed_for_stale_action_safety": true
+}

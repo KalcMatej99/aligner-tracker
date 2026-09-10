@@ -88,7 +88,8 @@ class PlatformAccessibilityTest {
                 }
             }
         }
-        val heading = awaitNode("Today heading") { it.isHeading && it.names(R.string.wear_heading) }
+        val heading =
+            awaitNode("Today state heading") { it.isHeading && it.names(R.string.state_out) }
         assertTrue(heading.isVisibleToUser)
         heading.recycle()
         val action = awaitNode("Put in action") { it.isClickable && it.names(R.string.put_in) }

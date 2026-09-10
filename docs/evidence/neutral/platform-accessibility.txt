@@ -1,0 +1,103 @@
+
+org.alignertracker.app.ui.PlatformAccessibilityTest:.
+Error in todayExportsStateAndRespondsToPlatformFocusAndClick(org.alignertracker.app.ui.PlatformAccessibilityTest):
+java.lang.AssertionError: Missing Android accessibility node: Today heading
+window=884 package=org.alignertracker.app class=android.widget.FrameLayout visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.LinearLayout visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.FrameLayout visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=androidx.compose.ui.platform.ComposeView visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.ScrollView visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=false heading=false clickable=false editable=false text=Sep 8, 2026 description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=true clickable=false editable=false text=Aligners out description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=This break description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=2 hours, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Since Sep 8, 2026, 10:00:00 AM (UTC) description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=true clickable=false editable=false text=Today so far description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Recorded wear description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=1 hour, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Recorded out description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=2 hours, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Tracked time description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=3 hours, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Untracked elapsed time description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=9 hours, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Untracked hours are unknown, not missed wear. Today is still in progress. description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Prescribed target: 22 hours, 0 minutes per day description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Tray 1 of 20 description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Daily accounting: UTC · UTC description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=true editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Put aligners in description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.Button visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=true editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Forgot a switch? Correct it description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.Button visible=true heading=false clickable=false editable=false text=null description=null error=null
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.awaitNode(PlatformAccessibilityTest.kt:251)
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.todayExportsStateAndRespondsToPlatformFocusAndClick(PlatformAccessibilityTest.kt:91)
+	... 66 trimmed
+Caused by: androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 5000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:755)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:362)
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.awaitNode(PlatformAccessibilityTest.kt:230)
+	... 68 more
+
+
+Time: 9.977
+There was 1 failure:
+1) todayExportsStateAndRespondsToPlatformFocusAndClick(org.alignertracker.app.ui.PlatformAccessibilityTest)
+java.lang.AssertionError: Missing Android accessibility node: Today heading
+window=884 package=org.alignertracker.app class=android.widget.FrameLayout visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.LinearLayout visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.FrameLayout visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=androidx.compose.ui.platform.ComposeView visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.ScrollView visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=false heading=false clickable=false editable=false text=Sep 8, 2026 description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=true clickable=false editable=false text=Aligners out description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=This break description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=2 hours, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Since Sep 8, 2026, 10:00:00 AM (UTC) description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=true clickable=false editable=false text=Today so far description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Recorded wear description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=1 hour, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Recorded out description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=2 hours, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Tracked time description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=3 hours, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Untracked elapsed time description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=9 hours, 0 minutes description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Untracked hours are unknown, not missed wear. Today is still in progress. description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Prescribed target: 22 hours, 0 minutes per day description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Tray 1 of 20 description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Daily accounting: UTC · UTC description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=true editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Put aligners in description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.Button visible=true heading=false clickable=false editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.view.View visible=true heading=false clickable=true editable=false text=null description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.TextView visible=true heading=false clickable=false editable=false text=Forgot a switch? Correct it description=null error=null
+window=884 package=org.alignertracker.app class=android.widget.Button visible=true heading=false clickable=false editable=false text=null description=null error=null
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.awaitNode(PlatformAccessibilityTest.kt:251)
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.todayExportsStateAndRespondsToPlatformFocusAndClick(PlatformAccessibilityTest.kt:91)
+	... 66 trimmed
+Caused by: androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 5000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:755)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:362)
+	at org.alignertracker.app.ui.PlatformAccessibilityTest.awaitNode(PlatformAccessibilityTest.kt:230)
+	... 68 more
+
+FAILURES!!!
+Tests run: 2,  Failures: 1
+
+

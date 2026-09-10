@@ -1,0 +1,8 @@
+
+org.alignertracker.app.ui.PlatformAccessibilityTest:..
+
+Time: 5.535
+
+OK (2 tests)
+
+

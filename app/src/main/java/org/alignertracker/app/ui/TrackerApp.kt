@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -50,6 +51,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -84,9 +86,6 @@ fun TrackerApp(model: TrackerViewModel) {
     val notice by model.notice.collectAsStateWithLifecycle()
     val pendingRestore by model.pendingRestore.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val compactControls =
-        androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp /
-            LocalDensity.current.fontScale < 300
     val keyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     var now by androidx.compose.runtime.remember { mutableStateOf(Instant.now()) }
@@ -217,8 +216,16 @@ fun TrackerApp(model: TrackerViewModel) {
             AdaptiveTrackerTopBar(
                 title =
                     stringResource(
-                        if (destination == Destination.SETTINGS) R.string.settings
-                        else R.string.app_name
+                        if (snapshot?.plan == null) R.string.app_name
+                        else
+                            when (destination) {
+                                Destination.TODAY -> R.string.wear_heading
+                                Destination.SCHEDULE -> R.string.plan_heading
+                                Destination.HISTORY -> R.string.history_heading
+                                Destination.PROGRESS -> R.string.reports_title
+                                Destination.SETTINGS -> R.string.settings
+                                else -> destination.title
+                            }
                     ),
                 showBack =
                     destination in
@@ -241,21 +248,16 @@ fun TrackerApp(model: TrackerViewModel) {
                                 )
                     )
                         Box {
-                            if (compactControls)
-                                androidx.compose.material3.IconButton(
-                                    onClick = { moreExpanded = true },
-                                    modifier =
-                                        Modifier.semantics {
-                                            contentDescription =
-                                                context.getString(R.string.more_features)
-                                        },
-                                ) {
-                                    TrackerMoreIcon()
-                                }
-                            else
-                                TextButton(onClick = { moreExpanded = true }) {
-                                    Text(stringResource(R.string.more_features))
-                                }
+                            androidx.compose.material3.IconButton(
+                                onClick = { moreExpanded = true },
+                                modifier =
+                                    Modifier.semantics {
+                                        contentDescription =
+                                            context.getString(R.string.more_features)
+                                    },
+                            ) {
+                                TrackerMoreIcon()
+                            }
                             androidx.compose.material3.DropdownMenu(
                                 expanded = moreExpanded,
                                 onDismissRequest = { moreExpanded = false },
@@ -275,20 +277,15 @@ fun TrackerApp(model: TrackerViewModel) {
                             }
                         }
                     if (snapshot != null && destination != Destination.SETTINGS)
-                        if (compactControls)
-                            androidx.compose.material3.IconButton(
-                                onClick = { navigate(Destination.SETTINGS) },
-                                modifier =
-                                    Modifier.semantics {
-                                        contentDescription = context.getString(R.string.settings)
-                                    },
-                            ) {
-                                TrackerNavIcon(Destination.SETTINGS)
-                            }
-                        else
-                            TextButton(onClick = { navigate(Destination.SETTINGS) }) {
-                                Text(stringResource(R.string.settings))
-                            }
+                        androidx.compose.material3.IconButton(
+                            onClick = { navigate(Destination.SETTINGS) },
+                            modifier =
+                                Modifier.semantics {
+                                    contentDescription = context.getString(R.string.settings)
+                                },
+                        ) {
+                            TrackerNavIcon(Destination.SETTINGS)
+                        }
                 },
             )
         },
@@ -319,30 +316,43 @@ fun TrackerApp(model: TrackerViewModel) {
                 screenState.SaveableStateProvider(
                     "$destinationName:${state?.plan?.trackingStartedAt ?: 0}"
                 ) {
-                    if (state == null) {
-                        Column(
-                            Modifier.align(Alignment.Center),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            CircularProgressIndicator()
-                            Text(stringResource(R.string.loading))
-                        }
-                    } else if (destination == Destination.SETTINGS) {
-                        SettingsScreen(
-                            state.plan,
-                            preferences,
-                            busy,
-                            notificationsAllowed,
-                            exactAllowed,
-                            breakChannelAllowed,
-                            trayChannelAllowed,
-                            onRequestNotifications = {
-                                if (Build.VERSION.SDK_INT >= 33)
-                                    notificationPermission.launch(
-                                        Manifest.permission.POST_NOTIFICATIONS
-                                    )
-                                else
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        LocalScreenHeadingVisible provides
+                            (state?.plan == null && destination != Destination.SETTINGS)
+                    ) {
+                        if (state == null) {
+                            Column(
+                                Modifier.align(Alignment.Center),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                CircularProgressIndicator()
+                                Text(stringResource(R.string.loading))
+                            }
+                        } else if (destination == Destination.SETTINGS) {
+                            SettingsScreen(
+                                state.plan,
+                                preferences,
+                                busy,
+                                notificationsAllowed,
+                                exactAllowed,
+                                breakChannelAllowed,
+                                trayChannelAllowed,
+                                onRequestNotifications = {
+                                    if (Build.VERSION.SDK_INT >= 33)
+                                        notificationPermission.launch(
+                                            Manifest.permission.POST_NOTIFICATIONS
+                                        )
+                                    else
+                                        launchIntent(
+                                            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                                .putExtra(
+                                                    Settings.EXTRA_APP_PACKAGE,
+                                                    context.packageName,
+                                                )
+                                        )
+                                },
+                                onOpenNotificationSettings = {
                                     launchIntent(
                                         Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                                             .putExtra(
@@ -350,82 +360,84 @@ fun TrackerApp(model: TrackerViewModel) {
                                                 context.packageName,
                                             )
                                     )
-                            },
-                            onOpenNotificationSettings = {
-                                launchIntent(
-                                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                                        .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                                )
-                            },
-                            onRequestExact = {
-                                if (Build.VERSION.SDK_INT >= 31)
-                                    launchIntent(
-                                        Intent(
-                                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                                            Uri.parse("package:${context.packageName}"),
-                                        )
-                                    )
-                            },
-                            appointmentChannelAllowed =
-                                context
-                                    .getSystemService(android.app.NotificationManager::class.java)
-                                    .getNotificationChannel(
-                                        org.alignertracker.app.reminders.ReminderScheduler
-                                            .APPOINTMENT_CHANNEL
-                                    )
-                                    ?.importance != android.app.NotificationManager.IMPORTANCE_NONE,
-                            onGoal = model::updateGoal,
-                            onDetails = { navigate(Destination.DETAILS) },
-                            onReminders = model::updateReminders,
-                            onExport = { confirmation = if (it) "exportCsv" else "exportBackup" },
-                            onImport = ::openImport,
-                            onDelete = { confirmation = "delete" },
-                            onEncryptedExport = {
-                                runCatching { encryptedExporter.launch("aligner-backup.atbk") }
-                                    .onFailure { model.reportError(pickerFailure) }
-                            },
-                            onEncryptedImport = {
-                                runCatching {
-                                        encryptedImporter.launch(
-                                            arrayOf(
-                                                "application/octet-stream",
-                                                "application/zip",
-                                                "*/*",
+                                },
+                                onRequestExact = {
+                                    if (Build.VERSION.SDK_INT >= 31)
+                                        launchIntent(
+                                            Intent(
+                                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                                                Uri.parse("package:${context.packageName}"),
                                             )
                                         )
-                                    }
-                                    .onFailure { model.reportError(pickerFailure) }
-                            },
-                        )
-                    } else if (state.plan == null) {
-                        OnboardingScreen(busy, model::startTracking, ::openImport)
-                    } else
-                        when (destination) {
-                            Destination.TODAY ->
-                                TodayScreen(
-                                    state,
-                                    now,
-                                    busy,
-                                    onDetails = { navigate(Destination.DETAILS) },
-                                    onToggle = model::setWearing,
-                                    onCorrect = { navigate(Destination.HISTORY) },
-                                )
-                            Destination.SCHEDULE ->
-                                ScheduleScreen(
-                                    state,
-                                    busy,
-                                    { confirmation = "advance" },
-                                    { confirmation = "complete" },
-                                    onDetails = { navigate(Destination.DETAILS) },
-                                )
-                            Destination.HISTORY -> HistoryScreen(state, now, busy) { editId = it }
-                            Destination.PROGRESS -> ReportsScreen(state, model, now, preferences)
-                            Destination.PHOTOS -> PhotosScreen(state, model, busy)
-                            Destination.DETAILS ->
-                                TreatmentDetailsScreen(state, model, busy) { goBack() }
-                            Destination.JOURNAL -> JournalScreen(state, model, busy)
-                            Destination.SETTINGS -> Unit
-                        }
+                                },
+                                appointmentChannelAllowed =
+                                    context
+                                        .getSystemService(
+                                            android.app.NotificationManager::class.java
+                                        )
+                                        .getNotificationChannel(
+                                            org.alignertracker.app.reminders.ReminderScheduler
+                                                .APPOINTMENT_CHANNEL
+                                        )
+                                        ?.importance !=
+                                        android.app.NotificationManager.IMPORTANCE_NONE,
+                                onGoal = model::updateGoal,
+                                onDetails = { navigate(Destination.DETAILS) },
+                                onReminders = model::updateReminders,
+                                onExport = {
+                                    confirmation = if (it) "exportCsv" else "exportBackup"
+                                },
+                                onImport = ::openImport,
+                                onDelete = { confirmation = "delete" },
+                                onEncryptedExport = {
+                                    runCatching { encryptedExporter.launch("aligner-backup.atbk") }
+                                        .onFailure { model.reportError(pickerFailure) }
+                                },
+                                onEncryptedImport = {
+                                    runCatching {
+                                            encryptedImporter.launch(
+                                                arrayOf(
+                                                    "application/octet-stream",
+                                                    "application/zip",
+                                                    "*/*",
+                                                )
+                                            )
+                                        }
+                                        .onFailure { model.reportError(pickerFailure) }
+                                },
+                            )
+                        } else if (state.plan == null) {
+                            OnboardingScreen(busy, model::startTracking, ::openImport)
+                        } else
+                            when (destination) {
+                                Destination.TODAY ->
+                                    TodayScreen(
+                                        state,
+                                        now,
+                                        busy,
+                                        onDetails = { navigate(Destination.DETAILS) },
+                                        onToggle = model::setWearing,
+                                        onCorrect = { navigate(Destination.HISTORY) },
+                                    )
+                                Destination.SCHEDULE ->
+                                    ScheduleScreen(
+                                        state,
+                                        busy,
+                                        { confirmation = "advance" },
+                                        { confirmation = "complete" },
+                                        onDetails = { navigate(Destination.DETAILS) },
+                                    )
+                                Destination.HISTORY ->
+                                    HistoryScreen(state, now, busy) { editId = it }
+                                Destination.PROGRESS ->
+                                    ReportsScreen(state, model, now, preferences)
+                                Destination.PHOTOS -> PhotosScreen(state, model, busy)
+                                Destination.DETAILS ->
+                                    TreatmentDetailsScreen(state, model, busy) { goBack() }
+                                Destination.JOURNAL -> JournalScreen(state, model, busy)
+                                Destination.SETTINGS -> Unit
+                            }
+                    }
                 }
             }
         }
@@ -617,7 +629,13 @@ fun TrackerApp(model: TrackerViewModel) {
             }
         TrackerDialog(
             onDismissRequest = { if (!busy) confirmation = null },
-            title = { Text(title) },
+            title = {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.semantics { heading() },
+                )
+            },
             text = { Text(stringResource(body)) },
             confirmButton = {
                 TextButton(
@@ -667,11 +685,11 @@ fun TrackerApp(model: TrackerViewModel) {
 @Composable
 internal fun TrackerNavigation(destination: Destination, onNavigate: (Destination) -> Unit) {
     val tabs =
-        listOf(Destination.TODAY, Destination.SCHEDULE, Destination.HISTORY, Destination.PROGRESS)
+        listOf(Destination.TODAY, Destination.HISTORY, Destination.SCHEDULE, Destination.PROGRESS)
     val fontScale = LocalDensity.current.fontScale
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         if (maxWidth / fontScale < 300.dp) {
-            Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
+            Surface(color = MaterialTheme.colorScheme.surface) {
                 Column(
                     Modifier.fillMaxWidth()
                         .navigationBarsPadding()
@@ -690,7 +708,7 @@ internal fun TrackerNavigation(destination: Destination, onNavigate: (Destinatio
                                     shape = MaterialTheme.shapes.medium,
                                     color =
                                         if (selected) MaterialTheme.colorScheme.secondaryContainer
-                                        else MaterialTheme.colorScheme.surfaceContainerLow,
+                                        else MaterialTheme.colorScheme.surface,
                                     contentColor =
                                         if (selected) MaterialTheme.colorScheme.onSecondaryContainer
                                         else MaterialTheme.colorScheme.onSurface,
@@ -720,7 +738,10 @@ internal fun TrackerNavigation(destination: Destination, onNavigate: (Destinatio
                 }
             }
         } else {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp,
+            ) {
                 tabs.forEach { tab ->
                     NavigationBarItem(
                         selected = destination == tab,
@@ -759,7 +780,9 @@ fun AdaptiveTrackerTopBar(
                         title,
                         style = MaterialTheme.typography.titleMedium,
                         modifier =
-                            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                            Modifier.fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                                .semantics { heading() },
                     )
                     Row(
                         Modifier.fillMaxWidth().padding(horizontal = 8.dp),
@@ -767,17 +790,33 @@ fun AdaptiveTrackerTopBar(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (showBack)
-                            TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                            IconButton(
+                                onClick = onBack,
+                                modifier = Modifier.recordAction(stringResource(R.string.back)),
+                            ) {
+                                TrackerUtilityIcon(UtilityIcon.BACK)
+                            }
                         actions()
                     }
                 }
             }
         } else {
             TopAppBar(
-                title = { Text(title) },
+                title = {
+                    Text(
+                        title,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.semantics { heading() },
+                    )
+                },
                 navigationIcon = {
                     if (showBack)
-                        TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                        IconButton(
+                            onClick = onBack,
+                            modifier = Modifier.recordAction(stringResource(R.string.back)),
+                        ) {
+                            TrackerUtilityIcon(UtilityIcon.BACK)
+                        }
                 },
                 actions = actions,
             )

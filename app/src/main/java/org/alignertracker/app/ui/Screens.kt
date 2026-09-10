@@ -75,8 +75,11 @@ internal fun ScreenColumn(content: @Composable ColumnScope.() -> Unit) {
     )
 }
 
+internal val LocalScreenHeadingVisible = androidx.compose.runtime.staticCompositionLocalOf { true }
+
 @Composable
 internal fun Heading(@StringRes title: Int) {
+    if (!LocalScreenHeadingVisible.current) return
     Text(
         stringResource(title),
         style = MaterialTheme.typography.headlineMedium,
@@ -89,7 +92,7 @@ internal fun Section(@StringRes title: Int, content: @Composable ColumnScope.() 
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
             stringResource(title),
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.semantics { heading() },
         )
         content()
@@ -248,8 +251,8 @@ fun OnboardingScreen(busy: Boolean, onStart: (Boolean, String) -> Unit, onImport
                     Surface(
                         color =
                             if (selected) MaterialTheme.colorScheme.primaryContainer
-                            else MaterialTheme.colorScheme.surfaceContainerLow,
-                        shape = MaterialTheme.shapes.medium,
+                            else MaterialTheme.colorScheme.surface,
+                        shape = MaterialTheme.shapes.small,
                         border =
                             androidx.compose.foundation.BorderStroke(
                                 1.dp,
@@ -293,16 +296,27 @@ fun OnboardingScreen(busy: Boolean, onStart: (Boolean, String) -> Unit, onImport
             Button(
                 onClick = { wearing?.let { onStart(it, zone) } },
                 enabled = !busy && wearing != null,
+                shape = MaterialTheme.shapes.small,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
             ) {
                 Text(stringResource(if (busy) R.string.saving else R.string.setup_start))
             }
         }
-        Text(stringResource(R.string.zone_value, readableZone(zone)))
+        HorizontalDivider()
+        Text(
+            stringResource(R.string.zone_value, readableZone(zone)),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         TextButton(onClick = { chooseZone = true }, enabled = !busy) {
             Text(stringResource(R.string.change_accounting_zone))
         }
-        OutlinedButton(onClick = onImport, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            shape = MaterialTheme.shapes.small,
+            onClick = onImport,
+            enabled = !busy,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+        ) {
             Text(stringResource(R.string.setup_import))
         }
     }
@@ -363,20 +377,57 @@ internal fun Totals(
             )
             .toMillis()
             .coerceAtLeast(0)
-    MetricPair(
-        R.string.worn,
-        durationLabel(summary.wornMillis),
-        R.string.removed,
-        durationLabel(summary.removedMillis),
-    )
-    MetricPair(
-        R.string.covered,
-        durationLabel(summary.trackedMillis),
-        R.string.untracked,
-        durationLabel((elapsed - summary.trackedMillis).coerceAtLeast(0)),
-    )
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        SummaryRow(R.string.worn, durationLabel(summary.wornMillis), prominent = true)
+        SummaryRow(R.string.removed, durationLabel(summary.removedMillis))
+        HorizontalDivider(Modifier.padding(vertical = 2.dp))
+        SummaryRow(R.string.covered, durationLabel(summary.trackedMillis))
+        SummaryRow(
+            R.string.untracked,
+            durationLabel((elapsed - summary.trackedMillis).coerceAtLeast(0)),
+        )
+    }
     if (showCurrentNote)
         Text(stringResource(R.string.coverage_note), style = MaterialTheme.typography.bodySmall)
+}
+
+/** Compact facts retain complete units and stack when scaled text needs more room. */
+@Composable
+internal fun SummaryRow(@StringRes label: Int, value: String, prominent: Boolean = false) {
+    BoxWithConstraints(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}) {
+        val valueStyle =
+            if (prominent) MaterialTheme.typography.titleMedium
+            else MaterialTheme.typography.bodyMedium
+        if (maxWidth / LocalDensity.current.fontScale < 280.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    stringResource(label),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(value, style = valueStyle)
+            }
+        } else {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringResource(label),
+                    Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    value,
+                    Modifier.weight(1.15f),
+                    style = valueStyle,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -455,7 +506,6 @@ fun TodayScreen(
             ) {
                 if (!compact)
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Heading(R.string.wear_heading)
                         Text(
                             readableDate(now.atZone(zone).toLocalDate()),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -463,18 +513,10 @@ fun TodayScreen(
                     }
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.extraLarge,
-                    color =
-                        if (plan.completed) MaterialTheme.colorScheme.surfaceContainer
-                        else if (wearing) MaterialTheme.colorScheme.primaryContainer
-                        else MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor =
-                        if (plan.completed) MaterialTheme.colorScheme.onSurface
-                        else if (wearing) MaterialTheme.colorScheme.onPrimaryContainer
-                        else MaterialTheme.colorScheme.onTertiaryContainer,
+                    color = MaterialTheme.colorScheme.surface,
                 ) {
                     Column(
-                        Modifier.padding(24.dp),
+                        Modifier.padding(vertical = 4.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
@@ -483,6 +525,9 @@ fun TodayScreen(
                                 else if (wearing) R.string.state_in else R.string.state_out
                             ),
                             style = MaterialTheme.typography.headlineLarge,
+                            color =
+                                if (plan.completed) MaterialTheme.colorScheme.onSurface
+                                else MaterialTheme.colorScheme.primary,
                             modifier = Modifier.semantics { heading() },
                         )
                         if (plan.completed) Text(stringResource(R.string.completed_body))
@@ -515,6 +560,7 @@ fun TodayScreen(
                     TextButton(onClick = onCorrect, enabled = !busy) {
                         Text(stringResource(R.string.correct_missed_transition))
                     }
+                HorizontalDivider()
                 Section(R.string.today_summary) {
                     Totals(summary, now, zone, !plan.completed)
                     Text(
@@ -566,10 +612,11 @@ fun TodayScreen(
                 Surface(color = MaterialTheme.colorScheme.surface) {
                     Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
                         Button(
+                            shape = MaterialTheme.shapes.small,
                             onClick = { onToggle(!wearing) },
                             enabled = !busy,
                             modifier =
-                                Modifier.fillMaxWidth().heightIn(min = 64.dp).semantics {
+                                Modifier.fillMaxWidth().heightIn(min = 56.dp).semantics {
                                     stateDescription = currentState
                                     liveRegion = LiveRegionMode.Polite
                                 },
@@ -631,6 +678,7 @@ fun ScheduleScreen(
                     Button(
                         onClick = onAdvance,
                         enabled = !busy,
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
                     ) {
                         Text(stringResource(R.string.advance_tray))
@@ -639,6 +687,7 @@ fun ScheduleScreen(
                     Button(
                         onClick = onComplete,
                         enabled = !busy,
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
                     ) {
                         Text(stringResource(R.string.complete_action))
@@ -652,7 +701,12 @@ fun ScheduleScreen(
         if (!plan.completed && plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
             Section(R.string.future_schedule) {
                 WearMath.futureTrayStarts(snapshot).forEach { (tray, startDate) ->
-                    Text(stringResource(R.string.future_tray, tray, readableDate(startDate)))
+                    Text(
+                        stringResource(R.string.future_tray, tray, readableDate(startDate)),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 8.dp),
+                    )
+                    HorizontalDivider()
                 }
                 if (plan.totalTrays!! > plan.currentTray!! + 12)
                     Text(stringResource(R.string.future_more))
@@ -683,57 +737,64 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
     ScreenColumn {
         Heading(R.string.history_heading)
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(readableDate(date), style = MaterialTheme.typography.titleLarge)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                TextButton(
-                    modifier = Modifier.weight(1f),
-                    enabled = date > LocalDate.of(1970, 1, 1),
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
                     onClick = { selected = date.minusDays(1).toString() },
+                    enabled = date > LocalDate.of(1970, 1, 1),
                 ) {
-                    Text(stringResource(R.string.previous_day))
+                    TrackerChevron(
+                        forward = false,
+                        description = stringResource(R.string.previous_day),
+                    )
                 }
                 TextButton(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                    onClick = {
+                        if (compactDate) {
+                            dateDraft = selected
+                            dateInvalid = false
+                            dateEntry = true
+                        } else
+                            android.app
+                                .DatePickerDialog(
+                                    dateContext,
+                                    R.style.TrackerDatePicker,
+                                    { _, year, month, day ->
+                                        selected = LocalDate.of(year, month + 1, day).toString()
+                                    },
+                                    date.year,
+                                    date.monthValue - 1,
+                                    date.dayOfMonth,
+                                )
+                                .apply {
+                                    datePicker.maxDate =
+                                        today
+                                            .atStartOfDay(ZoneId.systemDefault())
+                                            .toInstant()
+                                            .toEpochMilli()
+                                    datePicker.minDate =
+                                        LocalDate.of(1970, 1, 1)
+                                            .atStartOfDay(ZoneId.systemDefault())
+                                            .toInstant()
+                                            .toEpochMilli()
+                                }
+                                .show()
+                    },
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(readableDate(date), style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            stringResource(R.string.choose_date),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+                IconButton(
                     onClick = { selected = date.plusDays(1).toString() },
                     enabled = date < today,
                 ) {
-                    Text(stringResource(R.string.next_day))
+                    TrackerChevron(forward = true, description = stringResource(R.string.next_day))
                 }
-            }
-            TextButton(
-                onClick = {
-                    if (compactDate) {
-                        dateDraft = selected
-                        dateInvalid = false
-                        dateEntry = true
-                    } else
-                        android.app
-                            .DatePickerDialog(
-                                dateContext,
-                                R.style.TrackerDatePicker,
-                                { _, year, month, day ->
-                                    selected = LocalDate.of(year, month + 1, day).toString()
-                                },
-                                date.year,
-                                date.monthValue - 1,
-                                date.dayOfMonth,
-                            )
-                            .apply {
-                                datePicker.maxDate =
-                                    today
-                                        .atStartOfDay(ZoneId.systemDefault())
-                                        .toInstant()
-                                        .toEpochMilli()
-                                datePicker.minDate =
-                                    LocalDate.of(1970, 1, 1)
-                                        .atStartOfDay(ZoneId.systemDefault())
-                                        .toInstant()
-                                        .toEpochMilli()
-                            }
-                            .show()
-                }
-            ) {
-                Text(stringResource(R.string.choose_date))
             }
             if (summary.trackedMillis == 0L) Text(stringResource(R.string.no_tracking))
             Totals(summary, now, zone, date == today && !plan.completed)
@@ -749,27 +810,52 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                         ),
                         readableTime(event.at, zone),
                     )
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        stringResource(
-                            if (event.wearing) R.string.state_in else R.string.state_out
-                        ),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Text(readableTime(event.at, zone))
-                    if (event.id == snapshot.events.firstOrNull()?.id)
-                        Text(
-                            stringResource(R.string.initial_event),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    else if (!plan.completed)
-                        OutlinedButton(
-                            onClick = { onEdit(event.id) },
-                            enabled = !busy,
-                            modifier = Modifier.heightIn(min = 48.dp).recordAction(editDescription),
-                        ) {
-                            Text(stringResource(R.string.edit_time))
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                    val details: @Composable () -> Unit = {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                stringResource(
+                                    if (event.wearing) R.string.state_in else R.string.state_out
+                                ),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Text(readableTime(event.at, zone))
                         }
+                    }
+                    val action: @Composable () -> Unit = {
+                        if (event.id == snapshot.events.firstOrNull()?.id)
+                            Text(
+                                stringResource(R.string.initial_event),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        else if (!plan.completed)
+                            IconButton(
+                                onClick = { onEdit(event.id) },
+                                enabled = !busy,
+                                modifier =
+                                    Modifier.heightIn(min = 48.dp).recordAction(editDescription),
+                            ) {
+                                TrackerUtilityIcon(UtilityIcon.EDIT)
+                            }
+                    }
+                    if (
+                        maxWidth / LocalDensity.current.fontScale < 320.dp ||
+                            event.id == snapshot.events.firstOrNull()?.id
+                    ) {
+                        Column {
+                            details()
+                            action()
+                        }
+                    } else {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(Modifier.weight(1f)) { details() }
+                            action()
+                        }
+                    }
                 }
                 HorizontalDivider()
             }
