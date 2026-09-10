@@ -1,6 +1,19 @@
 # Release preparation and artifact verification
 
-Current private phone update: **versionCode 6**, published with explicit owner authorization
+Current private phone update: **versionCode 7**, published with owner authorization
+on 2026-09-10 after merging [PR #38](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/38).
+[Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_7.apk) while connected to Tailscale.
+Merged main `bf59c97`; application code matches tested source `3ec3246`, tag
+`visual-time-candidate-7-final`. Phone SHA256
+`064d69842930871443aec6a90b273515d20225755aeee72301656e9c1cf7cb4e`.
+All HTTPS snapshot files and signed indexes were downloaded and verified; app and
+repository signing identities are unchanged. Versions 2–6 remain available.
+Non-Tailscale LAN access returns 403. [Deployment evidence](evidence/release7/store-live-verification.json).
+[Validation and same-signer upgrade preservation](validation-refinement.md).
+No owner phone installation; owner aesthetic and physical acceptance remain open.
+Wear remains a local companion artifact, outside the phone catalogue.
+
+Previous private phone update: **versionCode 6**, published with explicit owner authorization
 on 2026-09-10. [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_6.apk).
 Source tag `phone-release-6`, merged main commit `690f321340132694a85a3514bab8d86ba996599a`.
 APK SHA256 `b3b0c97937aef80f12b12aee85e7a73b2f52278e94ff66e0f2593466f25b46da`.
@@ -184,6 +197,10 @@ to the existing Tailscale-only phone store on 2026-09-10. The earlier candidate-
 statements record preparation status before that authorization. Wear remains a local
 companion artifact and was not added to the phone catalogue.
 
-## Unpublished visual and picker candidate 7
+## Visual and picker candidate 7 preparation (historical)
 
 Owner-requested refinement #37 is prepared from `3ec3246`, tag `visual-time-candidate-7-final`, with versionCode7 and the existing app identity. [Validation and signed6→7 data-preservation evidence](validation-refinement.md). Local installable bundle: `/home/matejkalc/.local/share/aligner-tracker/releases/visual-time-candidate-7/`. This does not replace the published version6 or authorize installation onto the owner phone. Owner aesthetic and physical acceptance remain open.
+
+The owner subsequently requested “Merge and deploy”; PR #38 was merged and the exact
+signed phone candidate above was published on 2026-09-10. Earlier unpublished status
+records the preparation checkpoint, not the current store state.
