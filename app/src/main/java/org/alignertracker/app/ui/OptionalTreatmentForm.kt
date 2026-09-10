@@ -115,6 +115,7 @@ internal fun OptionalTreatmentForm(
             )
         )
         Button(
+            shape = androidx.compose.material3.MaterialTheme.shapes.small,
             onClick = {
                 val minutes = parseUserHours(goal)
                 goalError = minutes !in 1..1440
@@ -168,6 +169,7 @@ internal fun OptionalTreatmentForm(
         if (attempted && missingEstablishedField) ErrorText(R.string.established_schedule_required)
         if (established) Text(stringResource(R.string.existing_schedule_edit_help))
         Button(
+            shape = androidx.compose.material3.MaterialTheme.shapes.small,
             onClick = {
                 attempted = true
                 if (valid) {

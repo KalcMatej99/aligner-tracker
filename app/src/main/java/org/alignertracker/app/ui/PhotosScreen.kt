@@ -14,7 +14,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
@@ -73,13 +72,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
     ) {
-        item {
-            Text(
-                stringResource(R.string.photos_title),
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.semantics { heading() },
-            )
-        }
+        item { Heading(R.string.photos_title) }
         item { Text(stringResource(R.string.photos_private)) }
         item {
             TrackerTextField(
@@ -102,6 +95,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         }
         item {
             Button(
+                shape = androidx.compose.material3.MaterialTheme.shapes.small,
                 onClick = {
                     runCatching {
                             picked.launch(
@@ -122,6 +116,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         }
         item {
             OutlinedButton(
+                shape = MaterialTheme.shapes.small,
                 onClick = {
                     runCatching {
                             val uri = model.createCapture()
@@ -145,6 +140,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         item { Text(stringResource(R.string.photo_selection, selected.size)) }
         item {
             Button(
+                shape = androidx.compose.material3.MaterialTheme.shapes.small,
                 onClick = { comparing = !comparing },
                 enabled = comparing || selected.size == 2,
                 modifier = Modifier.fillMaxWidth(),
@@ -158,6 +154,7 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
         }
         item {
             OutlinedButton(
+                shape = MaterialTheme.shapes.small,
                 onClick = { exportPreview = true },
                 enabled = !busy && selected.size in 2..100,
                 modifier = Modifier.fillMaxWidth(),
@@ -175,7 +172,19 @@ fun PhotosScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boole
             val description = photoDescription(photo, zone)
             val selectDescription = stringResource(R.string.select_photo_accessibility, description)
             val deleteDescription = stringResource(R.string.delete_photo_accessibility, description)
-            ElevatedCard(Modifier.fillMaxWidth()) {
+            OutlinedCard(
+                Modifier.fillMaxWidth(),
+                colors =
+                    CardDefaults.outlinedCardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                border =
+                    androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outlineVariant,
+                    ),
+                shape = MaterialTheme.shapes.small,
+            ) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.semantics(mergeDescendants = true) {}) {
                         PhotoPreview(photo, model)

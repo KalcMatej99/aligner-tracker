@@ -32,7 +32,10 @@ internal fun TrackerDialog(
     dismissButton: (@Composable () -> Unit)? = null,
 ) {
     BasicAlertDialog(onDismissRequest = onDismissRequest) {
-        Surface(shape = MaterialTheme.shapes.extraLarge, tonalElevation = 6.dp) {
+        Surface(
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) {
             Column(
                 Modifier.fillMaxWidth()
                     .heightIn(

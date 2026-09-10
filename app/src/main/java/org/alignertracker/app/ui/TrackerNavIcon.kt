@@ -9,6 +9,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 /** Original 24-unit pictograms; adjacent native tab labels provide semantics. */
@@ -75,5 +77,21 @@ internal fun TrackerMoreIcon() {
     Canvas(Modifier.size(24.dp)) {
         val u = size.width / 24f
         for (y in listOf(5f, 12f, 19f)) drawCircle(ink, 1.8f * u, Offset(12f * u, y * u))
+    }
+}
+
+@Composable
+internal fun TrackerChevron(forward: Boolean, description: String) {
+    val ink = androidx.compose.material3.LocalContentColor.current
+    val rtl =
+        androidx.compose.ui.platform.LocalLayoutDirection.current ==
+            androidx.compose.ui.unit.LayoutDirection.Rtl
+    Canvas(Modifier.size(24.dp).then(Modifier.semantics { contentDescription = description })) {
+        val u = size.width / 24f
+        val pointsRight = forward != rtl
+        val x = if (pointsRight) 9f else 15f
+        val tip = if (pointsRight) 15f else 9f
+        drawLine(ink, Offset(x * u, 6 * u), Offset(tip * u, 12 * u), 1.8f * u, StrokeCap.Round)
+        drawLine(ink, Offset(tip * u, 12 * u), Offset(x * u, 18 * u), 1.8f * u, StrokeCap.Round)
     }
 }

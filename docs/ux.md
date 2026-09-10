@@ -44,3 +44,11 @@ History uses bounded native date selection. Reports show newest days first with
 human-readable totals, explicit ranges/coverage and unknown-day text. Secondary
 Back returns to the origin and retains drafts. Tracking-first setup from #32,
 resource-backed copy for #31 and the adaptive navigation acceptance of #24 remain.
+
+## Neutral phone redesign — candidate 5
+
+[Neutral design decisions](neutral-redesign.md) supersede the warm/pine visual
+specification above following owner rejection of published version4. One screen
+header, white/charcoal surfaces, restrained blue, compact facts/date controls and
+neutral supporting records preserve the tracking-first behavior. Validation and
+remaining owner/device gates are in [candidate5 evidence](validation-neutral.md).

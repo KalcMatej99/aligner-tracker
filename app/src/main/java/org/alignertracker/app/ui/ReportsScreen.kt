@@ -50,32 +50,24 @@ fun ReportsScreen(
     LazyColumn(
         Modifier.widthIn(max = 680.dp).fillMaxSize().padding(horizontal = 20.dp),
         contentPadding = PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
-            Text(
-                stringResource(R.string.reports_title),
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.semantics { heading() },
-            )
-        }
+        item { Heading(R.string.reports_title) }
 
         item {
-            Column {
-                for (row in listOf(1, 7, 30, 0).chunked(2)) FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    for (period in row) FilterChip(
-                        selected = count == period,
-                        onClick = { count = period },
-                        label = {
-                            Text(
-                                if (period == 0) stringResource(R.string.report_month)
-                                else stringResource(R.string.report_days, period)
-                            )
-                        },
-                    )
-                }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (period in listOf(1, 7, 30, 0)) FilterChip(
+                    selected = count == period,
+                    onClick = { count = period },
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.heightIn(min = 48.dp),
+                    label = {
+                        Text(
+                            if (period == 0) stringResource(R.string.report_month)
+                            else stringResource(R.string.report_days, period)
+                        )
+                    },
+                )
             }
         }
         item {
@@ -90,11 +82,11 @@ fun ReportsScreen(
         }
         item {
             Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                shape = MaterialTheme.shapes.small,
             ) {
                 Column(
-                    Modifier.fillMaxWidth().padding(20.dp),
+                    Modifier.fillMaxWidth().padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
@@ -236,7 +228,11 @@ fun ReportsScreen(
             )
         }
         item {
-            OutlinedButton(onClick = { preview = true }, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(
+                shape = MaterialTheme.shapes.small,
+                onClick = { preview = true },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 Text(stringResource(R.string.preview_report))
             }
         }

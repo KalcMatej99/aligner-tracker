@@ -8,6 +8,8 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -94,8 +96,8 @@ fun SettingsScreen(
                         else R.string.target_help
                     )
                 )
-                Text(stringResource(R.string.watch_privacy))
                 Button(
+                    shape = androidx.compose.material3.MaterialTheme.shapes.small,
                     onClick = {
                         val value = parseUserHours(goal)
                         goalError = value == null || value !in 1..1440
@@ -138,6 +140,7 @@ fun SettingsScreen(
                 }
                 Text(stringResource(R.string.precise_help))
                 Button(
+                    shape = androidx.compose.material3.MaterialTheme.shapes.small,
                     onClick = {
                         val minutes = parseUserInteger(delay)
                         delayError = minutes == null || minutes !in 1..240
@@ -202,12 +205,18 @@ fun SettingsScreen(
                             Text(stringResource(R.string.precise_settings))
                         }
                 }
-                Text(stringResource(R.string.reminder_limits))
+                Text(
+                    stringResource(R.string.reminder_limits),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
+        HorizontalDivider()
         Section(R.string.data_heading) {
             Text(stringResource(R.string.data_help))
             if (plan != null) {
                 OutlinedButton(
+                    shape = MaterialTheme.shapes.small,
                     onClick = { onExport(false) },
                     enabled = !busy,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
@@ -215,6 +224,7 @@ fun SettingsScreen(
                     Text(stringResource(R.string.export_backup))
                 }
                 OutlinedButton(
+                    shape = MaterialTheme.shapes.small,
                     onClick = onEncryptedExport,
                     enabled = !busy,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
@@ -222,6 +232,7 @@ fun SettingsScreen(
                     Text(stringResource(R.string.export_encrypted_backup))
                 }
                 OutlinedButton(
+                    shape = MaterialTheme.shapes.small,
                     onClick = { onExport(true) },
                     enabled = !busy,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
@@ -230,6 +241,7 @@ fun SettingsScreen(
                 }
             }
             OutlinedButton(
+                shape = MaterialTheme.shapes.small,
                 onClick = onImport,
                 enabled = !busy,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
@@ -237,6 +249,7 @@ fun SettingsScreen(
                 Text(stringResource(R.string.import_backup))
             }
             OutlinedButton(
+                shape = MaterialTheme.shapes.small,
                 onClick = onEncryptedImport,
                 enabled = !busy,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
@@ -255,7 +268,15 @@ fun SettingsScreen(
                     )
                 }
         }
-        Text(stringResource(R.string.privacy_footer))
+        HorizontalDivider()
+        Section(R.string.watch_information) {
+            Text(
+                stringResource(R.string.watch_privacy),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Text(stringResource(R.string.privacy_footer), style = MaterialTheme.typography.bodyMedium)
     }
 }
 

@@ -12,4 +12,5 @@
     <string name="report_goal_duration">Prescribed target: %1$s</string>
     <string name="report_out_tracked">%1$s out · %2$s tracked</string>
     <string name="report_goal_unknown">Prescribed target unavailable for this day</string>
+    <string name="watch_information">Wear OS companion</string>
 </resources>

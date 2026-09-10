@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -188,7 +189,7 @@ class TrackerScreensTest {
             }
         }
         compose.onNodeWithText("Date (YYYY-MM-DD)").assertDoesNotExist()
-        compose.onNodeWithText("Previous day").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Previous day").performScrollTo().performClick()
         compose.onNodeWithText("Sep 7, 2026").assertExists()
         compose.onNodeWithText("Choose date").performClick()
         val automation =

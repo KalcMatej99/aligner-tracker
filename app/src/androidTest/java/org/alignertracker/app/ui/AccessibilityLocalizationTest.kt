@@ -20,6 +20,7 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsToggleable
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -143,7 +144,7 @@ class AccessibilityLocalizationTest {
             .onNodeWithText("Put aligners in")
             .assertIsDisplayed()
             .assertHasClickAction()
-            .assertHeightIsAtLeast(64.dp)
+            .assertHeightIsAtLeast(56.dp)
     }
 
     @Test
@@ -195,8 +196,11 @@ class AccessibilityLocalizationTest {
         }
 
         val previous =
-            compose.onNodeWithText("Previous day").performScrollTo().getUnclippedBoundsInRoot()
-        val next = compose.onNodeWithText("Next day").getUnclippedBoundsInRoot()
+            compose
+                .onNodeWithContentDescription("Previous day")
+                .performScrollTo()
+                .getUnclippedBoundsInRoot()
+        val next = compose.onNodeWithContentDescription("Next day").getUnclippedBoundsInRoot()
         assertTrue("Previous should begin on the RTL reading side", previous.left > next.left)
     }
 

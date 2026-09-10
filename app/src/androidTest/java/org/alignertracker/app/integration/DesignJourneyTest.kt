@@ -111,6 +111,18 @@ class DesignJourneyTest {
     }
 
     @Test
+    fun dateBrowsingPreservesRecordsAndBoundsNextDay() {
+        val before = seed()
+        compose.onNodeWithText("History").performClick()
+        compose.onNodeWithContentDescription("Next day").assertIsNotEnabled()
+        compose.onNodeWithContentDescription("Previous day").assertIsDisplayed().performClick()
+        compose.onNodeWithContentDescription("Next day").assertIsEnabled().performClick()
+        compose.onNodeWithContentDescription("Next day").assertIsNotEnabled()
+        compose.onNodeWithText("Choose date").assertHasClickAction()
+        assertEquals(before, runBlocking { container.repository.snapshot() })
+    }
+
+    @Test
     fun newlyStartedReportIncludesSubMinuteCoverage() {
         val start = Instant.now().toEpochMilli() - 2000
         runBlocking {
