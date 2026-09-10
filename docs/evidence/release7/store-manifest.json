@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "package_id": "org.alignertracker.app",
+  "device_target": "phone",
+  "name": "Aligner Tracker",
+  "summary": "Private aligner wear tracking, reminders and backups",
+  "description": "Start recording aligner wear immediately with IN or OUT. Add prescribed hours and tray details when ready; unknown goals and dates are never invented. Track schedules and history on your phone. Includes reminders, a home-screen widget, reports, private progress photos and encrypted portable backups. No account, ads, analytics or Internet permission.\n\nPrivate development build for owner testing. Physical reminder, battery and full device acceptance remain pending. Phone features work without Google Play services. Optional watch communication needs a compatible Wear service; the watch APK is not included.",
+  "version_code": 7,
+  "version_name": "1.0.0-dev",
+  "min_sdk": 26,
+  "apk_sha256": "064d69842930871443aec6a90b273515d20225755aeee72301656e9c1cf7cb4e",
+  "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9",
+  "source_url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker",
+  "source_revision": "3ec3246e2ea4f5317e874b5a24181c534aae3513",
+  "source_sha256": "9baa019a21ea30835438b55219238fa0358757f4c63fe530d6e03a897642d2e0",
+  "license": "GPL-3.0-or-later",
+  "release_notes": "Clearer recorded wear summaries, daily charts with historical targets and gaps, and recorded versus estimated tray milestones. Timezone settings are centralized in Settings. Native date and time pickers preserve optional values and precise event times. Same-signer version 6 to 7 emulator upgrade preserved records and reminder preferences. Private development build; owner aesthetic and physical-device acceptance remain open.",
+  "approved": true,
+  "fixture": false
+}
