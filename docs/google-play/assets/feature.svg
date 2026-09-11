@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+<rect width="1024" height="500" fill="#F4F5F7"/>
+<text x="80" y="198" font-family="DejaVu Sans" font-size="56" font-weight="bold" fill="#252A32">Aligner Tracker</text>
+<text x="82" y="254" font-family="DejaVu Sans" font-size="25" fill="#555E6B">Your routine, recorded.</text>
+<text x="82" y="304" font-family="DejaVu Sans" font-size="21" fill="#555E6B">Wear time · Tray schedule · Private photos</text>
+<path d="M780 151V262Q848 343 916 262V151" fill="none" stroke="#245BC3" stroke-width="17" stroke-linecap="round"/>
+</svg>
