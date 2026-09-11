@@ -11,6 +11,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
@@ -25,7 +26,10 @@ import org.alignertracker.app.domain.*
 fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Boolean) {
     val zone = ZoneId.of(snapshot.plan?.zoneId ?: "UTC")
     var date by rememberSaveable { mutableStateOf(LocalDate.now(zone).toString()) }
-    var calendar by rememberSaveable { mutableStateOf(false) }
+    var calendar by rememberSaveable { mutableStateOf(true) }
+    var editor by rememberSaveable { mutableStateOf("") }
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    LaunchedEffect(editor, calendar) { listState.scrollToItem(0) }
     var noteText by rememberSaveable { mutableStateOf("") }
     var noteId by rememberSaveable { mutableStateOf(0L) }
     var appointmentId by rememberSaveable { mutableStateOf(0L) }
@@ -51,28 +55,40 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
             missingEnd,
             zone,
         )
-    val notes =
-        snapshot.notes.filter {
-            Instant.ofEpochMilli(it.occurredAt).atZone(zone).toLocalDate() == parsed
-        }
+    val cellWidth = maxOf(48.dp, (40 * LocalDensity.current.fontScale).dp)
+    val notes = snapshot.notes.sortedByDescending { it.occurredAt }
     LazyColumn(
         Modifier.widthIn(max = 680.dp).fillMaxSize().padding(horizontal = 20.dp),
+        state = listState,
         contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item { Heading(R.string.journal_title) }
-        item { DateField(date, { date = it }, R.string.picker_date) }
-        if (parsed == null) item { FormFeedback(R.string.journal_date_invalid) }
         item {
-            FilterChip(
-                selected = calendar,
-                onClick = { calendar = !calendar },
-                label = { Text(stringResource(R.string.calendar_toggle)) },
-            )
+            if (editor.isEmpty())
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = calendar,
+                        onClick = { calendar = true },
+                        label = { Text(stringResource(R.string.support_calendar)) },
+                    )
+                    FilterChip(
+                        selected = !calendar,
+                        onClick = { calendar = false },
+                        label = { Text(stringResource(R.string.support_notes)) },
+                    )
+                }
+            else
+                TextButton(onClick = { editor = "" }, enabled = !busy) {
+                    Text(stringResource(R.string.cancel))
+                }
         }
-        if (calendar && parsed != null)
+        if (editor.isNotEmpty())
+            item { DateField(date, { date = it }, R.string.picker_date, enabled = !busy) }
+        if (parsed == null) item { FormFeedback(R.string.journal_date_invalid) }
+        if (calendar && parsed != null && editor.isEmpty())
             item {
-                val locale = java.util.Locale.getDefault()
+                val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
                 val month = YearMonth.from(parsed)
                 val firstWeekday = java.time.temporal.WeekFields.of(locale).firstDayOfWeek
                 val offset = (month.atDay(1).dayOfWeek.value - firstWeekday.value + 7) % 7
@@ -88,14 +104,18 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                             " " +
                             parsed.year
                     )
+                    Text(
+                        stringResource(R.string.support_calendar_markers),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
                     Row(Modifier.horizontalScroll(rememberScrollState())) {
-                        Column(Modifier.width(448.dp)) {
+                        Column(Modifier.width(cellWidth * 7)) {
                             Row {
                                 for (index in 0..6) Text(
                                     firstWeekday
                                         .plus(index.toLong())
                                         .getDisplayName(java.time.format.TextStyle.SHORT, locale),
-                                    modifier = Modifier.width(64.dp),
+                                    modifier = Modifier.requiredWidth(cellWidth),
                                 )
                             }
                             (0 until offset + month.lengthOfMonth()).toList().chunked(7).forEach {
@@ -103,7 +123,7 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                                 Row {
                                     row.forEach { cell ->
                                         val day = cell - offset + 1
-                                        if (day < 1) Spacer(Modifier.width(64.dp))
+                                        if (day < 1) Spacer(Modifier.requiredWidth(cellWidth))
                                         else {
                                             val cellDate = month.atDay(day)
                                             val label =
@@ -113,22 +133,71 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                                                             java.time.format.FormatStyle.FULL
                                                         )
                                                 )
+                                            val recordLabel =
+                                                stringResource(
+                                                    R.string.support_day_records,
+                                                    label,
+                                                    snapshot.appointments.count {
+                                                        Instant.ofEpochMilli(it.startsAt)
+                                                            .atZone(zone)
+                                                            .toLocalDate() == cellDate
+                                                    },
+                                                    snapshot.notes.count {
+                                                        Instant.ofEpochMilli(it.occurredAt)
+                                                            .atZone(zone)
+                                                            .toLocalDate() == cellDate
+                                                    },
+                                                )
                                             TextButton(
+                                                colors =
+                                                    ButtonDefaults.textButtonColors(
+                                                        containerColor =
+                                                            if (cellDate == parsed)
+                                                                MaterialTheme.colorScheme
+                                                                    .primaryContainer
+                                                            else
+                                                                androidx.compose.ui.graphics.Color
+                                                                    .Transparent
+                                                    ),
                                                 onClick = { date = cellDate.toString() },
                                                 modifier =
-                                                    Modifier.width(64.dp)
-                                                        .heightIn(min = 56.dp)
+                                                    Modifier.requiredWidth(cellWidth)
+                                                        .heightIn(min = 64.dp)
                                                         .semantics {
-                                                            contentDescription = label
+                                                            contentDescription = recordLabel
                                                             selected = cellDate == parsed
                                                         },
                                             ) {
-                                                Text(
-                                                    java.text.NumberFormat.getIntegerInstance(
-                                                            locale
+                                                Column(
+                                                    horizontalAlignment =
+                                                        androidx.compose.ui.Alignment
+                                                            .CenterHorizontally
+                                                ) {
+                                                    Text(
+                                                        java.text.NumberFormat.getIntegerInstance(
+                                                                locale
+                                                            )
+                                                            .format(day)
+                                                    )
+                                                    if (
+                                                        snapshot.appointments.any {
+                                                            Instant.ofEpochMilli(it.startsAt)
+                                                                .atZone(zone)
+                                                                .toLocalDate() == cellDate
+                                                        } ||
+                                                            snapshot.notes.any {
+                                                                Instant.ofEpochMilli(it.occurredAt)
+                                                                    .atZone(zone)
+                                                                    .toLocalDate() == cellDate
+                                                            }
+                                                    )
+                                                        Text(
+                                                            "•",
+                                                            Modifier.clearAndSetSemantics {},
+                                                            style =
+                                                                MaterialTheme.typography.labelSmall,
                                                         )
-                                                        .format(day)
-                                                )
+                                                }
                                             }
                                         }
                                     }
@@ -138,375 +207,461 @@ fun JournalScreen(snapshot: TrackerSnapshot, model: TrackerViewModel, busy: Bool
                     }
                 }
             }
-        if (parsed != null)
+        if (calendar && parsed != null && editor.isEmpty())
             item {
-                val summary = WearMath.summarize(snapshot, parsed, Instant.now())
-                Text(
-                    stringResource(
-                        R.string.journal_summary,
-                        summary.wornMillis / 60000,
-                        summary.removedMillis / 60000,
-                        summary.trackedMillis / 60000,
-                    )
-                )
-            }
-        if (snapshot.trackingGaps.isNotEmpty())
-            item { Text(stringResource(R.string.clock_gap_notice)) }
-        item {
-            Text(
-                stringResource(R.string.notes_heading),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() },
-            )
-        }
-        if (notes.isEmpty()) item { Text(stringResource(R.string.notes_empty)) }
-        items(notes, key = { "note${it.id}" }) { note ->
-            val noteDescription =
-                stringResource(
-                    R.string.note_record_accessibility,
-                    readableTime(note.occurredAt, zone),
-                    note.text.take(80),
-                )
-            val editDescription =
-                stringResource(R.string.edit_record_accessibility, noteDescription)
-            val deleteDescription =
-                stringResource(R.string.delete_record_accessibility, noteDescription)
-            OutlinedCard(
-                Modifier.fillMaxWidth(),
-                colors =
-                    CardDefaults.outlinedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                border =
-                    androidx.compose.foundation.BorderStroke(
-                        1.dp,
-                        MaterialTheme.colorScheme.outlineVariant,
-                    ),
-                shape = MaterialTheme.shapes.small,
-            ) {
-                Column(Modifier.padding(12.dp)) {
-                    Text(note.text)
-                    IconButton(
-                        onClick = {
-                            noteId = note.id
-                            noteText = note.text
-                        },
-                        modifier = Modifier.recordAction(editDescription),
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    shape = MaterialTheme.shapes.large,
+                ) {
+                    Column(
+                        Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        TrackerUtilityIcon(UtilityIcon.EDIT)
-                    }
-                    IconButton(
-                        onClick = { delete = "note" to note.id },
-                        enabled = !busy,
-                        modifier = Modifier.recordAction(deleteDescription),
-                    ) {
-                        TrackerUtilityIcon(UtilityIcon.DELETE)
-                    }
-                }
-            }
-        }
-        item {
-            TrackerTextField(
-                noteText,
-                { noteText = it.take(10000) },
-                label = { Text(stringResource(R.string.journal_note_text)) },
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-        item {
-            Button(
-                shape = androidx.compose.material3.MaterialTheme.shapes.small,
-                onClick = {
-                    val existing = snapshot.notes.firstOrNull { it.id == noteId }
-                    model.saveNote(
-                        existing?.copy(text = noteText)
-                            ?: TreatmentNote(
-                                occurredAt = parsed!!.atStartOfDay(zone).toInstant().toEpochMilli(),
-                                text = noteText,
-                            )
-                    ) {
-                        noteId = 0
-                        noteText = ""
-                    }
-                },
-                enabled =
-                    !busy &&
-                        parsed != null &&
-                        parsed <= LocalDate.now(zone) &&
-                        noteText.isNotBlank(),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.save_journal_note))
-            }
-        }
-        item { Text(stringResource(R.string.appointment_permission_hint)) }
-        item {
-            Text(
-                stringResource(R.string.appointments_heading),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() },
-            )
-        }
-        if (snapshot.appointments.isEmpty())
-            item { Text(stringResource(R.string.appointments_empty)) }
-        items(snapshot.appointments.sortedBy { it.startsAt }, key = { "appointment${it.id}" }) {
-            appointment ->
-            val description =
-                stringResource(
-                    R.string.appointment_record_accessibility,
-                    appointment.title,
-                    readableTime(appointment.startsAt, zone),
-                )
-            val editDescription = stringResource(R.string.edit_record_accessibility, description)
-            val deleteDescription =
-                stringResource(R.string.delete_record_accessibility, description)
-            val completionDescription =
-                stringResource(
-                    R.string.record_action_accessibility,
-                    stringResource(
-                        if (appointment.completed) R.string.appointment_reopen
-                        else R.string.appointment_complete
-                    ),
-                    description,
-                )
-            val completionState =
-                stringResource(
-                    if (appointment.completed) R.string.appointment_completed_state
-                    else R.string.appointment_upcoming_state
-                )
-            OutlinedCard(
-                Modifier.fillMaxWidth(),
-                colors =
-                    CardDefaults.outlinedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                border =
-                    androidx.compose.foundation.BorderStroke(
-                        1.dp,
-                        MaterialTheme.colorScheme.outlineVariant,
-                    ),
-                shape = MaterialTheme.shapes.small,
-            ) {
-                Column(Modifier.padding(12.dp)) {
-                    Text(appointment.title, style = MaterialTheme.typography.titleMedium)
-                    Text(readableTime(appointment.startsAt, zone))
-                    if (appointment.note.isNotBlank()) Text(appointment.note)
-                    IconButton(
-                        onClick = {
-                            appointmentId = appointment.id
-                            title = appointment.title
-                            date =
-                                Instant.ofEpochMilli(appointment.startsAt)
-                                    .atZone(zone)
-                                    .toLocalDate()
-                                    .toString()
-                            appointmentTime =
-                                Instant.ofEpochMilli(appointment.startsAt)
-                                    .atZone(zone)
-                                    .toOffsetDateTime()
-                                    .toOffsetTime()
-                                    .toString()
-                            duration = appointment.durationMinutes.toString()
-                            reminder = appointment.reminderMinutesBefore?.toString() ?: ""
-                            appointmentNote = appointment.note
-                        },
-                        modifier = Modifier.recordAction(editDescription),
-                    ) {
-                        TrackerUtilityIcon(UtilityIcon.EDIT)
-                    }
-                    TextButton(
-                        onClick = {
-                            model.saveAppointment(
-                                appointment.copy(completed = !appointment.completed)
-                            )
-                        },
-                        modifier =
-                            Modifier.recordAction(completionDescription).semantics {
-                                stateDescription = completionState
-                            },
-                        enabled = !busy,
-                    ) {
+                        Text(readableDate(parsed), style = MaterialTheme.typography.titleMedium)
+                        val summary = WearMath.summarize(snapshot, parsed, Instant.now())
                         Text(
-                            stringResource(
-                                if (appointment.completed) R.string.appointment_reopen
-                                else R.string.appointment_complete
-                            )
+                            if (summary.trackedMillis > 0)
+                                stringResource(
+                                    R.string.support_day_wear,
+                                    compactDuration(summary.wornMillis),
+                                )
+                            else stringResource(R.string.progress_missing)
                         )
                     }
-                    IconButton(
-                        onClick = { delete = "appointment" to appointment.id },
-                        modifier = Modifier.recordAction(deleteDescription),
-                        enabled = !busy,
-                    ) {
-                        TrackerUtilityIcon(UtilityIcon.DELETE)
+                }
+            }
+        if (editor == "correction" && snapshot.trackingGaps.isNotEmpty())
+            item { Text(stringResource(R.string.clock_gap_notice)) }
+        if (!calendar && editor.isEmpty()) {
+            item {
+                Button(
+                    onClick = {
+                        noteId = 0
+                        noteText = ""
+                        editor = "note"
+                    },
+                    enabled = !busy,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.support_add_note))
+                }
+            }
+            item {
+                Text(
+                    stringResource(R.string.support_recent_notes),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.semantics { heading() },
+                )
+            }
+            if (notes.isEmpty()) item { Text(stringResource(R.string.support_note_empty)) }
+            items(notes, key = { "note${it.id}" }) { note ->
+                val noteDescription =
+                    stringResource(
+                        R.string.note_record_accessibility,
+                        readableTime(note.occurredAt, zone),
+                        note.text.take(80),
+                    )
+                val editDescription =
+                    stringResource(R.string.edit_record_accessibility, noteDescription)
+                val deleteDescription =
+                    stringResource(R.string.delete_record_accessibility, noteDescription)
+                OutlinedCard(
+                    Modifier.fillMaxWidth(),
+                    colors =
+                        CardDefaults.outlinedCardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                    border =
+                        androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant,
+                        ),
+                    shape = MaterialTheme.shapes.small,
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(
+                            readableDate(
+                                Instant.ofEpochMilli(note.occurredAt).atZone(zone).toLocalDate()
+                            ),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                        Text(note.text)
+                        Row {
+                            IconButton(
+                                onClick = {
+                                    editor = "note"
+                                    date =
+                                        Instant.ofEpochMilli(note.occurredAt)
+                                            .atZone(zone)
+                                            .toLocalDate()
+                                            .toString()
+                                    noteId = note.id
+                                    noteText = note.text
+                                },
+                                modifier = Modifier.recordAction(editDescription),
+                            ) {
+                                TrackerUtilityIcon(UtilityIcon.EDIT)
+                            }
+                            IconButton(
+                                onClick = { delete = "note" to note.id },
+                                enabled = !busy,
+                                modifier = Modifier.recordAction(deleteDescription),
+                            ) {
+                                TrackerUtilityIcon(UtilityIcon.DELETE)
+                            }
+                        }
                     }
                 }
             }
         }
-        item {
-            TrackerTextField(
-                title,
-                { title = it.take(200) },
-                label = { Text(stringResource(R.string.appointment_title)) },
-                modifier =
-                    Modifier.fillMaxWidth().fieldError(title.isBlank(), R.string.title_required),
-                isError = title.isBlank(),
-            )
+        if (editor == "note") {
+            item {
+                TrackerTextField(
+                    noteText,
+                    { noteText = it.take(10000) },
+                    label = { Text(stringResource(R.string.journal_note_text)) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            item {
+                Button(
+                    shape = androidx.compose.material3.MaterialTheme.shapes.small,
+                    onClick = {
+                        val existing = snapshot.notes.firstOrNull { it.id == noteId }
+                        model.saveNote(
+                            existing?.copy(text = noteText)
+                                ?: TreatmentNote(
+                                    occurredAt =
+                                        parsed!!.atStartOfDay(zone).toInstant().toEpochMilli(),
+                                    text = noteText,
+                                )
+                        ) {
+                            noteId = 0
+                            noteText = ""
+                            editor = ""
+                        }
+                    },
+                    enabled =
+                        !busy &&
+                            parsed != null &&
+                            parsed <= LocalDate.now(zone) &&
+                            noteText.isNotBlank(),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.save_journal_note))
+                }
+            }
         }
-        item {
-            TimeField(
-                appointmentTime,
-                { appointmentTime = it },
-                R.string.appointment_time,
-                parsed,
-                zone,
-                !busy,
-            )
-        }
-        item {
-            TrackerTextField(
-                duration,
-                { duration = it },
-                label = { Text(stringResource(R.string.appointment_duration)) },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .fieldError(
-                            duration.toIntOrNull() !in 1..1440,
-                            R.string.appointment_duration_invalid,
-                        ),
-                isError = duration.toIntOrNull() !in 1..1440,
-            )
-        }
-        item {
-            TrackerTextField(
-                reminder,
-                { reminder = it },
-                label = { Text(stringResource(R.string.appointment_reminder)) },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .fieldError(
-                            reminder.isNotBlank() && reminder.toIntOrNull() !in 0..10080,
-                            R.string.appointment_reminder_invalid,
-                        ),
-                isError = reminder.isNotBlank() && reminder.toIntOrNull() !in 0..10080,
-            )
-        }
-        item {
-            TrackerTextField(
-                appointmentNote,
-                { appointmentNote = it.take(10000) },
-                label = { Text(stringResource(R.string.appointment_note_text)) },
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-        if (
-            appointmentAt == null ||
-                duration.toIntOrNull() !in 1..1440 ||
-                title.isBlank() ||
-                (reminder.isNotBlank() && reminder.toIntOrNull() !in 0..10080)
-        )
-            item { FormFeedback(R.string.appointment_form_invalid) }
-        item {
-            Button(
-                shape = androidx.compose.material3.MaterialTheme.shapes.small,
-                onClick = {
-                    val existing = snapshot.appointments.firstOrNull { it.id == appointmentId }
-                    model.saveAppointment(
-                        (existing
-                                ?: Appointment(
-                                    startsAt = appointmentAt!!,
-                                    durationMinutes = duration.toInt(),
-                                    title = title,
-                                ))
-                            .copy(
-                                startsAt = appointmentAt!!,
-                                durationMinutes = duration.toInt(),
-                                title = title,
-                                note = appointmentNote,
-                                reminderMinutesBefore = reminder.toIntOrNull(),
-                            )
-                    ) {
+        if (calendar && editor.isEmpty()) {
+            item {
+                Button(
+                    onClick = {
                         appointmentId = 0
                         title = ""
                         appointmentNote = ""
+                        editor = "appointment"
+                    },
+                    enabled = !busy,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.support_add_appointment))
+                }
+            }
+            item {
+                Text(
+                    stringResource(R.string.appointments_heading),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.semantics { heading() },
+                )
+            }
+            if (
+                snapshot.appointments.none {
+                    Instant.ofEpochMilli(it.startsAt).atZone(zone).toLocalDate() == parsed
+                }
+            )
+                item { Text(stringResource(R.string.support_calendar_empty)) }
+            items(
+                snapshot.appointments
+                    .filter {
+                        Instant.ofEpochMilli(it.startsAt).atZone(zone).toLocalDate() == parsed
                     }
-                },
-                enabled =
-                    !busy &&
-                        appointmentAt != null &&
-                        duration.toIntOrNull() in 1..1440 &&
-                        title.isNotBlank() &&
-                        (reminder.isBlank() || reminder.toIntOrNull() in 0..10080),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.save_appointment))
+                    .sortedBy { it.startsAt },
+                key = { "appointment${it.id}" },
+            ) { appointment ->
+                val description =
+                    stringResource(
+                        R.string.appointment_record_accessibility,
+                        appointment.title,
+                        readableTime(appointment.startsAt, zone),
+                    )
+                val editDescription =
+                    stringResource(R.string.edit_record_accessibility, description)
+                val deleteDescription =
+                    stringResource(R.string.delete_record_accessibility, description)
+                val completionDescription =
+                    stringResource(
+                        R.string.record_action_accessibility,
+                        stringResource(
+                            if (appointment.completed) R.string.appointment_reopen
+                            else R.string.appointment_complete
+                        ),
+                        description,
+                    )
+                val completionState =
+                    stringResource(
+                        if (appointment.completed) R.string.appointment_completed_state
+                        else R.string.appointment_upcoming_state
+                    )
+                OutlinedCard(
+                    Modifier.fillMaxWidth(),
+                    colors =
+                        CardDefaults.outlinedCardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                    border =
+                        androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outlineVariant,
+                        ),
+                    shape = MaterialTheme.shapes.small,
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(appointment.title, style = MaterialTheme.typography.titleMedium)
+                        Text(readableTime(appointment.startsAt, zone))
+                        if (appointment.note.isNotBlank()) Text(appointment.note)
+                        FlowRow(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            IconButton(
+                                onClick = {
+                                    editor = "appointment"
+                                    appointmentId = appointment.id
+                                    title = appointment.title
+                                    date =
+                                        Instant.ofEpochMilli(appointment.startsAt)
+                                            .atZone(zone)
+                                            .toLocalDate()
+                                            .toString()
+                                    appointmentTime =
+                                        Instant.ofEpochMilli(appointment.startsAt)
+                                            .atZone(zone)
+                                            .toOffsetDateTime()
+                                            .toOffsetTime()
+                                            .toString()
+                                    duration = appointment.durationMinutes.toString()
+                                    reminder = appointment.reminderMinutesBefore?.toString() ?: ""
+                                    appointmentNote = appointment.note
+                                },
+                                modifier = Modifier.recordAction(editDescription),
+                            ) {
+                                TrackerUtilityIcon(UtilityIcon.EDIT)
+                            }
+                            TextButton(
+                                onClick = {
+                                    model.saveAppointment(
+                                        appointment.copy(completed = !appointment.completed)
+                                    )
+                                },
+                                modifier =
+                                    Modifier.recordAction(completionDescription).semantics {
+                                        stateDescription = completionState
+                                    },
+                                enabled = !busy,
+                            ) {
+                                Text(
+                                    stringResource(
+                                        if (appointment.completed) R.string.appointment_reopen
+                                        else R.string.appointment_complete
+                                    )
+                                )
+                            }
+                            IconButton(
+                                onClick = { delete = "appointment" to appointment.id },
+                                modifier = Modifier.recordAction(deleteDescription),
+                                enabled = !busy,
+                            ) {
+                                TrackerUtilityIcon(UtilityIcon.DELETE)
+                            }
+                        }
+                    }
+                }
             }
         }
-        item {
-            Text(
-                stringResource(R.string.missing_interval),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.semantics { heading() },
+        if (editor == "appointment") {
+            item { Text(stringResource(R.string.appointment_permission_hint)) }
+            item {
+                TrackerTextField(
+                    title,
+                    { title = it.take(200) },
+                    label = { Text(stringResource(R.string.appointment_title)) },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .fieldError(title.isBlank(), R.string.title_required),
+                    isError = title.isBlank(),
+                )
+            }
+            item {
+                TimeField(
+                    appointmentTime,
+                    { appointmentTime = it },
+                    R.string.appointment_time,
+                    parsed,
+                    zone,
+                    !busy,
+                )
+            }
+            item {
+                TrackerTextField(
+                    duration,
+                    { duration = it },
+                    label = { Text(stringResource(R.string.appointment_duration)) },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .fieldError(
+                                duration.toIntOrNull() !in 1..1440,
+                                R.string.appointment_duration_invalid,
+                            ),
+                    isError = duration.toIntOrNull() !in 1..1440,
+                )
+            }
+            item {
+                TrackerTextField(
+                    reminder,
+                    { reminder = it },
+                    label = { Text(stringResource(R.string.appointment_reminder)) },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .fieldError(
+                                reminder.isNotBlank() && reminder.toIntOrNull() !in 0..10080,
+                                R.string.appointment_reminder_invalid,
+                            ),
+                    isError = reminder.isNotBlank() && reminder.toIntOrNull() !in 0..10080,
+                )
+            }
+            item {
+                TrackerTextField(
+                    appointmentNote,
+                    { appointmentNote = it.take(10000) },
+                    label = { Text(stringResource(R.string.appointment_note_text)) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+            if (
+                appointmentAt == null ||
+                    duration.toIntOrNull() !in 1..1440 ||
+                    title.isBlank() ||
+                    (reminder.isNotBlank() && reminder.toIntOrNull() !in 0..10080)
             )
+                item { FormFeedback(R.string.appointment_form_invalid) }
+            item {
+                Button(
+                    shape = androidx.compose.material3.MaterialTheme.shapes.small,
+                    onClick = {
+                        val existing = snapshot.appointments.firstOrNull { it.id == appointmentId }
+                        model.saveAppointment(
+                            (existing
+                                    ?: Appointment(
+                                        startsAt = appointmentAt!!,
+                                        durationMinutes = duration.toInt(),
+                                        title = title,
+                                    ))
+                                .copy(
+                                    startsAt = appointmentAt!!,
+                                    durationMinutes = duration.toInt(),
+                                    title = title,
+                                    note = appointmentNote,
+                                    reminderMinutesBefore = reminder.toIntOrNull(),
+                                )
+                        ) {
+                            editor = ""
+                            appointmentId = 0
+                            title = ""
+                            appointmentNote = ""
+                        }
+                    },
+                    enabled =
+                        !busy &&
+                            appointmentAt != null &&
+                            duration.toIntOrNull() in 1..1440 &&
+                            title.isNotBlank() &&
+                            (reminder.isBlank() || reminder.toIntOrNull() in 0..10080),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.save_appointment))
+                }
+            }
         }
-        item { Text(stringResource(R.string.missing_interval_hint)) }
-        item {
-            TimeField(
-                missingStart,
-                { missingStart = it },
-                R.string.interval_start,
-                parsed,
-                zone,
-                !busy,
-            )
-        }
-        item {
-            DateField(
-                missingEndDate,
-                { missingEndDate = it },
-                R.string.interval_end_date,
-                LocalDate.now(zone),
-                !busy,
-            )
-        }
-        item {
-            TimeField(
-                missingEnd,
-                { missingEnd = it },
-                R.string.interval_end,
-                runCatching { LocalDate.parse(missingEndDate) }.getOrNull(),
-                zone,
-                !busy,
-            )
-        }
-        item {
-            FilterChip(
-                selected = missingWearing,
-                onClick = { missingWearing = !missingWearing },
-                label = {
-                    Text(
-                        stringResource(
-                            if (missingWearing) R.string.widget_in else R.string.widget_out
+        if (editor.isEmpty() && calendar)
+            item {
+                TextButton(onClick = { editor = "correction" }, enabled = !busy) {
+                    Text(stringResource(R.string.missing_interval))
+                }
+            }
+        if (editor == "correction") {
+            item {
+                Text(
+                    stringResource(R.string.missing_interval),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.semantics { heading() },
+                )
+            }
+            item { Text(stringResource(R.string.missing_interval_hint)) }
+            item {
+                TimeField(
+                    missingStart,
+                    { missingStart = it },
+                    R.string.interval_start,
+                    parsed,
+                    zone,
+                    !busy,
+                )
+            }
+            item {
+                DateField(
+                    missingEndDate,
+                    { missingEndDate = it },
+                    R.string.interval_end_date,
+                    LocalDate.now(zone),
+                    !busy,
+                )
+            }
+            item {
+                TimeField(
+                    missingEnd,
+                    { missingEnd = it },
+                    R.string.interval_end,
+                    runCatching { LocalDate.parse(missingEndDate) }.getOrNull(),
+                    zone,
+                    !busy,
+                )
+            }
+            item {
+                FilterChip(
+                    selected = missingWearing,
+                    onClick = { missingWearing = !missingWearing },
+                    label = {
+                        Text(
+                            stringResource(
+                                if (missingWearing) R.string.widget_in else R.string.widget_out
+                            )
                         )
-                    )
-                },
-            )
-        }
-        if (start == null || end == null || start >= end || end > System.currentTimeMillis())
-            item { FormFeedback(R.string.correction_form_invalid) }
-        item {
-            Button(
-                shape = androidx.compose.material3.MaterialTheme.shapes.small,
-                onClick = { correctionConfirm = true },
-                enabled =
-                    !busy &&
-                        start != null &&
-                        end != null &&
-                        start < end &&
-                        end <= System.currentTimeMillis(),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.review_correction))
+                    },
+                )
+            }
+            if (start == null || end == null || start >= end || end > System.currentTimeMillis())
+                item { FormFeedback(R.string.correction_form_invalid) }
+            item {
+                Button(
+                    shape = androidx.compose.material3.MaterialTheme.shapes.small,
+                    onClick = { correctionConfirm = true },
+                    enabled =
+                        !busy &&
+                            start != null &&
+                            end != null &&
+                            start < end &&
+                            end <= System.currentTimeMillis(),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.review_correction))
+                }
             }
         }
     }

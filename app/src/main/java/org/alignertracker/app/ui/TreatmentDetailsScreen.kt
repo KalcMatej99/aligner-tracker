@@ -52,122 +52,149 @@ fun TreatmentDetailsScreen(
             .getOrNull()
     ScreenColumn {
         Heading(R.string.treatment_details)
-        TextButton(onClick = onDone, enabled = !busy) { Text(stringResource(R.string.not_now)) }
-        OptionalTreatmentForm(snapshot, model, busy)
-        Text(stringResource(R.string.schedule_instructions))
-        if (active != null && snapshot.plan?.completed == false) {
+        TreatmentPlanOverview(snapshot.plan)
+        ExpandableBlock(
+            R.string.support_plan_edit,
+            stringResource(R.string.support_plan_edit_hint),
+            Destination.DETAILS,
+        ) {
+            OptionalTreatmentForm(snapshot, model, busy)
+        }
+        if (active != null && snapshot.plan?.completed == false)
+            ExpandableBlock(
+                R.string.save_schedule,
+                stringResource(R.string.support_schedule_hint),
+                Destination.SCHEDULE,
+            ) {
+                Text(stringResource(R.string.schedule_instructions))
+                TrackerTextField(
+                    intervals,
+                    { intervals = it },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .fieldError(parsed == null, R.string.schedule_format_invalid),
+                    label = { Text(stringResource(R.string.variable_intervals)) },
+                    supportingText = { Text(stringResource(R.string.interval_example)) },
+                    isError = parsed == null,
+                )
+                if (parsed == null) FormFeedback(R.string.schedule_format_invalid)
+                TrackerTextField(
+                    reason,
+                    { reason = it.take(1000) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.adjustment_reason)) },
+                )
+                Button(
+                    shape = androidx.compose.material3.MaterialTheme.shapes.small,
+                    onClick = { confirm = "schedule" },
+                    enabled = !busy && parsed != null,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.save_schedule))
+                }
+            }
+        ExpandableBlock(
+            R.string.new_phase,
+            stringResource(R.string.support_phase_hint),
+            Destination.SCHEDULE,
+        ) {
+            Text(stringResource(R.string.phase_instructions))
             TrackerTextField(
-                intervals,
-                { intervals = it },
+                phaseName,
+                { phaseName = it.take(100) },
                 modifier =
                     Modifier.fillMaxWidth()
-                        .fieldError(parsed == null, R.string.schedule_format_invalid),
-                label = { Text(stringResource(R.string.variable_intervals)) },
-                supportingText = { Text(stringResource(R.string.interval_example)) },
-                isError = parsed == null,
+                        .fieldError(phaseName.isBlank(), R.string.phase_name_required),
+                label = { Text(stringResource(R.string.phase_name)) },
+                isError = phaseName.isBlank(),
             )
-            if (parsed == null) FormFeedback(R.string.schedule_format_invalid)
+            for (phaseKind in
+                listOf(TreatmentPhaseKind.REFINEMENT, TreatmentPhaseKind.RETENTION)) FilterChip(
+                selected = kind == phaseKind.name,
+                onClick = { kind = phaseKind.name },
+                label = {
+                    Text(
+                        stringResource(
+                            if (phaseKind == TreatmentPhaseKind.REFINEMENT)
+                                R.string.phase_refinement
+                            else R.string.phase_retention
+                        )
+                    )
+                },
+            )
             TrackerTextField(
-                reason,
-                { reason = it.take(1000) },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(R.string.adjustment_reason)) },
+                count,
+                { count = it },
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(count.toIntOrNull() !in 1..1000, R.string.tray_count_invalid),
+                label = { Text(stringResource(R.string.phase_count)) },
+                isError = count.toIntOrNull() !in 1..1000,
             )
+            TrackerTextField(
+                days,
+                { days = it },
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .fieldError(days.toIntOrNull() !in 1..365, R.string.tray_days_invalid),
+                label = { Text(stringResource(R.string.phase_days)) },
+                isError = days.toIntOrNull() !in 1..365,
+            )
+            Text(stringResource(R.string.phase_choose_state))
+            for (state in listOf(true, false)) FilterChip(
+                selected = phaseWearing == state,
+                onClick = { phaseWearing = state },
+                label = {
+                    Text(stringResource(if (state) R.string.widget_in else R.string.widget_out))
+                },
+            )
+            if (
+                phaseName.isBlank() ||
+                    count.toIntOrNull() !in 1..1000 ||
+                    days.toIntOrNull() !in 1..365
+            )
+                FormFeedback(R.string.phase_form_invalid)
             Button(
                 shape = androidx.compose.material3.MaterialTheme.shapes.small,
-                onClick = { confirm = "schedule" },
-                enabled = !busy && parsed != null,
+                onClick = { confirm = "phase" },
+                enabled =
+                    !busy &&
+                        phaseWearing != null &&
+                        phaseName.isNotBlank() &&
+                        count.toIntOrNull() in 1..1000 &&
+                        days.toIntOrNull() in 1..365,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(stringResource(R.string.save_schedule))
+                Text(stringResource(R.string.begin_phase))
             }
         }
-        Text(
-            stringResource(R.string.new_phase),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.semantics { heading() },
-        )
-        Text(stringResource(R.string.phase_instructions))
-        TrackerTextField(
-            phaseName,
-            { phaseName = it.take(100) },
-            modifier =
-                Modifier.fillMaxWidth()
-                    .fieldError(phaseName.isBlank(), R.string.phase_name_required),
-            label = { Text(stringResource(R.string.phase_name)) },
-            isError = phaseName.isBlank(),
-        )
-        for (phaseKind in
-            listOf(TreatmentPhaseKind.REFINEMENT, TreatmentPhaseKind.RETENTION)) FilterChip(
-            selected = kind == phaseKind.name,
-            onClick = { kind = phaseKind.name },
-            label = {
+        if (snapshot.trayHistory.isNotEmpty())
+            ExpandableBlock(
+                R.string.actual_tray_history,
+                stringResource(R.string.support_history_hint),
+                Destination.HISTORY,
+            ) {
                 Text(
-                    stringResource(
-                        if (phaseKind == TreatmentPhaseKind.REFINEMENT) R.string.phase_refinement
-                        else R.string.phase_retention
+                    stringResource(R.string.actual_tray_history),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.semantics { heading() },
+                )
+                if (snapshot.trayHistory.isEmpty())
+                    Text(stringResource(R.string.tray_history_empty))
+                snapshot.trayHistory.asReversed().forEach { entry ->
+                    val name = snapshot.phases.firstOrNull { it.id == entry.phaseId }?.name ?: ""
+                    Text(
+                        stringResource(
+                            R.string.tray_history_row,
+                            name,
+                            entry.trayNumber,
+                            entry.startedOn,
+                            entry.endedOn ?: stringResource(R.string.ongoing),
+                            entry.prescribedDays,
+                        )
                     )
-                )
-            },
-        )
-        TrackerTextField(
-            count,
-            { count = it },
-            modifier =
-                Modifier.fillMaxWidth()
-                    .fieldError(count.toIntOrNull() !in 1..1000, R.string.tray_count_invalid),
-            label = { Text(stringResource(R.string.phase_count)) },
-            isError = count.toIntOrNull() !in 1..1000,
-        )
-        TrackerTextField(
-            days,
-            { days = it },
-            modifier =
-                Modifier.fillMaxWidth()
-                    .fieldError(days.toIntOrNull() !in 1..365, R.string.tray_days_invalid),
-            label = { Text(stringResource(R.string.phase_days)) },
-            isError = days.toIntOrNull() !in 1..365,
-        )
-        Text(stringResource(R.string.phase_choose_state))
-        for (state in listOf(true, false)) FilterChip(
-            selected = phaseWearing == state,
-            onClick = { phaseWearing = state },
-            label = { Text(stringResource(if (state) R.string.widget_in else R.string.widget_out)) },
-        )
-        if (phaseName.isBlank() || count.toIntOrNull() !in 1..1000 || days.toIntOrNull() !in 1..365)
-            FormFeedback(R.string.phase_form_invalid)
-        Button(
-            shape = androidx.compose.material3.MaterialTheme.shapes.small,
-            onClick = { confirm = "phase" },
-            enabled =
-                !busy &&
-                    phaseWearing != null &&
-                    phaseName.isNotBlank() &&
-                    count.toIntOrNull() in 1..1000 &&
-                    days.toIntOrNull() in 1..365,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(stringResource(R.string.begin_phase))
-        }
-        Text(
-            stringResource(R.string.actual_tray_history),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.semantics { heading() },
-        )
-        if (snapshot.trayHistory.isEmpty()) Text(stringResource(R.string.tray_history_empty))
-        snapshot.trayHistory.asReversed().forEach { entry ->
-            val name = snapshot.phases.firstOrNull { it.id == entry.phaseId }?.name ?: ""
-            Text(
-                stringResource(
-                    R.string.tray_history_row,
-                    name,
-                    entry.trayNumber,
-                    entry.startedOn,
-                    entry.endedOn ?: stringResource(R.string.ongoing),
-                    entry.prescribedDays,
-                )
-            )
-        }
+                }
+            }
     }
     confirm?.let { action ->
         TrackerDialog(

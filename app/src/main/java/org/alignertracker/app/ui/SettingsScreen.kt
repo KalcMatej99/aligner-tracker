@@ -4,21 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,10 +53,6 @@ fun SettingsScreen(
 ) {
     var choosingZone by rememberSaveable { mutableStateOf(false) }
     var zoneQuery by rememberSaveable { mutableStateOf("") }
-    var goal by rememberSaveable(plan?.dailyGoalMinutes) { mutableStateOf("") }
-    var goalError by rememberSaveable { mutableStateOf(false) }
-    val goalFeedback = remember { BringIntoViewRequester() }
-    LaunchedEffect(goalError) { if (goalError) goalFeedback.bringIntoView() }
     var enabled by rememberSaveable(preferences.enabled) { mutableStateOf(preferences.enabled) }
     var trayEnabled by
         rememberSaveable(preferences.trayEnabled) { mutableStateOf(preferences.trayEnabled) }
@@ -72,75 +64,16 @@ fun SettingsScreen(
     var delayError by rememberSaveable { mutableStateOf(false) }
     ScreenColumn {
         Heading(R.string.settings_heading)
-        if (plan != null)
-            TextButton(onClick = onDetails) {
-                Text(stringResource(R.string.edit_treatment_details))
-            }
-        if (plan != null)
-            Section(R.string.target_heading) {
-                plan.dailyGoalMinutes?.let {
-                    Text(stringResource(R.string.goal_value, durationLabel(it * 60_000L)))
-                }
-                Entry(
-                    goal,
-                    {
-                        goal = it
-                        goalError = false
-                    },
-                    R.string.optional_goal_hours,
-                    numeric = true,
-                    error = goalError,
-                    errorMessage = if (goalError) R.string.goal_hours_invalid else null,
-                    enabled = !busy && !plan.completed,
-                    modifier = Modifier.bringIntoViewRequester(goalFeedback),
-                )
-                Text(
-                    stringResource(
-                        if (plan.dailyGoalMinutes == null) R.string.initial_target_help
-                        else R.string.target_help
-                    )
-                )
-                Button(
-                    shape = androidx.compose.material3.MaterialTheme.shapes.small,
-                    onClick = {
-                        val value = parseUserHours(goal)
-                        goalError = value == null || value !in 1..1440
-                        if (!goalError) onGoal(value!!)
-                    },
-                    enabled = !busy && !plan.completed,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-                ) {
-                    Text(stringResource(R.string.save_target))
-                }
-            }
-        Section(R.string.treatment_zone) {
-            Text(stringResource(R.string.zone_value, readableZone(plan?.zoneId ?: startupZone)))
-            Text(stringResource(R.string.fixed_zone_help))
-            if (plan == null) {
-                TextButton(onClick = { choosingZone = !choosingZone }) {
-                    Text(stringResource(R.string.change_accounting_zone))
-                }
-                if (choosingZone) {
-                    Entry(zoneQuery, { zoneQuery = it }, R.string.search_zones)
-                    java.time.ZoneId.getAvailableZoneIds()
-                        .sorted()
-                        .filter { it.replace('_', ' ').contains(zoneQuery, ignoreCase = true) }
-                        .take(40)
-                        .forEach { id ->
-                            TextButton(
-                                onClick = {
-                                    onStartupZone(id)
-                                    choosingZone = false
-                                }
-                            ) {
-                                Text(readableZone(id))
-                            }
-                        }
-                }
-            }
-        }
+        if (plan != null) TreatmentSettingsLink(onDetails)
         if (plan != null && !plan.completed)
-            Section(R.string.reminder_heading) {
+            ExpandableBlock(
+                R.string.reminder_heading,
+                stringResource(
+                    if (notificationsAllowed) R.string.notifications_allowed
+                    else R.string.notifications_blocked
+                ),
+                Destination.TODAY,
+            ) {
                 Text(stringResource(R.string.reminder_staged))
                 ToggleRow(stringResource(R.string.break_reminder), enabled, !busy) {
                     enabled = it
@@ -240,8 +173,41 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        HorizontalDivider()
-        Section(R.string.data_heading) {
+        ExpandableBlock(
+            R.string.treatment_zone,
+            readableZone(plan?.zoneId ?: startupZone),
+            Destination.HISTORY,
+        ) {
+            Text(stringResource(R.string.zone_value, readableZone(plan?.zoneId ?: startupZone)))
+            Text(stringResource(R.string.fixed_zone_help))
+            if (plan == null) {
+                TextButton(onClick = { choosingZone = !choosingZone }) {
+                    Text(stringResource(R.string.change_accounting_zone))
+                }
+                if (choosingZone) {
+                    Entry(zoneQuery, { zoneQuery = it }, R.string.search_zones)
+                    java.time.ZoneId.getAvailableZoneIds()
+                        .sorted()
+                        .filter { it.replace('_', ' ').contains(zoneQuery, ignoreCase = true) }
+                        .take(40)
+                        .forEach { id ->
+                            TextButton(
+                                onClick = {
+                                    onStartupZone(id)
+                                    choosingZone = false
+                                }
+                            ) {
+                                Text(readableZone(id))
+                            }
+                        }
+                }
+            }
+        }
+        ExpandableBlock(
+            R.string.data_heading,
+            stringResource(R.string.support_data_hint),
+            Destination.SETTINGS,
+        ) {
             Text(stringResource(R.string.data_help))
             if (plan != null) {
                 OutlinedButton(
@@ -297,8 +263,11 @@ fun SettingsScreen(
                     )
                 }
         }
-        HorizontalDivider()
-        Section(R.string.watch_information) {
+        ExpandableBlock(
+            R.string.watch_information,
+            stringResource(R.string.support_watch_hint),
+            Destination.SETTINGS,
+        ) {
             Text(
                 stringResource(R.string.watch_privacy),
                 style = MaterialTheme.typography.bodyMedium,
@@ -335,5 +304,24 @@ private fun ToggleRow(
             enabled = enabled,
             modifier = Modifier.clearAndSetSemantics {},
         )
+    }
+}
+
+@Composable
+private fun TreatmentSettingsLink(onDetails: () -> Unit) {
+    androidx.compose.material3.OutlinedCard(
+        onClick = onDetails,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        androidx.compose.foundation.layout.Column(Modifier.padding(16.dp)) {
+            Text(
+                stringResource(R.string.treatment_details),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                stringResource(R.string.support_plan_edit_hint),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
     }
 }

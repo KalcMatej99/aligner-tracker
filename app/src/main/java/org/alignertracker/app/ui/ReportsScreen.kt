@@ -29,6 +29,7 @@ fun ReportsScreen(
     now: Instant,
     preferences: ReminderPreferences,
     busy: Boolean = false,
+    onPhotos: (() -> Unit)? = null,
 ) {
     if (snapshot.plan == null) {
         ScreenColumn {
@@ -49,10 +50,15 @@ fun ReportsScreen(
             ->
             uri?.let { model.export(context.contentResolver, it, true) }
         }
-    ProgressOverview(snapshot, now) {
-        count = it
-        showTools = true
-    }
+    ProgressOverview(
+        snapshot,
+        now,
+        onPhotos = onPhotos,
+        onTools = {
+            count = it
+            showTools = true
+        },
+    )
     if (showTools)
         ModalBottomSheet(onDismissRequest = { showTools = false }) {
             LazyColumn(

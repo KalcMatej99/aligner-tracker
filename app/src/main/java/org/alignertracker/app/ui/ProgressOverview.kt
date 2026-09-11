@@ -35,7 +35,12 @@ internal fun completeProgressDays(days: List<DaySummary>, today: LocalDate, zone
     }
 
 @Composable
-internal fun ProgressOverview(snapshot: TrackerSnapshot, now: Instant, onTools: (Int) -> Unit) {
+internal fun ProgressOverview(
+    snapshot: TrackerSnapshot,
+    now: Instant,
+    onPhotos: (() -> Unit)? = null,
+    onTools: (Int) -> Unit,
+) {
     var count by rememberSaveable { mutableStateOf(7) }
     val zone = ZoneId.of(snapshot.plan?.zoneId ?: "UTC")
     val today = now.atZone(zone).toLocalDate()
@@ -166,6 +171,7 @@ internal fun ProgressOverview(snapshot: TrackerSnapshot, now: Instant, onTools: 
                 }
             }
         }
+        if (onPhotos != null) item { PhotoProgressEntry(snapshot.photos.size, onPhotos) }
         item {
             OutlinedButton(
                 onClick = { onTools(count) },

@@ -264,17 +264,16 @@ fun TrackerApp(model: TrackerViewModel) {
                                 onDismissRequest = { moreExpanded = false },
                             ) {
                                 for (target in
-                                    listOf(
-                                        Destination.DETAILS,
-                                        Destination.JOURNAL,
-                                        Destination.PHOTOS,
-                                    )) androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(stringResource(target.title)) },
-                                    onClick = {
-                                        moreExpanded = false
-                                        navigate(target)
-                                    },
-                                )
+                                    listOf(Destination.DETAILS, Destination.JOURNAL)) androidx
+                                    .compose
+                                    .material3
+                                    .DropdownMenuItem(
+                                        text = { Text(stringResource(target.title)) },
+                                        onClick = {
+                                            moreExpanded = false
+                                            navigate(target)
+                                        },
+                                    )
                             }
                         }
                     if (snapshot != null && destination != Destination.SETTINGS)
@@ -438,7 +437,14 @@ fun TrackerApp(model: TrackerViewModel) {
                                 Destination.HISTORY ->
                                     HistoryScreen(state, now, busy) { editId = it }
                                 Destination.PROGRESS ->
-                                    ReportsScreen(state, model, now, preferences, busy)
+                                    ReportsScreen(
+                                        state,
+                                        model,
+                                        now,
+                                        preferences,
+                                        busy,
+                                        onPhotos = { navigate(Destination.PHOTOS) },
+                                    )
                                 Destination.PHOTOS -> PhotosScreen(state, model, busy)
                                 Destination.DETAILS ->
                                     TreatmentDetailsScreen(state, model, busy) { goBack() }
