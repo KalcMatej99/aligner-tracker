@@ -1,0 +1,8 @@
+
+org.alignertracker.app.ui.PrivacyInformationTest:.
+
+Time: 5.982
+
+OK (1 test)
+
+

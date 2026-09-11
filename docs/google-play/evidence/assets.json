@@ -1,0 +1,32 @@
+[
+  {
+    "file": "docs/google-play/assets/icon.png",
+    "width": 512,
+    "height": 512
+  },
+  {
+    "file": "docs/google-play/assets/feature.png",
+    "width": 1024,
+    "height": 500
+  },
+  {
+    "file": "docs/google-play/assets/phone/01-today.png",
+    "width": 1080,
+    "height": 2160
+  },
+  {
+    "file": "docs/google-play/assets/phone/04-progress.png",
+    "width": 1080,
+    "height": 2160
+  },
+  {
+    "file": "docs/google-play/assets/phone/02-history.png",
+    "width": 1080,
+    "height": 2160
+  },
+  {
+    "file": "docs/google-play/assets/phone/03-schedule.png",
+    "width": 1080,
+    "height": 2160
+  }
+]

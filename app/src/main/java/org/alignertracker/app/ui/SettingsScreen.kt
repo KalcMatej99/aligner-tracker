@@ -274,6 +274,7 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+        PrivacyInformation()
         Text(stringResource(R.string.privacy_footer), style = MaterialTheme.typography.bodyMedium)
     }
 }

@@ -1,0 +1,53 @@
+{
+  "apk_sha256": "916c436e086c9e7434f12fdb9ea6d6ca7b81cce28e206f437effe6051e249732",
+  "zip_alignment_16kb": true,
+  "elf_libraries": [
+    {
+      "library": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "relro_end_mod_16384": [
+        8192
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libdatastore_shared_counter.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ],
+      "relro_end_mod_16384": [
+        0
+      ]
+    },
+    {
+      "library": "lib/x86_64/libandroidx.graphics.path.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "relro_end_mod_16384": [
+        12288
+      ]
+    },
+    {
+      "library": "lib/x86_64/libdatastore_shared_counter.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ],
+      "relro_end_mod_16384": [
+        0
+      ]
+    }
+  ],
+  "runtime_test_required": true
+}

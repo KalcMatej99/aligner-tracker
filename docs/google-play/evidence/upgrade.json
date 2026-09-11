@@ -1,0 +1,28 @@
+{
+  "from_version_code": 12,
+  "to_version_code": 13,
+  "bundletool_device_split_upgrade": true,
+  "tables_equal": true,
+  "table_counts": {
+    "android_metadata": 1,
+    "appointments": 1,
+    "command_outcomes": 0,
+    "photo_metadata": 0,
+    "room_master_table": 1,
+    "schedule_revisions": 0,
+    "sqlite_sequence": 4,
+    "target_history": 0,
+    "tracker_state": 1,
+    "tracking_gaps": 1,
+    "tray_history": 0,
+    "tray_intervals": 0,
+    "treatment": 1,
+    "treatment_notes": 1,
+    "treatment_phases": 0,
+    "wear_events": 13
+  },
+  "preferences_equal": true,
+  "preferences": {},
+  "play_delivered_build": false,
+  "physical_device": false
+}
