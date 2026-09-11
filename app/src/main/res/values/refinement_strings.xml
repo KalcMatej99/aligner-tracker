@@ -32,5 +32,8 @@
     <string name="history_legend_out">OUT</string>
     <string name="history_legend_unknown">Untracked</string>
     <string name="history_legend_future">Future</string>
-    <string name="history_bar_note">Daily totals, not the order of changes.</string>
+    <string name="history_bar_note">Color shows recorded state at that time.</string>
+    <string name="history_timeline">Day timeline · 24-hour clock</string>
+    <string name="history_axis_hour" translatable="false">%1$02d:00</string>
+    <string name="history_time_interval">%1$s: %2$s to %3$s</string>
 </resources>

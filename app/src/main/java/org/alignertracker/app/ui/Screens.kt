@@ -322,7 +322,7 @@ internal fun Totals(
     zone: ZoneId,
     showCurrentNote: Boolean = false,
     wearGoalBelowBar: Boolean = false,
-    historyLegend: Boolean = false,
+    historySnapshot: TrackerSnapshot? = null,
 ) {
     val date = LocalDate.parse(summary.date)
     val elapsed =
@@ -341,7 +341,8 @@ internal fun Totals(
                 prominent = true,
             )
         }
-        BreakdownBar(summary, now, zone)
+        if (historySnapshot != null) HistoryDayTimeline(historySnapshot, date, now, zone)
+        else BreakdownBar(summary, now, zone)
         if (wearGoalBelowBar) TodayWearGoal(summary)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
@@ -358,7 +359,7 @@ internal fun Totals(
                 style = MaterialTheme.typography.bodySmall,
             )
         }
-        if (historyLegend) HistoryBarLegend()
+        if (historySnapshot != null) HistoryBarLegend()
         else
             DetailsDisclosure(R.string.time_details) {
                 Text(stringResource(R.string.time_details_body))
@@ -736,7 +737,7 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                 }
             }
             if (summary.trackedMillis == 0L) Text(stringResource(R.string.no_tracking))
-            Totals(summary, now, zone, date == today && !plan.completed, historyLegend = true)
+            Totals(summary, now, zone, date == today && !plan.completed, historySnapshot = snapshot)
         }
         Section(R.string.events_heading) {
             if (events.isEmpty()) Text(stringResource(R.string.no_changes))

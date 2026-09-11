@@ -27,7 +27,7 @@ class HistoryFocusTest {
         var edited: Long? = null
         compose.setContent { AlignerTheme { HistoryScreen(snapshot, now, busy) { edited = it } } }
         compose.onNodeWithText("About this breakdown").assertDoesNotExist()
-        compose.onNodeWithText("Daily totals, not the order of changes.").assertIsDisplayed()
+        compose.onNodeWithText("Color shows recorded state at that time.").assertIsDisplayed()
         compose
             .onNodeWithContentDescription("Edit time for Aligners in", substring = true)
             .assertDoesNotExist()
