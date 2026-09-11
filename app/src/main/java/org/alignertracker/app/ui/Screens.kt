@@ -322,7 +322,7 @@ internal fun Totals(
     zone: ZoneId,
     showCurrentNote: Boolean = false,
     wearGoalBelowBar: Boolean = false,
-    historySnapshot: TrackerSnapshot? = null,
+    timelineSnapshot: TrackerSnapshot? = null,
 ) {
     val date = LocalDate.parse(summary.date)
     val elapsed =
@@ -341,7 +341,7 @@ internal fun Totals(
                 prominent = true,
             )
         }
-        if (historySnapshot != null) HistoryDayTimeline(historySnapshot, date, now, zone)
+        if (timelineSnapshot != null) HistoryDayTimeline(timelineSnapshot, date, now, zone)
         else BreakdownBar(summary, now, zone)
         if (wearGoalBelowBar) TodayWearGoal(summary)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -359,7 +359,7 @@ internal fun Totals(
                 style = MaterialTheme.typography.bodySmall,
             )
         }
-        if (historySnapshot != null) HistoryBarLegend()
+        if (timelineSnapshot != null) HistoryBarLegend()
         else
             DetailsDisclosure(R.string.time_details) {
                 Text(stringResource(R.string.time_details_body))
@@ -544,7 +544,14 @@ fun TodayScreen(
                     }
                 HorizontalDivider()
                 Section(R.string.today_summary) {
-                    Totals(summary, now, zone, !plan.completed, wearGoalBelowBar = true)
+                    Totals(
+                        summary,
+                        now,
+                        zone,
+                        !plan.completed,
+                        wearGoalBelowBar = true,
+                        timelineSnapshot = snapshot,
+                    )
                 }
                 if (
                     !detailsDismissed &&
@@ -737,7 +744,13 @@ fun HistoryScreen(snapshot: TrackerSnapshot, now: Instant, busy: Boolean, onEdit
                 }
             }
             if (summary.trackedMillis == 0L) Text(stringResource(R.string.no_tracking))
-            Totals(summary, now, zone, date == today && !plan.completed, historySnapshot = snapshot)
+            Totals(
+                summary,
+                now,
+                zone,
+                date == today && !plan.completed,
+                timelineSnapshot = snapshot,
+            )
         }
         Section(R.string.events_heading) {
             if (events.isEmpty()) Text(stringResource(R.string.no_changes))
