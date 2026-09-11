@@ -62,3 +62,7 @@ was opened and cancelled, confirming the original actual-change guard remains.
 Final `scripts/check.sh` passed with JDK21: 66 phone +9 Wear JVM tests, Spotless,
 debug/release lint and all required phone/Wear debug, instrumentation and release
 builds. Local build artifacts are validation outputs, not a published release.
+
+The owner approved the result and authorized merge and deployment. These changes
+are now included in private update 10; see [release evidence](release.md). Earlier
+preparation-only statements above describe the state before that authorization.

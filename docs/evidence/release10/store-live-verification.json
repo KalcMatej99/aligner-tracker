@@ -1,0 +1,21 @@
+{
+  "status": "verified",
+  "fingerprint": "7F72BE14125ABE9A79D5B291956D5BAA30E79E0BA8ED34441485D07C5B21BD32",
+  "releases": 9,
+  "retained_releases": 9,
+  "withdrawals": 0,
+  "index_v2_sha256": "b728a23a7a9d50371a8ec6c012d31693c1bc74d6726bee67935654f578be83f3",
+  "timestamp": 1789108555000,
+  "apk": {
+    "package_id": "org.alignertracker.app",
+    "version_code": 10,
+    "version_name": "1.0.0-dev",
+    "min_sdk": 26,
+    "apk_sha256": "ceebacdf72d4ec4af9cac66dcc87c9bb77cca63a41bfdc48c4da30d1e4188483",
+    "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9"
+  },
+  "all_https_files_match": true,
+  "lan_http_status": "403",
+  "merged_commit": "45c35c3388d7d2c39ecfb359a24e113a77d309be",
+  "physical_installation": false
+}
