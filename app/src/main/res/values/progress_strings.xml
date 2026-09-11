@@ -1,0 +1,21 @@
+<resources>
+    <string name="progress_window">%1$d days</string>
+    <string name="progress_average">Average daily wear</string>
+    <string name="progress_unavailable">—</string>
+    <string name="progress_wait_complete">Available after a fully recorded day</string>
+    <plurals name="progress_average_basis"><item quantity="one">Based on %1$d complete day · excludes today</item><item quantity="other">Based on %1$d complete days · excludes today</item></plurals>
+    <string name="progress_daily_wear">Daily wear</string>
+    <string name="progress_recorded">Recorded wear</string>
+    <string name="progress_incomplete">Partial day</string>
+    <string name="progress_target">Target</string>
+    <string name="progress_complete">Complete day</string>
+    <string name="progress_missing">No recorded time</string>
+    <string name="progress_hours">Hours</string>
+    <string name="progress_coverage">Tracking coverage</string>
+    <string name="progress_coverage_counts">%1$d complete · %2$d partial · %3$d no data</string>
+    <string name="progress_target_days">Target reached on %1$d of %2$d complete days with a target</string>
+    <string name="progress_tools">Details &amp; export</string>
+    <string name="progress_export">Export all history (CSV)</string>
+    <string name="progress_day_description">%1$s. Wear %2$s. Out %3$s. %4$s. Target: %5$s.</string>
+    <string name="progress_chart_help">Bars show recorded wear, not when it happened. Stripes mark partial days, including today; a dash at zero means no data. Target marks use each day’s saved target. Coverage blocks are full, half-filled or empty. Only fully recorded past days count toward the average and target comparison.</string>
+</resources>

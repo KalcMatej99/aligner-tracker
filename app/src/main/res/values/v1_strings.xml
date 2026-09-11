@@ -66,7 +66,7 @@
     <string name="interval_end">End time</string>
     <string name="review_correction">Review correction</string>
     <string name="delete_record_hint">Delete this record from the app? Previously exported copies are unaffected.</string>
-    <string name="reports_title">Reports</string>
+    <string name="reports_title">Progress</string>
     <string name="reports_rules">Only recorded time is counted. Targets are those prescribed for each date. Untracked time is unknown.</string>
     <string name="report_days">Days: %1$d</string>
     <string name="report_totals">Worn %1$d min · removed %2$d min · covered %3$d min</string>

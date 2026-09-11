@@ -438,7 +438,7 @@ fun TrackerApp(model: TrackerViewModel) {
                                 Destination.HISTORY ->
                                     HistoryScreen(state, now, busy) { editId = it }
                                 Destination.PROGRESS ->
-                                    ReportsScreen(state, model, now, preferences)
+                                    ReportsScreen(state, model, now, preferences, busy)
                                 Destination.PHOTOS -> PhotosScreen(state, model, busy)
                                 Destination.DETAILS ->
                                     TreatmentDetailsScreen(state, model, busy) { goBack() }
