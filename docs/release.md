@@ -1,6 +1,8 @@
 # Release preparation and artifact verification
 
-Current private phone update: **versionCode 10**, published on 2026-09-11 after the
+Current private phone update: **versionCode 11**, published on 2026-09-11 after owner authorization. Progress includes photo access; Settings, Treatment details, Calendar and Notes are redesigned. [Release and upgrade evidence](release11.md). Refresh Kalc Apps in F-Droid while connected to Tailscale, or [download the APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_11.apk). No owner-phone installation was performed.
+
+Previous private phone update: **versionCode 10**, published on 2026-09-11 after the
 owner approved Schedule and requested “merge and deploy”. PRs
 [#47](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/47) and
 [#49](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/49) are merged.
