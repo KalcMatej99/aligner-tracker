@@ -1,0 +1,19 @@
+{
+  "source_commit": "3e4c196f3cdb58dd645b8b1291c77accc929f25c",
+  "version_name": "1.1.0",
+  "version_code": 13,
+  "bundletool": "1.18.3",
+  "bundletool_sha256": "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29",
+  "app_signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9",
+  "play_uploaded": false,
+  "private_store_published": false,
+  "physical_installation": false,
+  "artifacts": {
+    "aligner-tracker.aab": "bf0648ed7b919f3980c9a8b67c855984b44186fd6902c3d94eb8f75a19e500f9",
+    "universal.apks": "b1fd69d4b7c9a9f81cb5687dcb40ac6b522c94d34ca3f2f870f645ad7fda0b30",
+    "universal.apk": "916c436e086c9e7434f12fdb9ea6d6ca7b81cce28e206f437effe6051e249732",
+    "device-splits.apks": "aa91a09582d36414ab2e22bae2ac78da4b6e214970b0c6a9df5aac445a363dfa",
+    "source.tar.gz": "840e57b3cf1238acb59aac01c73f455630203b2d46498b23d6fe432e2c6cb6da",
+    "corresponding-source.tar.gz": "c16c8632c10ac301ead9ffc5cb259589adf01ad2b4b6685a77fa8411939f08fd"
+  }
+}

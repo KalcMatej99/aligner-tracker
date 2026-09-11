@@ -1,0 +1,11 @@
+{
+  "policy_url": "https://matejkalc.com/aligner-tracker/privacy.html",
+  "policy_sha256": "960daf3e9e20b33b1884d8454921b106c70ba370a438c7fe1aaa525be6fcd10d",
+  "policy_matches_canonical_html": true,
+  "source_url": "https://matejkalc.com/aligner-tracker/source/1.1.0-13.tar.gz",
+  "source_sha256": "c16c8632c10ac301ead9ffc5cb259589adf01ad2b4b6685a77fa8411939f08fd",
+  "source_download_matches": true,
+  "portfolio_pr": "https://github.com/KalcMatej99/portfolio/pull/45",
+  "portfolio_merge": "596677d97be8e2864f6338a673d8d4f727a2f177",
+  "no_private_store_exposure": true
+}

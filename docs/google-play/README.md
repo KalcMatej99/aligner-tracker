@@ -10,18 +10,25 @@ it does not publish a new private-store version or indicate Play approval.
 - [Public policy text](privacy-policy.md), generated from the exact English app resources using `python3 scripts/render-privacy-policy.py`. Run with `--check` to verify parity. Public contact: **me@matejkalc.com**, explicitly provided by the owner.
 - [Listing and original source assets](listing.md): title, short/full description, release notes, app icon, feature graphic and actual synthetic-record phone screenshots.
 - [Declaration worksheet](declarations.md): health features, data inventory, Wear/export boundaries and owner-dependent Console fields.
-- Local signed AAB, universal APK and device-specific split APK set, with exact committed source and notices. See validation evidence below. The signing process uses the existing owner key locally; no key is uploaded/exported to Google.
+- Local signed AAB, universal APK and device-specific split APK set, with exact committed source and notices. See [validation](validation.md). The signing process uses the existing owner key locally; no key is uploaded/exported to Google.
 - Reusable `scripts/build-play-candidate.sh`, `scripts/verify-play-native.py` and public/in-app policy parity check. Output is outside Git; no APKs, keys or passwords are committed.
 
 ## Public policy location
 
 Candidate policy URL:
-https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/src/branch/play/closed-testing/docs/google-play/privacy-policy.md
+https://matejkalc.com/aligner-tracker/privacy.html
 
-This is a normal public repository document, not the Tailscale-only app store. Keep
-the candidate branch while this URL is in use. After merge, use the main-branch URL
-and recheck anonymous access before entering it in Console. Do not submit a PR diff,
-PDF, login-only link or private-store URL as the policy.
+The policy is a standalone HTML page on the owner's public website. It has no
+JavaScript, analytics, form or login. The candidate source is also available at
+https://matejkalc.com/aligner-tracker/source/1.1.0-13.tar.gz with build instructions,
+GPL license and dependency notices. Source commit and checksum accompany it at
+https://matejkalc.com/aligner-tracker/source/1.1.0-13.txt.
+
+Forgejo's public DNS resolves to a Tailscale address: its repository URL is **not**
+a suitable globally accessible Play policy or source link. Neither private service
+was exposed or reconfigured. Regenerate/copy the HTML to portfolio
+`public/aligner-tracker/privacy.html` when the canonical policy changes; verify
+byte parity and public HTTPS after deployment.
 
 ## Owner steps before uploading
 

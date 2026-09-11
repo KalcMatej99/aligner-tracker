@@ -1,0 +1,14 @@
+[
+  {
+    "case": "mobile",
+    "overflow": false,
+    "errors": [],
+    "headings": 9
+  },
+  {
+    "case": "large-dark",
+    "overflow": false,
+    "errors": [],
+    "headings": 9
+  }
+]

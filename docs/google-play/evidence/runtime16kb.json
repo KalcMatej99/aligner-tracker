@@ -1,0 +1,14 @@
+{
+  "api": 35,
+  "emulator": "aligner-play16k",
+  "page_size": 16384,
+  "native_libraries_explicitly_loaded": true,
+  "debug_and_release_x86_64_libraries_identical": {
+    "lib/x86_64/libandroidx.graphics.path.so": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+    "lib/x86_64/libdatastore_shared_counter.so": "c3973140a0e6144a83e7dd7ee3c4e161f42181591feda254e12c8395d3bbacd0"
+  },
+  "instrumented_tests_passed": 6,
+  "signed_release_fresh_start_in_out_and_restart": true,
+  "arm64_hardware_tested": false,
+  "google_play_delivery_tested": false
+}

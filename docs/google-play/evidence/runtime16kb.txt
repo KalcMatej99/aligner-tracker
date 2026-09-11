@@ -1,0 +1,14 @@
+
+org.alignertracker.app.ui.PlayNativeCompatibilityTest:.
+org.alignertracker.app.ui.PrivacyInformationTest:.
+org.alignertracker.app.data.TrackerPersistenceTest:..
+org.alignertracker.app.photos.PhotoArchiveTest:.
+org.alignertracker.app.reminders.ReminderPlatformTest:INSTRUMENTATION_STATUS: reminder_delivery=AlarmManager
+INSTRUMENTATION_STATUS_CODE: 0
+.
+
+Time: 20.301
+
+OK (6 tests)
+
+
