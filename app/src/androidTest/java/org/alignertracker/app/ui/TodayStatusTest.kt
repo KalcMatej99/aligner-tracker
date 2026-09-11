@@ -42,6 +42,11 @@ class TodayStatusTest {
         compose.setContent {
             AlignerTheme { TodayScreen(fixture(), time, busy, {}, { busy = true }, {}) }
         }
+        compose
+            .onNodeWithContentDescription("Day timeline · 24-hour clock.", substring = true)
+            .performScrollTo()
+            .assertExists()
+        compose.onNodeWithText("About this breakdown").assertDoesNotExist()
         compose.onNodeWithText("Take aligners out").performClick()
         compose.onNodeWithText("Saving…").assertIsNotEnabled()
         compose.onNodeWithText("Forgot a switch? Correct it").assertIsNotEnabled()
