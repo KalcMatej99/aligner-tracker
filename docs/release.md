@@ -1,6 +1,12 @@
 # Release preparation and artifact verification
 
-Current private phone update: **versionCode 11**, published on 2026-09-11 after owner authorization. Progress includes photo access; Settings, Treatment details, Calendar and Notes are redesigned. [Release and upgrade evidence](release11.md). Refresh Kalc Apps in F-Droid while connected to Tailscale, or [download the APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_11.apk). No owner-phone installation was performed.
+Current private release: **1.1.0 (versionCode 12)**, published on 2026-09-11 at the owner's explicit request. [Download 1.1.0](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_12.apk) while connected to Tailscale, or refresh Kalc Apps in F-Droid.
+
+This is the accepted version 11 app with release metadata updated in both modules. PR #58 merged as `ac47660d6c3baf281bf6d041a919fd2fb115e80a`; tag `v1.1.0` identifies the identical source tree at `f724865fb82aa2123e8fecdbc449f1e576271b8f`. Local formatting, release lint and phone/Wear release builds passed. The version-only hosted CI run was still pending at publication; previous implementation CI passed. Signed 11 → 12 API36 emulator upgrade preserved every database table, including note, appointment and 13 wear events; preference datastores were absent on both sides. Original signing identities and older downloads remain intact. All live files were downloaded over HTTPS and matched; app reports versionName 1.1.0, versionCode 12. LAN access remains 403.
+
+[Release manifest](evidence/release12/release.json), [upgrade evidence](evidence/release12/upgrade-verification.json), [live verification](evidence/release12/store-live-verification.json). No owner-phone installation occurred. The version label does not close the separately tracked physical-device, TalkBack or paired Wear acceptance gates. Wear 1.1.0 is a local companion artifact only.
+
+Previous private phone update: **versionCode 11**, published on 2026-09-11 after owner authorization. Progress includes photo access; Settings, Treatment details, Calendar and Notes are redesigned. [Release and upgrade evidence](release11.md). Refresh Kalc Apps in F-Droid while connected to Tailscale, or [download the APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_11.apk). No owner-phone installation was performed.
 
 Previous private phone update: **versionCode 10**, published on 2026-09-11 after the
 owner approved Schedule and requested “merge and deploy”. PRs
