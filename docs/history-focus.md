@@ -23,7 +23,7 @@ into the next day even if there is no new event at midnight; before first record
 tracking gaps and elapsed time after completion remain untracked. Future time is
 never counted as IN or OUT. Numeric interval descriptions expose the exact recorded
 start/end instants through accessibility semantics. Day totals still come from
-unchanged WearMath accounting. Today and Progress retain their original totals bars.
+unchanged WearMath accounting. Today now reuses the same chronological day bar and legend following explicit owner feedback. Progress retains its original totals bars.
 
 Visible timestamps retain seconds and follow locale and device 12/24-hour format;
 the selected date supplies day context. Edit accessibility labels retain full date
@@ -85,3 +85,25 @@ callback, first-event protection, disabled saving, completion and empty history.
 No human comprehension, TalkBack speech quality or owner aesthetic acceptance is
 claimed from emulator captures or automated semantics. Translation delivery remains
 separate; English fallback and debug pseudolocales are exercised.
+
+## Shared Today timeline
+
+The owner accepted History and requested the same chronological bar on Today.
+Today now passes its authoritative snapshot to the same component, retaining its
+centered illustration, session timer and compact wear/target values beneath the
+bar. The static pattern key replaces Today’s explanation-only disclosure.
+[Before](screenshots/today-chronological/before.png),
+[updated running app](screenshots/today-chronological/after.png), and
+[Today matrix](screenshots/today-chronological/matrix).
+
+The shared projection and accounting are unchanged. The Today saving/state test
+also verifies the chronological chart is present and the old disclosure is absent.
+
+Today follow-up: 23 focused API36 instrumentation tests passed, including the
+Today IN/OUT layout matrix, 320dp/200%/dark/RTL/expanded configurations, saving,
+completion, unknown state, accessible status/action labels and failed-save behavior.
+Visual review retained readable axis labels and reachable tracking/correction
+controls; expanded text requires scrolling to lower summary content.
+
+The final shared-Today `scripts/check.sh` run passed: 66 phone +9 Wear JVM tests,
+Spotless, debug/release lint and all required APK builds.
