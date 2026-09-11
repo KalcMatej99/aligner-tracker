@@ -1,26 +1,29 @@
 # History refinement — #46
 
-Owner requested online research, implementation and a screenshot, preserving the
-progress/breakdown bar and date picker. Started from clean main `8a058f7` after
-fetching origin; no open PRs or existing changes. Inspected the running version9
-History screen and product, architecture, roadmap, design, accessibility and
-localization guidance. No release or owner-phone installation is included.
+Owner requested research and refinement, then clarified that the bar should represent
+when each state occurred. PR #47 / #46 now includes that chronological day bar.
+The native date picker remains unchanged. No release or owner-phone installation
+is included.
 
 ## Decision
 
-The existing “About this breakdown” button only reveals explanation and derived
-tracked/future totals. History now shows the four pattern keys inline plus “Daily
-totals, not the order of changes.” Exact totals remain in the unchanged bar's
-accessible description. The bar, date navigation and native calendar are unchanged.
-Today and Progress retain their existing disclosures.
+History shows a midnight-to-midnight timeline, with blue IN, striped gray OUT,
+dotted elapsed untracked time, and empty future time. Each boundary is positioned
+from its actual instant within the selected treatment-zone day. Axis labels use a
+24-hour clock; 24:00 means the following midnight. At larger text sizes fewer axis
+labels are shown. Time increases left-to-right in both LTR and RTL, with labels
+placed at the same physical instants. Day lengths can be23 or25 hours; local noon
+is therefore not forced to the geometric midpoint on a DST transition day.
 
-Considered color-only rows, repeated aligner pictures, and a proportional interval
-chart. Chose a restrained vertical event timeline: filled blue IN markers and
-outlined neutral OUT markers, always accompanied by explicit state labels.
-This reduces repeated date text and horizontal separators without implying
-unrecorded session durations or adding another competing chart. The thin connector
-indicates order only; spacing follows content height, not duration. No inferred
-activity or IN/OUT state is inserted on days without events.
+The inline key replaces “About this breakdown.” The vertical event list uses
+filled blue IN and outlined neutral OUT markers with explicit state labels. That
+list's connector indicates order only; its row spacing is not a duration scale.
+The horizontal day bar is proportional to elapsed duration. Overnight states carry
+into the next day even if there is no new event at midnight; before first recording,
+tracking gaps and elapsed time after completion remain untracked. Future time is
+never counted as IN or OUT. Numeric interval descriptions expose the exact recorded
+start/end instants through accessibility semantics. Day totals still come from
+unchanged WearMath accounting. Today and Progress retain their original totals bars.
 
 Visible timestamps retain seconds and follow locale and device 12/24-hour format;
 the selected date supplies day context. Edit accessibility labels retain full date
@@ -29,7 +32,7 @@ completed-treatment read-only behavior and exact event callbacks are preserved.
 No timestamp, timezone, accounting, persistence, reminders, backup, widget, Wear,
 permission or service contracts change.
 
-Original Compose Canvas source is [HistoryVisuals.kt](../app/src/main/java/org/alignertracker/app/ui/HistoryVisuals.kt),
+Original Compose Canvas source includes [HistoryDayTimeline.kt](../app/src/main/java/org/alignertracker/app/ui/HistoryDayTimeline.kt) and [HistoryVisuals.kt](../app/src/main/java/org/alignertracker/app/ui/HistoryVisuals.kt),
 authored by OpenAI Codex for this repository under its GPL-3.0-or-later license.
 No external artwork or new dependencies. The neutral palette and primary accent
 are reused; filled/outlined geometry and labels carry state in monochrome.
@@ -66,6 +69,14 @@ the unchanged native calendar flow and RTL date-navigation semantics.
 
 `scripts/check.sh` passed with JDK21: Spotless, 63 phone and 9 Wear JVM tests,
 debug/release lint, and all phone/Wear debug, instrumentation and release builds.
+
+The chronological follow-up adds three projection tests for ordered breaks,
+overnight carry, tracking-start/completion clipping, unknown coverage, actual DST
+day lengths and equality with WearMath totals. The focused History tests and capture
+matrix were rerun. Review caught overlapping numeric axis labels in expanded
+pseudolocale; the language-neutral numeric pattern is now non-translatable, while
+number formatting remains locale-aware. Exact interval accessibility descriptions
+remain localized. The final full check has 66 phone +9 Wear JVM tests.
 
 One material visual review found the list and legend readable across these cases.
 A focused test caught edit semantic bounds of40dp after the row refactor; restoring
