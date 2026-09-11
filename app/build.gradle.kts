@@ -14,8 +14,8 @@ android {
         applicationId = "org.alignertracker.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 11
-        versionName = "1.0.0-dev"
+        versionCode = 12
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true }
