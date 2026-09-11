@@ -179,6 +179,7 @@ class TalkBackSemanticsTest {
         compose.setContent {
             AlignerTheme { TreatmentDetailsScreen(example(), remember { model() }, false) }
         }
+        compose.onNodeWithText("New refinement or retention phase").performScrollTo().performClick()
         compose
             .onNodeWithText("Number of trays or retainers")
             .performScrollTo()
@@ -257,6 +258,7 @@ class TalkBackSemanticsTest {
                 )
         compose.setContent { AlignerTheme { JournalScreen(snapshot, remember { model() }, false) } }
         val list = compose.onNode(hasScrollToIndexAction())
+        compose.onNodeWithText("Notes").performClick()
         list.performScrollToKey("note1")
         compose
             .onNode(hasContentDescription("Edit Note", substring = true))
@@ -264,6 +266,9 @@ class TalkBackSemanticsTest {
             .performClick()
         list.performScrollToNode(hasText("Journal note"))
         compose.onNodeWithText("Journal note").assertTextContains("Bring spare case")
+        list.performScrollToIndex(0)
+        compose.onNodeWithText("Cancel").performClick()
+        compose.onNodeWithText("Calendar").performClick()
         list.performScrollToKey("appointment1")
         compose
             .onNode(

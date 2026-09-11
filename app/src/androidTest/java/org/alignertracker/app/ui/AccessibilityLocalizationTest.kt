@@ -74,11 +74,12 @@ class AccessibilityLocalizationTest {
         }
 
         compose
-            .onNodeWithText("Update target")
+            .onNodeWithText("Treatment details")
             .performScrollTo()
             .assertIsDisplayed()
             .assertHasClickAction()
             .assertHeightIsAtLeast(48.dp)
+        compose.onNodeWithText("Your data, your copy").performScrollTo().performClick()
         compose
             .onNodeWithText("Export encrypted backup")
             .performScrollTo()
@@ -117,6 +118,7 @@ class AccessibilityLocalizationTest {
             }
         }
 
+        compose.onNodeWithText("Optional reminders").performScrollTo().performClick()
         compose
             .onNodeWithText("Remind me after a break")
             .performScrollTo()
@@ -171,16 +173,16 @@ class AccessibilityLocalizationTest {
             }
         }
 
-        compose.onNodeWithText("Prescribed daily hours (optional)").performTextReplacement("0")
-        compose.onNodeWithText("Update target").performScrollTo().performClick()
+        compose.onNodeWithText("Optional reminders").performScrollTo().performClick()
         compose
-            .onNodeWithText("Prescribed daily hours (optional)")
+            .onNodeWithText("Break reminder delay in minutes")
+            .performScrollTo()
+            .performTextReplacement("0")
+        compose.onNodeWithText("Save reminders").performScrollTo().performClick()
+        compose
+            .onNodeWithText("Break reminder delay in minutes")
             .assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
-        compose
-            .onNodeWithText(
-                "Enter prescribed hours greater than 0 and no more than 24, in whole minutes."
-            )
-            .assertIsDisplayed()
+        compose.onNodeWithText("Enter a break delay from 1 to 240 minutes.").assertIsDisplayed()
     }
 
     @Test

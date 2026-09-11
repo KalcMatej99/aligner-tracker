@@ -1,0 +1,31 @@
+<resources>
+<string name="support_expanded">Expanded</string>
+<string name="support_collapsed">Collapsed</string>
+<string name="support_saved_plan">Your recorded plan</string>
+<string name="support_tray_position">Tray %1$d of %2$d</string>
+<string name="support_daily_target">%1$s daily target</string>
+<string name="support_tray_interval">%1$d days per tray</string>
+<string name="support_plan_edit">Edit target &amp; tray details</string>
+<string name="support_plan_edit_hint">Update the details prescribed to you</string>
+<string name="support_schedule_hint">Different intervals for different trays</string>
+<string name="support_phase_hint">Start refinement or retention when prescribed</string>
+<string name="support_history_hint">Previously recorded tray changes</string>
+<string name="support_reminder_hint">Breaks, tray changes and notification permissions</string>
+<string name="support_data_hint">Back up, restore, export or delete local data</string>
+<string name="support_zone_hint">Calendar-day accounting</string>
+<string name="support_watch_hint">Connection and privacy information</string>
+<string name="support_calendar">Calendar</string>
+<string name="support_notes">Notes</string>
+<string name="support_add_note">Add note</string>
+<string name="support_add_appointment">Add appointment</string>
+<string name="support_note_empty">Keep a note for your next visit</string>
+<string name="support_calendar_empty">No appointments on this date</string>
+<string name="support_selected_day">Selected day</string>
+<string name="support_day_records">%1$s. %2$d appointments, %3$d notes.</string>
+<string name="support_photo_progress">Photo progress</string>
+<string name="support_photo_empty">Add private photos and compare them over time</string>
+<string name="support_photo_saved">%1$d saved · open your photo journal</string>
+<string name="support_day_wear">%1$s recorded wear</string>
+<string name="support_calendar_markers">• Appointment or note · swipe across for more weekdays</string>
+<string name="support_recent_notes">Recent notes</string>
+</resources>

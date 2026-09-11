@@ -66,7 +66,32 @@ internal fun TrackerNavIcon(destination: Destination) {
                 drawPath(gear, ink, style = Stroke(1.6f * u))
                 drawCircle(ink, 3f * u, style = Stroke(1.6f * u))
             }
-            else -> Unit
+            Destination.PHOTOS -> {
+                drawRoundRect(
+                    ink,
+                    Offset(3 * u, 5 * u),
+                    Size(18 * u, 15 * u),
+                    androidx.compose.ui.geometry.CornerRadius(2 * u),
+                    style = Stroke(1.6f * u),
+                )
+                drawCircle(ink, 4 * u, Offset(12 * u, 12.5f * u), style = Stroke(1.6f * u))
+                line(7f, 5f, 9f, 2f)
+                line(9f, 2f, 15f, 2f)
+                line(15f, 2f, 17f, 5f)
+            }
+            Destination.DETAILS,
+            Destination.JOURNAL -> {
+                drawRoundRect(
+                    ink,
+                    Offset(4 * u, 3 * u),
+                    Size(16 * u, 18 * u),
+                    androidx.compose.ui.geometry.CornerRadius(2 * u),
+                    style = Stroke(1.6f * u),
+                )
+                line(8f, 8f, 16f, 8f)
+                line(8f, 12f, 16f, 12f)
+                line(8f, 16f, 12f, 16f)
+            }
         }
     }
 }
