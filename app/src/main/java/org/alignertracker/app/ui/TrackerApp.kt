@@ -433,6 +433,7 @@ fun TrackerApp(model: TrackerViewModel) {
                                         { confirmation = "advance" },
                                         { confirmation = "complete" },
                                         onDetails = { navigate(Destination.DETAILS) },
+                                        now = now,
                                     )
                                 Destination.HISTORY ->
                                     HistoryScreen(state, now, busy) { editId = it }

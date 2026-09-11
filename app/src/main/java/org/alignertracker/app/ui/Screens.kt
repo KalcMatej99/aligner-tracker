@@ -618,56 +618,93 @@ fun ScheduleScreen(
     onAdvance: () -> Unit,
     onComplete: () -> Unit,
     onDetails: () -> Unit = {},
+    now: Instant = Instant.now(),
 ) {
     val plan = snapshot.plan ?: return
     val due = WearMath.nextChangeDate(snapshot)
+    val lastTray = plan.hasSchedule && plan.currentTray == plan.totalTrays
+    var expanded by rememberSaveable { mutableStateOf(false) }
     ScreenColumn {
         Heading(R.string.plan_heading)
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Text(trayLabel(plan), style = MaterialTheme.typography.headlineSmall)
+        if (plan.completed) {
             Text(
-                plan.currentTrayStartedOn?.let {
-                    stringResource(R.string.current_started, readableDate(LocalDate.parse(it)))
-                } ?: stringResource(R.string.tray_date_unknown)
+                stringResource(R.string.completed_title),
+                style = MaterialTheme.typography.headlineSmall,
             )
-            if (plan.completed) Text(stringResource(R.string.completed_body))
-            else {
-                Text(
-                    due?.let { stringResource(R.string.estimated_change, readableDate(it)) }
-                        ?: stringResource(R.string.schedule_missing_details),
-                    style =
-                        if (due != null) MaterialTheme.typography.titleLarge
-                        else MaterialTheme.typography.bodyLarge,
-                )
-                DetailsDisclosure(R.string.about_schedule) {
-                    Text(stringResource(R.string.schedule_note))
-                }
-                if (plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
-                    Button(
-                        onClick = onAdvance,
-                        enabled = !busy,
-                        shape = MaterialTheme.shapes.small,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-                    ) {
-                        Text(stringResource(R.string.advance_tray))
-                    }
-                else if (plan.hasSchedule)
-                    Button(
-                        onClick = onComplete,
-                        enabled = !busy,
-                        shape = MaterialTheme.shapes.small,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-                    ) {
-                        Text(stringResource(R.string.complete_action))
-                    }
-            }
-        }
-        if (!plan.completed)
-            TextButton(onClick = onDetails) {
+            Text(stringResource(R.string.completed_body))
+        } else if (due == null) {
+            Text(
+                stringResource(R.string.schedule_plan_next),
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            Text(stringResource(R.string.schedule_missing_details))
+            if (plan.currentTray != null)
+                Text(trayLabel(plan), style = MaterialTheme.typography.titleMedium)
+            Button(
+                onClick = onDetails,
+                enabled = !busy,
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+            ) {
                 Text(stringResource(R.string.edit_treatment_details))
             }
-        if (snapshot.trayHistory.isNotEmpty())
-            Section(R.string.actual_tray_history) {
+        } else {
+            ScheduleNextChange(plan, due, now, lastTray)
+            Text(
+                stringResource(R.string.schedule_estimate_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (plan.hasSchedule)
+                Button(
+                    onClick = if (lastTray) onComplete else onAdvance,
+                    enabled = !busy,
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                ) {
+                    Text(
+                        stringResource(
+                            if (lastTray) R.string.complete_action else R.string.advance_tray
+                        )
+                    )
+                }
+            TextButton(
+                onClick = onDetails,
+                enabled = !busy,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+            ) {
+                Text(stringResource(R.string.edit_treatment_details))
+            }
+            val following = WearMath.futureTrayStarts(snapshot).drop(1)
+            if (following.isNotEmpty())
+                Section(R.string.schedule_after_next) {
+                    (if (expanded) following else following.take(3)).forEach { (tray, startDate) ->
+                        TrayMilestone(
+                            stringResource(R.string.tray_number_only, tray),
+                            readableDate(startDate),
+                            true,
+                            showStateLabel = false,
+                        )
+                    }
+                    if (following.size > 3)
+                        TextButton(onClick = { expanded = !expanded }) {
+                            Text(
+                                stringResource(
+                                    if (expanded) R.string.schedule_fewer
+                                    else R.string.schedule_more
+                                )
+                            )
+                        }
+                    if (expanded && plan.totalTrays!! > plan.currentTray!! + 12)
+                        Text(
+                            stringResource(R.string.future_more),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                }
+        }
+        if (snapshot.trayHistory.isNotEmpty()) {
+            HorizontalDivider()
+            DetailsDisclosure(R.string.actual_tray_history) {
                 snapshot.trayHistory.takeLast(4).forEach { entry ->
                     TrayMilestone(
                         stringResource(R.string.tray_number_only, entry.trayNumber),
@@ -676,22 +713,7 @@ fun ScheduleScreen(
                     )
                 }
             }
-        if (!plan.completed && plan.hasSchedule && plan.currentTray!! < plan.totalTrays!!)
-            Section(R.string.future_schedule) {
-                Text(
-                    stringResource(R.string.schedule_sequence),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                WearMath.futureTrayStarts(snapshot).forEach { (tray, startDate) ->
-                    TrayMilestone(
-                        stringResource(R.string.tray_number_only, tray),
-                        readableDate(startDate),
-                        true,
-                    )
-                }
-                if (plan.totalTrays!! > plan.currentTray!! + 12)
-                    Text(stringResource(R.string.future_more))
-            }
+        }
     }
 }
 

@@ -36,4 +36,16 @@
     <string name="history_timeline">Day timeline · 24-hour clock</string>
     <string name="history_axis_hour" translatable="false">%1$02d:00</string>
     <string name="history_time_interval">%1$s: %2$s to %3$s</string>
+    <string name="schedule_plan_next">Plan your next change</string>
+    <string name="schedule_next_change">Next planned change</string>
+    <string name="schedule_planned_finish">Planned finish</string>
+    <string name="schedule_next_tray">Change to tray %1$d</string>
+    <plurals name="schedule_days_until"><item quantity="one">In %1$d day</item><item quantity="other">In %1$d days</item></plurals>
+    <string name="schedule_planned_today">Planned for today</string>
+    <string name="schedule_date_passed">Planned date has passed</string>
+    <string name="schedule_elapsed">%1$d of %2$d planned days elapsed</string>
+    <string name="schedule_after_next">After that · estimated</string>
+    <string name="schedule_more">Show more planned changes</string>
+    <string name="schedule_fewer">Show fewer changes</string>
+    <string name="schedule_estimate_note">Dates are estimates; record changes when they happen.</string>
 </resources>

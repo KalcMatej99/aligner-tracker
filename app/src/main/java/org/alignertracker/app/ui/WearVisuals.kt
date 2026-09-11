@@ -126,10 +126,19 @@ internal fun DetailsDisclosure(label: Int, content: @Composable () -> Unit) {
 }
 
 @Composable
-internal fun TrayMilestone(label: String, date: String, estimated: Boolean) {
+internal fun TrayMilestone(
+    label: String,
+    date: String,
+    estimated: Boolean,
+    showStateLabel: Boolean = true,
+) {
     val color = MaterialTheme.colorScheme.onSurfaceVariant
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Canvas(Modifier.width(16.dp).height(64.dp).clearAndSetSemantics {}) {
+        Canvas(
+            Modifier.width(16.dp)
+                .height(if (showStateLabel) 64.dp else 48.dp)
+                .clearAndSetSemantics {}
+        ) {
             drawCircle(
                 color,
                 5.dp.toPx(),
@@ -146,12 +155,13 @@ internal fun TrayMilestone(label: String, date: String, estimated: Boolean) {
         Column(Modifier.weight(1f)) {
             Text(label, style = MaterialTheme.typography.titleMedium)
             Text(date)
-            Text(
-                stringResource(
-                    if (estimated) R.string.schedule_estimated else R.string.schedule_recorded
-                ),
-                style = MaterialTheme.typography.labelMedium,
-            )
+            if (showStateLabel)
+                Text(
+                    stringResource(
+                        if (estimated) R.string.schedule_estimated else R.string.schedule_recorded
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                )
         }
     }
 }
