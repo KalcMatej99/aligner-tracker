@@ -1,0 +1,185 @@
+{
+  "title": "Aligner Tracker \u00b7 Kalc Apps",
+  "text": "Skip to content\nPrivate repository\nTailscale connection required\nkalc apps\nApps\nAdd repository\n\u2197\n\u2190 All apps\nA\n\nORG.ALIGNERTRACKER.APP\n\nAligner Tracker\n\nPrivate aligner wear tracking, reminders and backups\n\nStart recording aligner wear immediately with IN or OUT. Add prescribed hours and tray details when ready; unknown goals and dates are never invented. Track schedules and history on your phone. Includes reminders, a home-screen widget, reports, private progress photos and encrypted portable backups. No account, ads, analytics or Internet permission.\n\nPrivate development build for owner testing. Physical reminder, battery and full device acceptance remain pending. Phone features work without Google Play services. Optional watch communication needs a compatible Wear service; the watch APK is not included.\n\nGet future updates through your F-Droid client.\n\nAdd the repository \u2192\nDownloads & releases\nFree & open source\nAndroid phone \u00b7 v1.0.0-dev\nLatest for this device\nVersion code\n10\nMinimum Android API\n26\nDownload size\n2.5 MB\nLicense\nGPL-3.0-or-later\nDownload APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nToday and History now show recorded states at their actual times across the day. History uses a clearer event timeline. Schedule focuses on the next planned tray change with a calendar-day diagram and compact future plan. Preserves recording and confirmation safeguards. Signed version 9 to 10 emulator upgrade preserves recorded data. Private development update; physical-device and TalkBack acceptance remain separate.\n\nVerify this release\nAndroid phone \u00b7 v1.0.0-dev\nPrevious release\nVersion code\n9\nMinimum Android API\n26\nDownload size\n2.4 MB\nLicense\nGPL-3.0-or-later\nDownload previous APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nToday centers a larger aligner illustration and session timer. Recorded wear and actual daily target sit below the breakdown bar, with compact values such as 8h56 / 22h. Removes the separate prescribed-time sentence and tray index. Owner preferred the screenshot; physical-device and TalkBack acceptance remain open. Signed version 8 to 9 emulator upgrade preserves recorded data.\n\nVerify this release\nAndroid phone \u00b7 v1.0.0-dev\nPrevious release\nVersion code\n8\nMinimum Android API\n26\nDownload size\n2.4 MB\nLicense\nGPL-3.0-or-later\nDownload previous APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nToday now shows an original fitted or separated aligner illustration for the recorded IN or OUT state. Session context, wear totals and labelled tracking actions remain. Preserves saving safeguards and unknown or completed states. Same-signer version 7 to 8 emulator upgrade preserves recorded data. Private development update; owner comprehension, aesthetics and physical acceptance remain open.\n\nVerify this release\nAndroid phone \u00b7 v1.0.0-dev\nPrevious release\nVersion code\n7\nMinimum Android API\n26\nDownload size\n2.4 MB\nLicense\nGPL-3.0-or-later\nDownload previous APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nClearer recorded wear summaries, daily charts with historical targets and gaps, and recorded versus estimated tray milestones. Timezone settings are centralized in Settings. Native date and time pickers preserve optional values and precise event times. Same-signer version 6 to 7 emulator upgrade preserved records and reminder preferences. Private development build; owner aesthetic and physical-device acceptance remain open.\n\nVerify this release\nAndroid phone \u00b7 v1.0.0-dev\nPrevious release\nVersion code\n6\nMinimum Android API\n26\nDownload size\n2.4 MB\nLicense\nGPL-3.0-or-later\nDownload previous APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nBack, edit and record-delete buttons now use consistent accessible icons. Includes the complete neutral phone redesign merged into main. Primary tracking actions and destructive confirmations keep explicit labels. Existing records and reminders are preserved; same-signer version 5 to 6 emulator upgrade verified. Private development build; owner and physical-device acceptance remain open.\n\nVerify this release\nAndroid phone \u00b7 v1.0.0-dev\nPrevious release\nVersion code\n5\nMinimum Android API\n26\nDownload size\n2.4 MB\nLicense\nGPL-3.0-or-later\nDownload previous APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nNeutral light and dark themes, clearer tracking state and daily totals, compact History and report controls, and consistent supporting screens. Preserves zero-field IN/OUT start, optional details, historical records, reminders and backup compatibility. Same signer; signed version 4 to 5 data-preserving upgrade and restore verified on emulator. Private development build; owner aesthetic and physical-device acceptance remain open.\n\nVerify this release\nAndroid phone \u00b7 v1.0.0-dev\nPrevious release\nVersion code\n4\nMinimum Android API\n26\nDownload size\n2.4 MB\nLicense\nGPL-3.0-or-later\nDownload previous APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nA calmer light and dark design makes IN/OUT state, session duration and today\u2019s recorded wear clearer. Tracking stays within reach; History correction, reports, optional setup and large-text/RTL layouts are improved. Existing records, prescriptions and backups remain compatible. Also fixes a Wear connection callback crash. Same signing identity; signed version 3 to 4 upgrade verified. Private development pilot; owner and physical-device acceptance remain pending.\n\nVerify this release\nAndroid phone \u00b7 v1.0.0-dev\nPrevious release\nVersion code\n3\nMinimum Android API\n26\nDownload size\n2.4 MB\nLicense\nGPL-3.0-or-later\nDownload previous APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nStart tracking with no typing: choose IN or OUT, then Start tracking. Prescribed hours, trays and treatment dates are optional and can be added or corrected later. Unknown information stays unknown; existing history and older backups are preserved. Private development pilot; owner Pixel usability and physical acceptance remain pending. Same permanent signer as version 2.\n\nVerify this release\nAndroid phone \u00b7 v1.0.0-dev\nPrevious release\nVersion code\n2\nMinimum Android API\n26\nDownload size\n2.3 MB\nLicense\nGPL-3.0-or-later\nDownload previous APK\nAndroid phone version 1.0.0-dev\n\u2193\nSource archive\nversion 1.0.0-dev\nLicense notices\nversion 1.0.0-dev\nWhat changed\n\nFirst privately distributed phone pilot. Permanent app signing identity. 55 phone unit tests, formatting, release lint and build passed. Physical Pixel installation and feature acceptance remain owner-performed. This is a development build, not the completed stable v1 release. Existing debug-signed installations cannot update in place; preserve a verified encrypted backup before any reinstall.\n\nVerify this release\n\nIF SOMETHING GETS IN THE WAY\n\nA few things to know\nOffline, an unavailable file or a failed refresh?\nAndroid blocked the installation?\nWant to cancel or stop an update?\nDownloading an APK directly?\nKalc Apps\n\nFree apps. A little more independence.\n\nIndependently operated. F-Droid compatible.\n\nNo accounts, ads or analytics. Privacy\n\nNot the official F-Droid catalogue.",
+  "overflow": false,
+  "links": [
+    {
+      "text": "Skip to content",
+      "url": "https://apps.server.matejkalc.com/apps/org.alignertracker.app/#main"
+    },
+    {
+      "text": "kalc apps",
+      "url": "https://apps.server.matejkalc.com/"
+    },
+    {
+      "text": "Apps",
+      "url": "https://apps.server.matejkalc.com/"
+    },
+    {
+      "text": "Add repository\n\u2197",
+      "url": "https://apps.server.matejkalc.com/add/"
+    },
+    {
+      "text": "\u2190 All apps",
+      "url": "https://apps.server.matejkalc.com/"
+    },
+    {
+      "text": "Add the repository \u2192",
+      "url": "https://apps.server.matejkalc.com/add/"
+    },
+    {
+      "text": "Download APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_10.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_10.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_10.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Download previous APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_9.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_9.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_9.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Download previous APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_8.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_8.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_8.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Download previous APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_7.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_7.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_7.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Download previous APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_6.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_6.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_6.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Download previous APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_5.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_5.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_5.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Download previous APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_4.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_4.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_4.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Download previous APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_3.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_3.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_3.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Download previous APK\nAndroid phone version 1.0.0-dev\n\u2193",
+      "url": "https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_2.apk"
+    },
+    {
+      "text": "Source archive\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_2.tar.gz"
+    },
+    {
+      "text": "License notices\nversion 1.0.0-dev",
+      "url": "https://apps.server.matejkalc.com/sources/org.alignertracker.app_2.txt"
+    },
+    {
+      "text": "",
+      "url": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker"
+    },
+    {
+      "text": "Kalc Apps",
+      "url": "https://apps.server.matejkalc.com/"
+    },
+    {
+      "text": "Privacy",
+      "url": "https://apps.server.matejkalc.com/privacy/"
+    }
+  ],
+  "errors": [],
+  "status": 200
+}

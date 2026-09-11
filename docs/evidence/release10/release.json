@@ -1,0 +1,22 @@
+{
+  "source_commit": "a154affbb2d52ab916058e547dcc8763c0bcda69",
+  "source_tag": "phone-release-10",
+  "published": true,
+  "physical_installation": false,
+  "artifacts": {
+    "phone": {
+      "file": "aligner-tracker-phone.apk",
+      "sha256": "ceebacdf72d4ec4af9cac66dcc87c9bb77cca63a41bfdc48c4da30d1e4188483",
+      "versionCode": 10,
+      "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9"
+    },
+    "wear": {
+      "file": "aligner-tracker-wear.apk",
+      "sha256": "00e950c57955bd4f71a50f0b432bb86d1bb53cb3e5a2df6faa6bba559296ac3b",
+      "versionCode": 10,
+      "signer_sha256": "9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9"
+    }
+  },
+  "merged_commit": "45c35c3388d7d2c39ecfb359a24e113a77d309be",
+  "hosted_ci": "https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/actions/runs/48"
+}

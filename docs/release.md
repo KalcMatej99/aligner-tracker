@@ -1,6 +1,47 @@
 # Release preparation and artifact verification
 
-Current private phone update: **versionCode 9**, published on 2026-09-10 after the
+Current private phone update: **versionCode 10**, published on 2026-09-11 after the
+owner approved Schedule and requested “merge and deploy”. PRs
+[#47](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/47) and
+[#49](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/49) are merged.
+[Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_10.apk)
+while connected to Tailscale, or refresh Kalc Apps in F-Droid.
+
+Today and History show chronological day bars with IN/OUT/untracked/future segments;
+History has a labelled event timeline. Schedule leads with the next planned date,
+countdown and elapsed-day diagram, with a compact future plan and original
+record-change confirmations. Source tag `phone-release-10` points to
+`a154affbb2d52ab916058e547dcc8763c0bcda69`; merged main `45c35c3388d7d2c39ecfb359a24e113a77d309be` has the same
+Git tree. Hosted [run 48](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/actions/runs/48)
+passed for the final candidate. The redundant intermediate-main run 47 was cancelled
+because its exact tree had already passed run 45; final release CI was required.
+Local formatting, release lint and both release builds passed. Prior implementation
+checks include 66 phone + 9 Wear JVM tests, Today/History/Schedule emulator tests and
+their visual matrices. See [History/Today](history-focus.md) and [Schedule](schedule-focus.md).
+
+Phone SHA256: `ceebacdf72d4ec4af9cac66dcc87c9bb77cca63a41bfdc48c4da30d1e4188483`.
+The app and repository signing identities are unchanged. The actual signed 9 → 10
+API 36 emulator upgrade preserved every database table, including synthetic plan
+and four wear events. Preference datastores were absent before and after; this is
+not populated-reminder evidence. No owner phone installation occurred.
+[Upgrade evidence](evidence/release10/upgrade-verification.json),
+[before](screenshots/release10/signed-before.png),
+[Today after](screenshots/release10/signed-after.png),
+[Schedule after](screenshots/release10/signed-schedule.png),
+[History after](screenshots/release10/signed-history.png).
+
+Every snapshot file was downloaded through HTTPS and matched, including the signed
+APK and repository indexes. The store lists version 10 first without mobile overflow
+or page errors; versions 2–9 remain available and non-Tailscale LAN requests return 403.
+Wear 10 is a local companion artifact, not a phone-store entry. Positive owner visual
+feedback is recorded; comprehension, TalkBack speech and physical-device acceptance
+are not inferred from that feedback or emulator checks.
+[Live verification](evidence/release10/store-live-verification.json),
+[browser](evidence/release10/store-browser.json),
+[store screenshot](screenshots/release10/store-mobile.png),
+[release manifest](evidence/release10/release.json).
+
+Previous private phone update: **versionCode 9**, published on 2026-09-10 after the
 owner preferred the updated Today screenshot and requested “Merge and deploy”.
 [PR #44](https://forgejo.server.matejkalc.com/matejkalc/aligner-tracker/pulls/44) is merged.
 [Install APK](https://apps.server.matejkalc.com/fdroid/repo/org.alignertracker.app_9.apk)

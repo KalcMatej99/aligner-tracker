@@ -107,3 +107,7 @@ controls; expanded text requires scrolling to lower summary content.
 
 The final shared-Today `scripts/check.sh` run passed: 66 phone +9 Wear JVM tests,
 Spotless, debug/release lint and all required APK builds.
+
+The owner approved the result and authorized merge and deployment. These changes
+are now included in private update 10; see [release evidence](release.md). Earlier
+preparation-only statements above describe the state before that authorization.
