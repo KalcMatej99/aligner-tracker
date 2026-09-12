@@ -1,0 +1,1 @@
+Corrected Google Play listing image formats. App behavior and stored data are unchanged.

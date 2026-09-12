@@ -1,7 +1,8 @@
 # Google Play closed-test preparation
 
 Owner-authorized preparation for issue #60, based on private 1.1.0 (code 12).
-Phone candidate: **1.1.0, versionCode 13**. The higher code permits an in-place update;
+Current candidate: **1.1.1, versionCode 14**; see [release 14](../release14.md).
+The original runtime validation below covers **1.1.0, versionCode 13**. The higher code permits an in-place update;
 it does not publish a new private-store version or indicate Play approval.
 
 ## Prepared deliverables
