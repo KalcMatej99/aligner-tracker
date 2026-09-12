@@ -1,0 +1,10 @@
+
+org.alignertracker.app.ui.OutTimelineCaptureTest:.
+org.alignertracker.app.ui.HistoryFocusTest:.
+org.alignertracker.app.ui.TodayStatusTest:...
+
+Time: 33.978
+
+OK (5 tests)
+
+

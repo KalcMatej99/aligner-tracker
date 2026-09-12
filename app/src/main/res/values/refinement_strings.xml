@@ -9,7 +9,7 @@
     <string name="nonexistent_time">This clock time does not exist on this date. Choose another time.</string>
     <string name="time_breakdown">Time breakdown</string>
     <string name="time_details">About this breakdown</string>
-    <string name="time_details_body">Solid: recorded wear. Striped: recorded OUT. Dotted: elapsed time with no record. Empty: future time. Segment lengths show totals, not the order of events.</string>
+    <string name="time_details_body">Solid: recorded wear. Outlined: recorded OUT. Dotted: elapsed time with no record. Empty: future time. Segment lengths show totals, not the order of events.</string>
     <string name="future_time">Future</string>
     <string name="short_duration">%1$d h %2$d min</string>
     <string name="chart_hours">Hours from 0 to %1$d</string>
@@ -28,11 +28,13 @@
     <string name="today_wear_goal_label">Recorded wear / target</string>
     <string name="today_wear_goal_description">Recorded wear: %1$s. Target: %2$s</string>
     <string name="today_value_unknown">—</string>
-    <string name="history_legend_in">IN</string>
-    <string name="history_legend_out">OUT</string>
-    <string name="history_legend_unknown">Untracked</string>
+    <string name="history_legend_in">Aligners in</string>
+    <string name="history_legend_out">Aligners out</string>
+    <string name="history_legend_unknown">Not tracked</string>
     <string name="history_legend_future">Future</string>
-    <string name="history_bar_note">Color shows recorded state at that time.</string>
+    <string name="history_bar_note">Each OUT block is one continuous break.</string>
+    <string name="timeline_out">Out</string>
+    <string name="timeline_now">Now</string>
     <string name="history_timeline">Day timeline · 24-hour clock</string>
     <string name="history_axis_hour" translatable="false">%1$02d:00</string>
     <string name="history_time_interval">%1$s: %2$s to %3$s</string>

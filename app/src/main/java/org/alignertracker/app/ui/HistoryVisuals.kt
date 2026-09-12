@@ -16,7 +16,9 @@ import java.time.ZoneId
 import org.alignertracker.app.R
 import org.alignertracker.app.domain.WearEvent
 
-/** Original code-drawn legend; matches the existing totals bar, without hiding its meaning. */
+/**
+ * Original code-drawn legend; matches the chronological day timeline, without hiding its meaning.
+ */
 @Composable
 internal fun HistoryBarLegend() {
     val colors = MaterialTheme.colorScheme
@@ -38,26 +40,30 @@ internal fun HistoryBarLegend() {
                     Canvas(Modifier.size(18.dp, 12.dp)) {
                         drawRect(
                             if (index == 0) colors.primary
-                            else if (index == 1) colors.onSurfaceVariant else colors.surface
+                            else if (index == 1) colors.surfaceContainerHigh else colors.surface
                         )
-                        if (index == 1)
-                            for (x in listOf(4f, 9f, 14f)) drawLine(
-                                colors.surface,
-                                Offset(x.dp.toPx(), 0f),
-                                Offset(x.dp.toPx(), size.height),
-                                1.dp.toPx(),
-                            )
                         if (index == 2)
                             for (x in listOf(4f, 9f, 14f)) drawCircle(
                                 colors.onSurfaceVariant,
                                 1.dp.toPx(),
                                 Offset(x.dp.toPx(), size.height / 2),
                             )
-                        drawRect(
-                            colors.outline,
-                            size = Size(size.width, size.height),
-                            style = Stroke(1.dp.toPx()),
-                        )
+                        if (index == 3) {
+                            drawLine(
+                                colors.outline,
+                                Offset(0f, size.height / 2),
+                                Offset(size.width, size.height / 2),
+                                1.dp.toPx(),
+                            )
+                        } else {
+                            val stroke = if (index == 1) 1.5.dp.toPx() else 1.dp.toPx()
+                            drawRect(
+                                if (index == 1) colors.onSurfaceVariant else colors.outline,
+                                topLeft = Offset(stroke / 2, stroke / 2),
+                                size = Size(size.width - stroke, size.height - stroke),
+                                style = Stroke(stroke),
+                            )
+                        }
                     }
                     Text(stringResource(label), style = MaterialTheme.typography.bodySmall)
                 }

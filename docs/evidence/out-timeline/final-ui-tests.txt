@@ -1,0 +1,9 @@
+
+org.alignertracker.app.ui.OutTimelineCaptureTest:.
+org.alignertracker.app.ui.HistoryFocusTest:.
+
+Time: 10.123
+
+OK (2 tests)
+
+
