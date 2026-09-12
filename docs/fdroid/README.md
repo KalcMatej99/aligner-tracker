@@ -36,6 +36,14 @@ microG compatibility classes, but require packager review; the binary scanner
 was **not** clean. No scanner suppression is proposed. The resolved runtime
 license inventory documents the microG coordinates and their source licensing.
 
+## Publication checks
+
+The public-history Gitleaks scan covered 90 commits and found no secrets. The
+new packaging metadata triggered one generic API-key heuristic on
+`AllowedAPKSigningKeys`; this is the intentionally public SHA-256 certificate
+fingerprint, not a private key. No signing material, APKs, databases or vault
+sessions are tracked in Git.
+
 ## Signing and publication
 
 Prefer F-Droid reproducible builds with the existing upstream signing identity.
