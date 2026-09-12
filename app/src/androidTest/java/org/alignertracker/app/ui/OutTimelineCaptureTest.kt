@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
@@ -117,9 +118,9 @@ class OutTimelineCaptureTest {
         val output =
             File(instrumentation.targetContext.getExternalFilesDir(null), "out-timeline/$name.png")
         output.parentFile!!.mkdirs()
-        instrumentation.waitForIdleSync()
-        android.os.SystemClock.sleep(250)
-        instrumentation.uiAutomation.takeScreenshot().let { bitmap ->
+        compose.waitForIdle()
+        // Read the rendered Compose surface, avoiding an Android launch/splash frame.
+        compose.onRoot().captureToImage().asAndroidBitmap().let { bitmap ->
             output.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
             bitmap.recycle()
         }

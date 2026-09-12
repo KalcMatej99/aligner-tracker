@@ -32,7 +32,8 @@ light 13.78:1, dark 11.08:1. These checks support legibility, not comprehension.
 `OutTimelineCaptureTest` renders the actual Today and History screen composables
 with synthetic September 12 records: OUT 07:30–08:15, 12:00–14:00 and 18:15–19:15;
 untracked before 01:00, and future after 21:00. Its matrix includes light/dark,
-320dp/200% text, RTL and no records. Captures are emulator evidence, not photographs
+320dp/200% text, RTL and no records. Captures read the rendered Compose surface directly on the emulator, avoiding Android
+launch/splash frames. They are emulator evidence, not photographs
 of the owner's device or a completed human comprehension test.
 
 Before release, ask the owner/tester to identify the number of breaks, longest break,
