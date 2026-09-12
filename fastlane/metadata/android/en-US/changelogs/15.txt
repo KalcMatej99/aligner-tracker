@@ -1,0 +1,1 @@
+Clearer Today and History timelines: continuous outlined OUT periods, explicit legend labels and a Now marker.
