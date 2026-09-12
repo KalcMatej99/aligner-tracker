@@ -1,0 +1,29 @@
+Categories:
+  - Sports & Health
+License: GPL-3.0-or-later
+AuthorName: Matej Kalc
+AuthorEmail: me@matejkalc.com
+AuthorWebSite: https://matejkalc.com
+SourceCode: https://github.com/KalcMatej99/aligner-tracker
+IssueTracker: https://github.com/KalcMatej99/aligner-tracker/issues
+
+AutoName: Aligner Tracker
+
+RepoType: git
+Repo: https://github.com/KalcMatej99/aligner-tracker.git
+Binaries: https://github.com/KalcMatej99/aligner-tracker/releases/download/v%v-%c/aligner-tracker-%v-%c.apk
+
+Builds:
+  - versionName: 1.1.0
+    versionCode: 13
+    commit: v1.1.0-13
+    subdir: app
+    gradle:
+      - yes
+
+AllowedAPKSigningKeys: 9cac6b2722e6e074bd607586df06335c3ae6300803616b3f38e88706d1ed53a9
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[0-9.]+-[0-9]+$
+CurrentVersion: 1.1.0
+CurrentVersionCode: 13

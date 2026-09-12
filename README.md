@@ -4,6 +4,12 @@ A free, open-source Android app for recording clear-aligner wear and following a
 
 **Local first:** no account, backend, ads, subscriptions, analytics or Internet permission. Every shipped feature is free. Full records stay in app-private storage unless you explicitly export them. The optional watch feature transfers minimal state and commands through Google Play Services; see [transport/privacy limits](docs/wear.md). Follow your clinician's prescribed target and schedule; this app records and reminds, and does not make treatment decisions.
 
+## Public source and F-Droid
+
+Public source and issue reports: [GitHub](https://github.com/KalcMatej99/aligner-tracker).
+F-Droid packaging is being prepared; the app is not yet listed in its official
+repository. See [submission details and build instructions](docs/fdroid/README.md).
+
 ## Expanded v1 implementation
 
 - One-tap IN/OUT tracking, persisted across app closure and restarts.

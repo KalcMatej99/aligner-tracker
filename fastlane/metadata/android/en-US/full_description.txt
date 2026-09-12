@@ -1,0 +1,17 @@
+Keep a clear record of your aligner routine, on your own phone.
+
+Record when your aligners are in or out with one tap. See your current session and a chronological view of the day, including time that was not tracked. Correct a forgotten switch when you need to.
+
+• Start tracking first; add prescribed wear targets and tray details when ready.
+• Review recorded wear across days and compare it with your own entered target.
+• See planned tray dates and record each change yourself.
+• Keep appointment reminders and dated notes together.
+• Save private progress photos for your own comparison.
+• Create password-protected backups and export your records when you choose.
+• Use optional reminders, subject to your Android notification and alarm settings.
+
+Free and open source, with no account, advertising or analytics. The phone app works offline. Backups and exports go only to the destination you choose. A cloud document provider may upload files you save there under its own terms.
+
+Aligner Tracker is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Consult your dental or other healthcare professional for medical advice, diagnosis or treatment. Follow their instructions for wear time, tray changes and completion. Schedule dates are estimates; photos are for personal comparison without diagnostic analysis.
+
+Optional watch communication requires a compatible Wear service and paired-device stack. The phone tracker works without Google Play services. Wear companion distribution is not part of this F-Droid submission.
