@@ -61,3 +61,34 @@ and paired-Wear acceptance gates remain open.
 - https://f-droid.org/docs/Submitting_to_F-Droid_Quick_Start_Guide/
 - https://f-droid.org/docs/Inclusion_Policy/
 - https://f-droid.org/docs/Reproducible_Builds/
+
+## Submission receipt — 2026-09-12
+
+- Public repository: https://github.com/KalcMatej99/aligner-tracker
+- Source tag: `v1.1.0-13`, commit `e83eb9121b3229fd6a5bc605a85e1378026e91d0`.
+- Signed reference: https://github.com/KalcMatej99/aligner-tracker/releases/tag/v1.1.0-13
+- Submitted packaging request: https://gitlab.com/fdroid/rfp/-/work_items/4385
+- Submission account: `KalcMatej99`, authenticated using owner-approved GitHub OAuth.
+- Forgejo preparation PR #64 merged; `github` and `origin` remain separate remotes.
+
+Phone JVM tests, Spotless, release lint and release build passed. A clean public
+clone also built successfully. Incremental-versus-clean comparison initially
+changed DEX/profile output; both clean build lineages subsequently produced the
+same tagged unsigned APK. The final source scanner and metadata lint passed.
+The 125 APK namespace findings above remain disclosed, not waived.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| Unsigned APK from both tagged checkouts | `fb4edc85b2768af969940eea60affb953d75db3ea029bf376174174fb920beed` |
+| Signed APK and signature-copied rebuild | `8739cdb53418600c42657d0b27df5d2864d4e2792d65f5c1b51060043c6e9abf` |
+
+The reference APK was signed with the existing owner key using apksigner 34.0.0.
+`apksigcopier` 1.1.1 copied that signature to the second build, and apksigner
+verified it; the resulting whole-file digest matched. An unauthenticated download
+from the GitHub release matched the same signed digest. These are local
+reproducibility results, not an F-Droid build-server result.
+
+The RFP requests initial maintainer review of the microG namespace findings and
+recipe. No fdroiddata merge request, F-Droid approval, catalog listing, or owner
+phone installation is claimed. Follow the RFP for feedback before packaging the
+final maintainer-approved recipe. Google Play remains on hold at the owner's request.

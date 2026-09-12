@@ -7,8 +7,9 @@ A free, open-source Android app for recording clear-aligner wear and following a
 ## Public source and F-Droid
 
 Public source and issue reports: [GitHub](https://github.com/KalcMatej99/aligner-tracker).
-F-Droid packaging is being prepared; the app is not yet listed in its official
-repository. See [submission details and build instructions](docs/fdroid/README.md).
+F-Droid [packaging request #4385](https://gitlab.com/fdroid/rfp/-/work_items/4385)
+has been submitted; the app is not yet listed in its official repository.
+See [submission details and build instructions](docs/fdroid/README.md).
 
 ## Expanded v1 implementation
 
