@@ -8,11 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import java.time.*
 import org.alignertracker.app.R
@@ -91,6 +94,15 @@ internal fun HistoryDayTimeline(
     val labels =
         listOf(R.string.state_in, R.string.state_out, R.string.untracked, R.string.future_time)
             .map { stringResource(it) }
+    val textMeasurer = rememberTextMeasurer()
+    val nowText =
+        textMeasurer.measure(
+            stringResource(R.string.timeline_now),
+            MaterialTheme.typography.labelSmall.copy(color = colors.onSurface),
+        )
+    val isToday = date == now.atZone(zone).toLocalDate()
+    val labelSpace = with(LocalDensity.current) { nowText.size.height.toDp() } + 6.dp
+    val barHeight = maxOf(28.dp, with(LocalDensity.current) { nowText.size.height.toDp() } + 12.dp)
     val description = stringResource(R.string.history_timeline)
     val intervalDescriptions =
         spans.map { span ->
@@ -112,48 +124,79 @@ internal fun HistoryDayTimeline(
             style = MaterialTheme.typography.labelLarge,
             color = colors.onSurfaceVariant,
         )
-        Canvas(Modifier.fillMaxWidth().height(28.dp)) {
+        Canvas(Modifier.fillMaxWidth().height(barHeight + if (isToday) labelSpace else 0.dp)) {
+            val top = if (isToday) labelSpace.toPx() else 3.dp.toPx()
+            val bottom = size.height - 3.dp.toPx()
             spans.forEach { span ->
                 val left = size.width * (span.start - start).toFloat() / (end - start)
                 val width = size.width * (span.end - span.start).toFloat() / (end - start)
-                val top = 3.dp.toPx()
-                drawRect(
+                clipRect(left, top, left + width, bottom) {
                     when (span.state) {
-                        HistoryTimeState.IN -> colors.primary
-                        HistoryTimeState.OUT -> colors.onSurfaceVariant
-                        else -> colors.surface
-                    },
-                    Offset(left, top),
-                    Size(width, size.height - 2 * top),
-                )
-                if (
-                    span.state == HistoryTimeState.OUT || span.state == HistoryTimeState.UNTRACKED
-                ) {
-                    var x = left + 3.dp.toPx()
-                    while (x < left + width) {
-                        if (span.state == HistoryTimeState.OUT)
-                            drawLine(
-                                colors.surface,
-                                Offset(x, top),
-                                Offset(x, size.height - top),
-                                1.dp.toPx(),
+                        HistoryTimeState.IN ->
+                            drawRect(colors.primary, Offset(left, top), Size(width, bottom - top))
+                        HistoryTimeState.OUT -> {
+                            drawRect(
+                                colors.surfaceContainerHigh,
+                                Offset(left, top),
+                                Size(width, bottom - top),
                             )
-                        else
-                            drawCircle(
+                            val stroke = minOf(1.5.dp.toPx(), width)
+                            drawRect(
                                 colors.onSurfaceVariant,
-                                1.dp.toPx(),
-                                Offset(x, size.height / 2),
+                                Offset(left + stroke / 2, top + stroke / 2),
+                                Size((width - stroke).coerceAtLeast(0f), bottom - top - stroke),
+                                style = Stroke(stroke),
                             )
-                        x += 6.dp.toPx()
+                        }
+                        HistoryTimeState.UNTRACKED -> {
+                            drawRect(colors.surface, Offset(left, top), Size(width, bottom - top))
+                            var x = left + 3.dp.toPx()
+                            while (x < left + width) {
+                                drawCircle(
+                                    colors.onSurfaceVariant,
+                                    1.dp.toPx(),
+                                    Offset(x, (top + bottom) / 2),
+                                )
+                                x += 6.dp.toPx()
+                            }
+                            drawRect(
+                                colors.outline,
+                                Offset(left, top),
+                                Size(width, bottom - top),
+                                style = Stroke(1.dp.toPx()),
+                            )
+                        }
+                        HistoryTimeState.FUTURE -> {
+                            drawLine(
+                                colors.outline,
+                                Offset(left, (top + bottom) / 2),
+                                Offset(left + width, (top + bottom) / 2),
+                                1.dp.toPx(),
+                            )
+                        }
                     }
                 }
             }
-            drawRect(
-                colors.outline,
-                Offset(0f, 3.dp.toPx()),
-                Size(size.width, size.height - 6.dp.toPx()),
-                style = Stroke(1.dp.toPx()),
-            )
+            if (isToday) {
+                val x = size.width * (now.toEpochMilli() - start).toFloat() / (end - start)
+                drawText(
+                    nowText,
+                    topLeft =
+                        Offset(
+                            (x - nowText.size.width / 2).coerceIn(
+                                0f,
+                                (size.width - nowText.size.width).coerceAtLeast(0f),
+                            ),
+                            0f,
+                        ),
+                )
+                drawLine(
+                    colors.onSurface,
+                    Offset(x, nowText.size.height + 2.dp.toPx()),
+                    Offset(x, bottom),
+                    1.dp.toPx(),
+                )
+            }
         }
         BoxWithConstraints {
             val hours =

@@ -74,22 +74,10 @@ internal fun BreakdownBar(
                 val color =
                     when (index) {
                         0 -> colors.primary
-                        1 -> colors.onSurfaceVariant
+                        1 -> colors.surfaceContainerHigh
                         else -> colors.surface
                     }
                 drawRect(color, Offset(left, 3.dp.toPx()), Size(width, size.height - 6.dp.toPx()))
-                if (index == 1) {
-                    var x = left + 3.dp.toPx()
-                    while (x < left + width) {
-                        drawLine(
-                            colors.surface,
-                            Offset(x, 4.dp.toPx()),
-                            Offset(x, size.height - 4.dp.toPx()),
-                            1.dp.toPx(),
-                        )
-                        x += 6.dp.toPx()
-                    }
-                }
                 if (index == 2) {
                     var x = left + 3.dp.toPx()
                     while (x < left + width) {
@@ -98,7 +86,7 @@ internal fun BreakdownBar(
                     }
                 }
                 drawRect(
-                    colors.outline,
+                    if (index == 1) colors.onSurfaceVariant else colors.outline,
                     Offset(left, 3.dp.toPx()),
                     Size(width, size.height - 6.dp.toPx()),
                     style = Stroke(1.dp.toPx()),

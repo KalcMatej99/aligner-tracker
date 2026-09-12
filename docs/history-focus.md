@@ -111,3 +111,9 @@ Spotless, debug/release lint and all required APK builds.
 The owner approved the result and authorized merge and deployment. These changes
 are now included in private update 10; see [release evidence](release.md). Earlier
 preparation-only statements above describe the state before that authorization.
+
+## Continuous OUT intervals — #68
+
+The [OUT timeline refinement](out-timeline.md) supersedes the striped OUT rendering
+and abbreviated legend above after a tester interpreted stripes as individual
+state changes. Temporal projection and accounting remain unchanged.
