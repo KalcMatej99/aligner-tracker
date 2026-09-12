@@ -1,7 +1,7 @@
 # Google Play listing draft — English (United States)
 
 Application: `org.alignertracker.app`; phone only for the initial closed test.
-Version: 1.1.0, versionCode 13 (privacy/health information added after private code 12).
+Version: 1.1.1, versionCode 14 (store image format correction; app behavior unchanged).
 
 ## App name
 
@@ -48,7 +48,10 @@ Initial Google Play closed-test candidate. Includes the accepted visual tracking
 
 ## Assets
 
-`assets/icon.png`: 512 × 512. `assets/feature.png`: 1024 × 500, opaque.
+`assets/icon.png`: 512 × 512, 32-bit RGBA PNG (opaque alpha channel).
+`assets/feature.png`: 1024 × 500, 24-bit RGB PNG without alpha.
+Phone screenshots: 1080 × 2160, 24-bit RGB PNG without alpha.
+The matching exports under `fastlane/metadata/android/en-US/images/` are identical.
 Original SVG sources are retained beside the PNG exports. The mark reuses this project's original `ic_tracker.xml` geometry; feature artwork and layout authored for Aligner Tracker by OpenAI Codex at the owner's request. No competitor assets, stock illustrations or new runtime dependencies.
 
 Phone screenshots are actual emulator captures with synthetic example records, made at 1080 × 2160 for the listing. They do not establish human comprehension, medical outcomes or physical-device acceptance. No mock reviews, awards, ratings or clinical claims.

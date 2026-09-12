@@ -1,0 +1,86 @@
+[
+  {
+    "path": "docs/google-play/assets/feature.png",
+    "mirror": "fastlane/metadata/android/en-US/images/featureGraphic.png",
+    "dimensions": [
+      1024,
+      500
+    ],
+    "mode": "RGB",
+    "bit_depth": 8,
+    "png_color_type": 2,
+    "pixels_unchanged": true,
+    "mirror_identical": true,
+    "sha256": "31ffec63ecc1201e3f11483437998929735553e5d23717d5f92374eccc2637b7"
+  },
+  {
+    "path": "docs/google-play/assets/icon.png",
+    "mirror": "fastlane/metadata/android/en-US/images/icon.png",
+    "dimensions": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "bit_depth": 8,
+    "png_color_type": 6,
+    "pixels_unchanged": true,
+    "mirror_identical": true,
+    "sha256": "f759d9ad8c0d58a31f920201bb7962dd045dd40789e20f9351671f4a59035c4b"
+  },
+  {
+    "path": "docs/google-play/assets/phone/01-today.png",
+    "mirror": "fastlane/metadata/android/en-US/images/phoneScreenshots/01-today.png",
+    "dimensions": [
+      1080,
+      2160
+    ],
+    "mode": "RGB",
+    "bit_depth": 8,
+    "png_color_type": 2,
+    "pixels_unchanged": true,
+    "mirror_identical": true,
+    "sha256": "0582b3e964f50796c0d78091cd07884129d23557008da95eb9b7e18358a134f0"
+  },
+  {
+    "path": "docs/google-play/assets/phone/02-history.png",
+    "mirror": "fastlane/metadata/android/en-US/images/phoneScreenshots/02-history.png",
+    "dimensions": [
+      1080,
+      2160
+    ],
+    "mode": "RGB",
+    "bit_depth": 8,
+    "png_color_type": 2,
+    "pixels_unchanged": true,
+    "mirror_identical": true,
+    "sha256": "a341548746cf087ace2a4c4a3a9eb1e56cb0111e70c9b63dd7e12150fee6fe41"
+  },
+  {
+    "path": "docs/google-play/assets/phone/03-schedule.png",
+    "mirror": "fastlane/metadata/android/en-US/images/phoneScreenshots/03-schedule.png",
+    "dimensions": [
+      1080,
+      2160
+    ],
+    "mode": "RGB",
+    "bit_depth": 8,
+    "png_color_type": 2,
+    "pixels_unchanged": true,
+    "mirror_identical": true,
+    "sha256": "fcc301a3fbce545dc3c7eb9e6753cb19181552ef88addd1dfc2270e7e84b403e"
+  },
+  {
+    "path": "docs/google-play/assets/phone/04-progress.png",
+    "mirror": "fastlane/metadata/android/en-US/images/phoneScreenshots/04-progress.png",
+    "dimensions": [
+      1080,
+      2160
+    ],
+    "mode": "RGB",
+    "bit_depth": 8,
+    "png_color_type": 2,
+    "pixels_unchanged": true,
+    "mirror_identical": true,
+    "sha256": "8c1f3592337a0ab2dca85cbfc4877bb1edd3d1c72c4368ecceec5226d322d247"
+  }
+]
