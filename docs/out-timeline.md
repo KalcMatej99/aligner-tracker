@@ -3,8 +3,8 @@
 The owner and a tester read the repeated white stripes in gray OUT spans as separate
 removal/insertion events. The timeline now gives each recorded OUT interval one
 continuous light neutral fill with a contrasting outline. Its exact start, end and
-width are unchanged. An `Out` label is drawn only when its measured text plus padding
-fits; narrow intervals are never widened to fit a label. Solid IN and outlined OUT
+width are unchanged. Following owner review, no text is drawn inside OUT blocks; the explicit
+legend identifies them. Narrow intervals are never widened. Solid IN and outlined OUT
 remain distinguishable without recognizing the blue hue.
 
 Elapsed untracked intervals retain their dots. Future time uses an unfilled thin
@@ -14,7 +14,7 @@ label stays inside the viewport, including near midnight. Axis labels retain the
 24-hour chronological left-to-right placement in RTL and on DST days.
 
 The legend uses `Aligners in`, `Aligners out`, `Not tracked` and `Future`, and wraps
-at narrow widths or large font sizes. Timeline height accommodates scaled labels.
+at narrow widths or large font sizes. Timeline height accommodates the scaled Now label.
 Existing exact state/start/end screen-reader descriptions are preserved. The shared
 totals-only breakdown also drops OUT stripes and updates its explanatory text;
 its totals semantics and the Progress screen's unrelated partial-day pattern remain
@@ -26,8 +26,8 @@ Design basis:
 - [Datawrapper direct labels](https://www.datawrapper.de/blog/text-in-data-visualizations):
   place explanations close to their chart elements without forcing labels to fit.
 
-OUT outline/fill contrast: light 5.62:1, dark 7.31:1. OUT text/fill contrast:
-light 13.78:1, dark 11.08:1. These checks support legibility, not comprehension.
+OUT outline/fill contrast: light 5.62:1, dark 7.31:1. These checks support
+legibility, not comprehension.
 
 `OutTimelineCaptureTest` renders the actual Today and History screen composables
 with synthetic September 12 records: OUT 07:30–08:15, 12:00–14:00 and 18:15–19:15;
@@ -50,7 +50,7 @@ until that feedback arrives. This task does not publish a new release.
   passed. [Build/test evidence](evidence/out-timeline/).
 - Visual review covered light/dark, the empty state, 320dp/200% text and RTL:
   no timeline or legend clipping; short OUT blocks keep their actual widths;
-  inline labels are omitted when they would not fit. The narrow-width fixture
+  all OUT blocks are unlabelled inside, regardless of width. The narrow-width fixture
   occupies part of the emulator window; its outside margin is test scaffolding.
 - After shortening the explanation to “Each OUT block is one continuous break,”
   the capture matrix and History regression are rechecked and screenshots refreshed.
@@ -61,3 +61,10 @@ Screenshots: [History](screenshots/out-timeline/history-light.png),
 [large RTL](screenshots/out-timeline/history-large-rtl-legend.png),
 [large Today](screenshots/out-timeline/today-large-legend.png),
 [empty](screenshots/out-timeline/history-empty.png).
+
+## Owner preview follow-up
+
+Removed the inline `Out` text at the owner's request, retaining the Now marker,
+legend, block geometry and accessible interval descriptions. Debug and test APK
+builds, formatting and debug lint passed; the six-case capture matrix passed again.
+Screenshots above show the final unlabelled OUT blocks.

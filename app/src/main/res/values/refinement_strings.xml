@@ -33,7 +33,6 @@
     <string name="history_legend_unknown">Not tracked</string>
     <string name="history_legend_future">Future</string>
     <string name="history_bar_note">Each OUT block is one continuous break.</string>
-    <string name="timeline_out">Out</string>
     <string name="timeline_now">Now</string>
     <string name="history_timeline">Day timeline · 24-hour clock</string>
     <string name="history_axis_hour" translatable="false">%1$02d:00</string>

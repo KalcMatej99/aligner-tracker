@@ -95,11 +95,6 @@ internal fun HistoryDayTimeline(
         listOf(R.string.state_in, R.string.state_out, R.string.untracked, R.string.future_time)
             .map { stringResource(it) }
     val textMeasurer = rememberTextMeasurer()
-    val outText =
-        textMeasurer.measure(
-            stringResource(R.string.timeline_out),
-            MaterialTheme.typography.labelSmall.copy(color = colors.onSurface),
-        )
     val nowText =
         textMeasurer.measure(
             stringResource(R.string.timeline_now),
@@ -107,7 +102,7 @@ internal fun HistoryDayTimeline(
         )
     val isToday = date == now.atZone(zone).toLocalDate()
     val labelSpace = with(LocalDensity.current) { nowText.size.height.toDp() } + 6.dp
-    val barHeight = maxOf(28.dp, with(LocalDensity.current) { outText.size.height.toDp() } + 12.dp)
+    val barHeight = maxOf(28.dp, with(LocalDensity.current) { nowText.size.height.toDp() } + 12.dp)
     val description = stringResource(R.string.history_timeline)
     val intervalDescriptions =
         spans.map { span ->
@@ -152,16 +147,6 @@ internal fun HistoryDayTimeline(
                                 Size((width - stroke).coerceAtLeast(0f), bottom - top - stroke),
                                 style = Stroke(stroke),
                             )
-                            if (width >= outText.size.width + 8.dp.toPx()) {
-                                drawText(
-                                    outText,
-                                    topLeft =
-                                        Offset(
-                                            left + (width - outText.size.width) / 2,
-                                            top + (bottom - top - outText.size.height) / 2,
-                                        ),
-                                )
-                            }
                         }
                         HistoryTimeState.UNTRACKED -> {
                             drawRect(colors.surface, Offset(left, top), Size(width, bottom - top))
