@@ -1,0 +1,8 @@
+
+org.alignertracker.app.ui.OutTimelineCaptureTest:.
+
+Time: 6.35
+
+OK (1 test)
+
+

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.2 / code15 — 2026-09-12
+
+- Show OUT intervals as continuous outlined blocks on Today and History, without inline text (#68).
+- Add a labelled Now marker and clearer legend; preserve exact interval times and stored records.
+
+## 1.1.1 / code14 — 2026-09-12
+
+- Correct Google Play icon and screenshot PNG formats, preserving artwork and pixels (#66).
+- Increment phone and Wear version metadata; tracking behavior and stored data are unchanged.
+
 ## Private development update 8
 
 - Today shows original fitted/separated aligner status illustrations with distinct accessible status and labelled opposite actions (#40).

@@ -14,4 +14,4 @@ Free and open source, with no account, advertising or analytics. The phone app w
 
 Aligner Tracker is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Consult your dental or other healthcare professional for medical advice, diagnosis or treatment. Follow their instructions for wear time, tray changes and completion. Schedule dates are estimates; photos are for personal comparison without diagnostic analysis.
 
-Optional watch communication requires a compatible Wear service and paired-device stack. The phone tracker works without Google Play services. Wear companion distribution is not part of this F-Droid submission.
+Source code and license: https://matejkalc.com/aligner-tracker/source/1.1.0-13.tar.gz

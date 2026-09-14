@@ -1,0 +1,37 @@
+default_platform(:android)
+
+# Paths are environment-specific; override via env vars rather than editing this file.
+PLAY_JSON_KEY = ENV.fetch("PLAY_JSON_KEY", File.expand_path("~/.config/aligner-tracker/play/service-account.json"))
+RELEASES_DIR  = ENV.fetch("ALIGNER_RELEASES_DIR", File.expand_path("~/.local/share/aligner-tracker/releases"))
+
+# Upload a signed AAB to a Google Play track (default: internal testing).
+# Reads listing + changelog (changelogs/<version_code>.txt) from ./fastlane/metadata.
+#
+# Usage:
+#   fastlane play_upload version:1.1.2-15
+#   fastlane play_upload aab:/path/to/app.aab track:internal
+#
+# Env overrides:
+#   PLAY_JSON_KEY, ALIGNER_RELEASES_DIR  - see above
+#   SKIP_AAB=1                           - apply metadata only, for an already-uploaded build
+#   VERSION_CODE=15                       - required with SKIP_AAB, since the versionCode
+#                                           can no longer be read out of the bundle
+lane :play_upload do |options|
+  version = options[:version] || "1.1.2-15"
+  aab = options[:aab] || File.join(RELEASES_DIR, version, "aligner-tracker.aab")
+  UI.user_error!("AAB not found: #{aab}") unless File.exist?(aab)
+
+  supply_params = {
+    json_key: PLAY_JSON_KEY,
+    package_name: "org.alignertracker.app",
+    track: (options[:track] || "internal"),
+    aab: aab,
+    skip_upload_aab: (ENV["SKIP_AAB"] == "1"),
+    # Play appends to multi-slot image types (screenshots), so a plain upload
+    # leaves stale captures in place alongside the new ones. Syncing deletes
+    # any remote image not present locally, keeping Play == fastlane/metadata.
+    sync_image_upload: true
+  }
+  supply_params[:version_code] = ENV["VERSION_CODE"].to_i if ENV["VERSION_CODE"]
+  supply(**supply_params)
+end
