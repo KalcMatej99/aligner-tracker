@@ -15,3 +15,6 @@ artifacts/
 
 /wear/build/
 __pycache__/
+
+# fastlane run reports
+fastlane/report.xml
